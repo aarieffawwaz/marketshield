@@ -59,6 +59,16 @@ Future<void> main() async {
     systemNavigationBarColor: C.bg,
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
+  // Bundled fonts load asynchronously; on web, chips and segmented buttons measured before they arrive
+  // keep clipped labels ("Hoaks Terbanta", "Indonesi a"). Wait briefly so the first frame uses the real fonts.
+  final fonts = GoogleFonts.pendingFonts([
+    for (final w in const [FontWeight.w400, FontWeight.w500, FontWeight.w600, FontWeight.w700, FontWeight.w800])
+      GoogleFonts.inter(fontWeight: w),
+    for (final w in const [FontWeight.w600, FontWeight.w700, FontWeight.w800]) GoogleFonts.outfit(fontWeight: w),
+  ]).timeout(const Duration(seconds: 2)).catchError((Object e) {
+    debugPrint('fonts not ready: $e');
+    return const <void>[];
+  });
   // Local storage only (no network); bounded so a slow platform channel can't hold the first frame.
   SharedPreferences? prefs;
   try {
@@ -66,6 +76,7 @@ Future<void> main() async {
   } catch (e) {
     debugPrint('shared_preferences unavailable: $e');
   }
+  await fonts;
   final state = AppState();
   final repo = DataRepo(prefs: prefs);
 
