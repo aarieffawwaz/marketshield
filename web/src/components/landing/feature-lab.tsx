@@ -164,8 +164,10 @@ function NudgeDemo() {
       <FluidTabs label={t("Skenario", "Scenario")} value={on ? "on" : "off"} onChange={(v) => setOn(v === "on")} className="w-fit rounded-full bg-sand-2 p-1" itemClassName="rounded-full px-3 py-1.5 text-[12px] font-medium" options={[{ value: "off", label: t("Semua diberi tahu sekaligus", "Everyone at once") }, { value: "on", label: t("Bertahap per kohort", "Staggered cohorts") }]} />
       <div className="flex h-36 items-end gap-3">
         {vals.map((v, k) => (
-          <div key={k} className="flex flex-1 flex-col items-center gap-1">
-            <motion.div className={cn("w-full rounded-t-lg", v > 60 ? "bg-crimson" : "bg-maroon")} animate={{ height: `${v}%` }} transition={{ type: "spring", stiffness: 160, damping: 20 }} />
+          <div key={k} className="flex h-full flex-1 flex-col items-center gap-1">
+            <div className="flex w-full flex-1 items-end">
+              <motion.div className={cn("w-full rounded-t-lg", v > 60 ? "bg-crimson" : "bg-maroon")} initial={{ height: 0 }} animate={{ height: `${v}%` }} transition={{ type: "spring", stiffness: 160, damping: 20 }} />
+            </div>
             <span className="text-[10.5px] text-muted">{days[k]}</span>
           </div>
         ))}
