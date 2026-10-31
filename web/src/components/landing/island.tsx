@@ -19,6 +19,7 @@ export function ScrollIsland() {
   const { tx } = useT();
   const [current, setCurrent] = useState<number>(-1);
   const [progress, setProgress] = useState(0);
+  const [atFooter, setAtFooter] = useState(false);
   useEffect(() => {
     const on = () => {
       const y = window.scrollY + window.innerHeight * 0.4;
@@ -28,6 +29,8 @@ export function ScrollIsland() {
         if (el && el.offsetTop <= y) idx = i;
       });
       setCurrent(idx);
+      const foot = document.querySelector("footer");
+      setAtFooter(!!foot && foot.getBoundingClientRect().top < window.innerHeight - 80);
       const max = document.documentElement.scrollHeight - window.innerHeight;
       setProgress(max > 0 ? window.scrollY / max : 0);
     };
@@ -39,7 +42,7 @@ export function ScrollIsland() {
   const c = 2 * Math.PI * r;
   return (
     <AnimatePresence>
-      {current >= 0 && SECTIONS[current].id !== "cakupan" && (
+      {current >= 0 && !atFooter && SECTIONS[current].id !== "cakupan" && (
         <motion.div
           initial={{ y: 40, opacity: 0, scale: 0.9 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
