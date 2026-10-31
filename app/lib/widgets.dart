@@ -8,7 +8,35 @@ import 'screens/sector.dart';
 import 'screens/sos.dart';
 import 'theme.dart';
 
-Widget logo([double s = 34]) => Image.asset('assets/img/logo.png', width: s, height: s);
+Widget logo([double s = 34]) => Image.asset('assets/img/logo.webp', width: s, height: s);
+
+/// Bundled photo decoded at (about) the size it is drawn, fading in once decoded.
+/// Keeps decode time and memory low on phones; images are at most 1080 px wide.
+class AssetPhoto extends StatelessWidget {
+  final String asset;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+  const AssetPhoto(this.asset, {super.key, this.width, this.height, this.fit = BoxFit.cover});
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, c) {
+        final dpr = MediaQuery.devicePixelRatioOf(context);
+        final w = width != null && width!.isFinite ? width! : (c.hasBoundedWidth ? c.maxWidth : 0.0);
+        final h = height != null && height!.isFinite ? height! : (c.hasBoundedHeight ? c.maxHeight : 0.0);
+        // BoxFit.cover crops; decode wide enough for boxes up to 2:1 taller than the image.
+        final target = math.max(w, h * 2) * dpr;
+        return Image(
+          image: ResizeImage.resizeIfNeeded(target > 0 ? target.round() : null, null, AssetImage(asset)),
+          width: width,
+          height: height,
+          fit: fit,
+          frameBuilder: (_, child, frame, sync) => sync
+              ? child
+              : AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: const Duration(milliseconds: 280), curve: Curves.easeOut, child: child),
+        );
+      });
+}
 
 Widget avatar([double s = 36]) => Container(
       width: s,
@@ -17,7 +45,7 @@ Widget avatar([double s = 36]) => Container(
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
         boxShadow: shadow1,
-        image: const DecorationImage(image: AssetImage('assets/img/avatar.jpg'), fit: BoxFit.cover),
+        image: DecorationImage(image: ResizeImage(const AssetImage('assets/img/avatar.webp'), width: (s * 3).round()), fit: BoxFit.cover),
       ),
     );
 

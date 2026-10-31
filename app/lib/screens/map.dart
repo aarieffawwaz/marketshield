@@ -136,7 +136,12 @@ class _MapScreenState extends State<MapScreen> {
                         ]),
                       ),
                     ),
-                    const Positioned(left: mapInset, bottom: attributionHeight + 8, child: SatChip('Sentinel-1 • NOAA-20 VIIRS • GPM')),
+                    // Leaves room for the 3D / Satelit buttons on the right.
+                    const Positioned(
+                        left: mapInset,
+                        right: mapInset + 96,
+                        bottom: attributionHeight + 8,
+                        child: Align(alignment: Alignment.centerLeft, child: SatChip('Sentinel-1 • NOAA-20 VIIRS • GPM'))),
                   ]),
                 ),
               ),
@@ -152,9 +157,9 @@ class _MapScreenState extends State<MapScreen> {
               ),
               const SizedBox(height: 12),
               Row(children: [
-                Expanded(child: _thumb('assets/img/semeru_cctv.jpg', 'CCTV Pos Sawur', () {})),
+                Expanded(child: _thumb('assets/img/semeru_cctv.webp', 'CCTV Pos Sawur', () {})),
                 const SizedBox(width: 10),
-                Expanded(child: _thumb('assets/img/sar_lahar.jpg', 'Radar Sentinel-1', () => push(context, const VolcanoScreen()))),
+                Expanded(child: _thumb('assets/img/sar_lahar.webp', 'Radar Sentinel-1', () => push(context, const VolcanoScreen()))),
               ]),
               const SizedBox(height: 14),
               MsCard(
@@ -199,7 +204,7 @@ class _MapScreenState extends State<MapScreen> {
           child: SizedBox(
             height: 110,
             child: Stack(fit: StackFit.expand, children: [
-              Image.asset(img, fit: BoxFit.cover),
+              AssetPhoto(img),
               const DecoratedBox(
                 decoration: BoxDecoration(
                     gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black54])),
@@ -231,7 +236,7 @@ class VolcanoScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 210,
                   child: Stack(fit: StackFit.expand, children: [
-                    Image.asset('assets/img/mahameru.jpg', fit: BoxFit.cover),
+                    const AssetPhoto('assets/img/mahameru.webp'),
                     const DecoratedBox(
                       decoration: BoxDecoration(
                           gradient: LinearGradient(

@@ -105,7 +105,7 @@ class _PhotoCard extends StatelessWidget {
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: Image.asset(p.asset, width: 64, height: 64, fit: BoxFit.cover),
+          child: AssetPhoto(p.asset, width: 64, height: 64),
         ),
         const SizedBox(width: 12),
         Expanded(

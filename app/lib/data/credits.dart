@@ -1,13 +1,13 @@
 // Attribution data for the Profil → "Sumber data & kredit foto" page.
 
 class PhotoCredit {
-  final String file; // basename in assets/img (without .jpg)
+  final String file; // basename in assets/img (without .webp)
   final String title;
   final String author;
   final String license;
   final String source;
   const PhotoCredit(this.file, this.title, this.author, this.license, this.source);
-  String get asset => 'assets/img/$file.jpg';
+  String get asset => 'assets/img/$file.webp';
 }
 
 /// Photos bundled in assets/img. Mirrors web/src/lib/photo-credits.json (all eight files ship in the app).
