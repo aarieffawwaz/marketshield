@@ -12,7 +12,7 @@ import { Logo, Mark } from "@/components/ui/brand";
 import { LangToggle, ThemeToggle } from "@/components/ui/lang-toggle";
 import { FluidTabs } from "@/components/ui/interactions";
 import { LEVELS, VOLCANO, type Level } from "@/lib/data";
-import { useAlerts } from "@/lib/live";
+import { useAlerts, useDataMode, useOfficialLevel } from "@/lib/live";
 import { PEOPLE, useApp, useT, type Role } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LevelChip } from "./ui";
@@ -121,7 +121,7 @@ export function Console() {
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="lg:hidden"><Mark /></Link>
             <div className="min-w-0">
-              <p className="hidden items-center gap-2 text-[11.5px] text-muted sm:flex">{session.org} · {VOLCANO.name} {session.uid ? <span className="inline-flex items-center gap-1 rounded-full bg-leaf/12 px-1.5 py-px text-[10.5px] font-medium text-leaf"><span className="h-1.5 w-1.5 rounded-full bg-current" /> Live</span> : <span className="rounded-full bg-sand px-1.5 py-px text-[10.5px] font-medium text-muted">{t("Mode demo", "Demo mode")}</span>}</p>
+              <p className="hidden items-center gap-2 text-[11.5px] text-muted sm:flex">{session.org} · {VOLCANO.name} <ModeBadge /></p>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.h1 key={current} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} transition={{ duration: 0.18 }} className="truncate font-display text-[17px] font-semibold text-wine">{label}</motion.h1>
               </AnimatePresence>
@@ -497,5 +497,28 @@ function CommandPalette({ items, go, close }: { items: { key: Tab; icon: typeof 
         </ul>
       </motion.div>
     </motion.div>
+  );
+}
+
+/** DEMO / LIVE indicator; live mode also starts from the official PVMBG level once */
+function ModeBadge() {
+  const { t } = useT();
+  const mode = useDataMode();
+  const operator = useApp((s) => !!s.session?.uid);
+  const official = useOfficialLevel();
+  const setLevel = useApp((s) => s.setLevel);
+  const synced = useRef(false);
+  useEffect(() => {
+    if (official && !synced.current) {
+      synced.current = true;
+      setLevel(official);
+    }
+  }, [official, setLevel]);
+  if (mode === "demo") return <span className="rounded-full bg-ember/15 px-1.5 py-px text-[10.5px] font-semibold uppercase tracking-wide text-[#b4500f]" title={t("Data contoh, tidak tersimpan", "Sample data, nothing is saved")}>Demo</span>;
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-leaf/12 px-1.5 py-px text-[10.5px] font-semibold uppercase tracking-wide text-leaf" title={operator ? t("Operator: perubahan tersimpan", "Operator: changes are saved") : t("Hanya lihat", "View only")}>
+      <span className="relative flex h-1.5 w-1.5"><span className="absolute inset-0 animate-ping rounded-full bg-current opacity-60" /><span className="relative h-1.5 w-1.5 rounded-full bg-current" /></span>
+      Live{operator ? "" : ` · ${t("lihat", "view")}`}
+    </span>
   );
 }

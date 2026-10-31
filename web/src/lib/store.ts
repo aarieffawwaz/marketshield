@@ -7,8 +7,12 @@ import type { Bi, Level } from "./data";
 type Lang = "id" | "en";
 
 export type Role = "bpbd" | "posko" | "donor";
-/** `uid` is set for real Firebase operators; demo sessions have none and never write to the database. */
-export type Session = { name: string; initials: string; role: Role; title: Bi; org: string; email: string; uid?: string; admin?: boolean };
+/**
+ * `uid` is set for real Firebase operators. `mode` picks the data source: "demo" = bundled scenario data,
+ * "live" = Firestore in realtime (read-only unless signed in as an operator).
+ */
+export type DataMode = "demo" | "live";
+export type Session = { name: string; initials: string; role: Role; title: Bi; org: string; email: string; uid?: string; admin?: boolean; mode?: DataMode };
 
 export const PEOPLE: Record<Role, Session> = {
   bpbd: { name: "Rizky Wardhana", initials: "RW", role: "bpbd", title: { id: "Operator Pusdalops", en: "Operations officer" }, org: "BPBD Kab. Lumajang", email: "rizky.w@bpbd-lumajang.go.id" },

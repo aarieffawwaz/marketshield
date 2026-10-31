@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { Area, AreaChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AlertTriangle, ArrowDownRight, ArrowRight, ArrowUpRight, Box, CheckCircle2, ChevronDown, Flag, Map as MapIcon, Megaphone, Minus, PackageCheck, Radio, Satellite, Search, Truck, Users } from "lucide-react";
 import { DRIVERS, LEVELS, VILLAGES, VERDICTS, type Posko, deviation, indicators, priceHistory, priority, riskSeries, rupiah, type Alert, type Level, type Verdict } from "@/lib/data";
-import { broadcastAlert, setPoskoStatus, useAlerts, useForecast, useIntel, usePosko, usePrices, useVillages } from "@/lib/live";
+import { broadcastAlert, setPoskoStatus, useDataMode, useAlerts, useForecast, useIntel, usePosko, usePrices, useVillages } from "@/lib/live";
 import { useApp, useT, type Role } from "@/lib/store";
 import { classify, type Check } from "@/lib/classify";
 import { Rolling, Stagger, staggerItem } from "@/components/ui/rolling";
@@ -519,6 +519,7 @@ export function PoskoPanel({ toast }: { toast: (m: string) => void }) {
   const { t, tx } = useT();
   const live = usePosko();
   const session = useApp((s) => s.session);
+  const mode = useDataMode();
   const [local, setLocal] = useState<Record<string, Posko["status"]>>({});
   const posts = live.data.map((p) => (local[p.id] ? { ...p, status: local[p.id], updated: { id: "baru saja", en: "just now" } } : p));
   const opts = [
@@ -540,6 +541,10 @@ export function PoskoPanel({ toast }: { toast: (m: string) => void }) {
                 value={p.status}
                 options={opts}
                 onChange={(st) => {
+                  if (!session?.uid && mode === "live") {
+                    toast(t("Mode live hanya-lihat. Masuk dengan akun operator untuk mengubah status.", "Live mode is view-only. Sign in as an operator to change status."));
+                    return;
+                  }
                   if (!session?.uid) {
                     setLocal((m) => ({ ...m, [p.id]: st }));
                     toast(t(`Mode demo: status ${p.name} hanya berubah di layar Anda.`, `Demo mode: ${p.name} status changed on your screen only.`));
@@ -605,6 +610,8 @@ export function AlertsPanel() {
   const level = useApp((s) => s.level);
   const live = useAlerts();
   const session = useApp((s) => s.session);
+  const mode = useDataMode();
+  const viewOnly = !session?.uid && mode === "live";
   const [demo, setDemo] = useState<Alert[]>([]);
   const items = [...demo, ...live.data];
   const [msg, setMsg] = useState("");
@@ -614,6 +621,7 @@ export function AlertsPanel() {
     const now = new Date();
     const hh = `${String(now.getHours()).padStart(2, "0")}.${String(now.getMinutes()).padStart(2, "0")}`;
     const text = `${area}: ${msg}`;
+    if (viewOnly) return;
     if (session?.uid) broadcastAlert(text).catch(() => setDemo((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: text, en: text } }, ...x]));
     else setDemo((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: text, en: text } }, ...x]);
     setMsg("");
@@ -634,7 +642,7 @@ export function AlertsPanel() {
         <textarea value={msg} onChange={(e) => setMsg(e.target.value)} rows={4} placeholder={t("Contoh: Jalur Curah Kobokan ditutup, gunakan koridor AB.", "e.g. The Curah Kobokan road is closed, use corridor AB.")} className="mt-1 w-full resize-none rounded-xl border border-line p-3 text-[13px] outline-none focus:border-maroon" />
         <HoldButton
           onConfirm={send}
-          disabled={!msg.trim()}
+          disabled={!msg.trim() || viewOnly}
           className="mt-3 w-full"
           icon={<Megaphone className="h-4 w-4" />}
           label={t("Tahan untuk menyiarkan", "Hold to broadcast")}
@@ -642,6 +650,7 @@ export function AlertsPanel() {
           doneLabel={t("Siaran terkirim", "Broadcast sent")}
         />
         <p className="mt-3 text-[11.5px] text-muted">{tx({ id: "Siaran dijadwalkan bertahap per kohort agar tidak memicu panic buying.", en: "Broadcasts are staggered by cohort to avoid panic buying." })}</p>
+        {viewOnly && <p className="mt-2 rounded-lg bg-sand px-3 py-2 text-[11.5px] text-muted">{t("Mode live hanya-lihat. Masuk dengan akun operator BPBD untuk menyiarkan.", "Live mode is view-only. Sign in as a BPBD operator to broadcast.")}</p>}
       </Card>
     </div>
   );

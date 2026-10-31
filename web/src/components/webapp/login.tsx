@@ -8,7 +8,7 @@ import { motion } from "motion/react";
 import { ArrowLeft, ArrowRight, Building2, HandHeart, KeyRound, Loader2, Tent } from "lucide-react";
 import { Logo } from "@/components/ui/brand";
 import { LangToggle, ThemeToggle } from "@/components/ui/lang-toggle";
-import { PEOPLE, useApp, useT, type Role } from "@/lib/store";
+import { PEOPLE, useApp, useT, type DataMode, type Role } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export function LoginScreen() {
@@ -19,11 +19,12 @@ export function LoginScreen() {
   const [pw, setPw] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState("");
+  const [mode, setMode] = useState<DataMode>("demo");
 
   const enter = (role: Role, key: string) => {
     setBusy(key);
     window.setTimeout(() => {
-      signIn(PEOPLE[role]);
+      signIn({ ...PEOPLE[role], mode });
       router.replace(role === "donor" ? "/app?tab=aid" : role === "posko" ? "/app?tab=posko" : "/app");
     }, 650);
   };
@@ -106,7 +107,20 @@ export function LoginScreen() {
             </button>
           </form>
 
-          <div className="my-7 flex items-center gap-3 text-[12px] text-muted"><span className="h-px flex-1 bg-line" />{t("atau coba mode demo sebagai", "or try demo mode as")}<span className="h-px flex-1 bg-line" /></div>
+          <div className="my-7 flex items-center gap-3 text-[12px] text-muted"><span className="h-px flex-1 bg-line" />{t("atau masuk cepat tanpa akun", "or jump in without an account")}<span className="h-px flex-1 bg-line" /></div>
+          <div className="mb-3 grid grid-cols-2 gap-1 rounded-2xl bg-sand-2 p-1" role="radiogroup" aria-label={t("Sumber data", "Data source")}>
+            {([
+              ["demo", t("Data contoh", "Sample data"), t("Konsep & skenario, bebas dicoba", "Concept & scenarios, try anything")],
+              ["live", t("Data live", "Live data"), t("Database asli, hanya lihat", "Real database, view only")],
+            ] as const).map(([m, h, sub]) => (
+              <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)} className={cn("rounded-xl px-3 py-2.5 text-left transition", mode === m ? "bg-surface shadow-sm ring-1 ring-line" : "hover:bg-surface/60")}>
+                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-wine">
+                  <span className={cn("h-2 w-2 rounded-full", m === "live" ? "bg-leaf" : "bg-ember")} /> {h}
+                </span>
+                <span className="mt-0.5 block text-[11.5px] leading-snug text-muted">{sub}</span>
+              </button>
+            ))}
+          </div>
           <div className="space-y-2">
             {roles.map((r) => {
               const p = PEOPLE[r.role];
@@ -123,7 +137,7 @@ export function LoginScreen() {
               );
             })}
           </div>
-          <p className="mt-3 flex items-start gap-1.5 text-[12px] text-muted"><KeyRound className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {t("Mode demo memakai data asli, tapi perubahan Anda tidak disimpan ke database.", "Demo mode shows real data, but your changes are not saved to the database.")}</p>
+          <p className="mt-3 flex items-start gap-1.5 text-[12px] text-muted"><KeyRound className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {mode === "demo" ? t("Data contoh: skenario Semeru siap pakai, level bisa diubah, tidak ada yang disimpan.", "Sample data: a ready Semeru scenario, change levels freely, nothing is saved.") : t("Data live: langsung dari Firestore secara realtime. Untuk mengubah data, masuk dengan akun operator di atas.", "Live data: straight from Firestore in realtime. To change data, sign in with an operator account above.")}</p>
           <p className="mt-8 text-center text-[12px] text-muted">{t("Dengan masuk, Anda menyetujui", "By signing in you agree to the")} <Link href="/syarat" className="underline">{t("Syarat", "Terms")}</Link> {t("dan", "and")} <Link href="/privasi" className="underline">{t("Kebijakan Privasi", "Privacy Policy")}</Link>.</p>
         </motion.div>
       </main>

@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { addDoc, collection, doc, getFirestore, limit, onSnapshot, orderBy, query, serverTimestamp, Timestamp, updateDoc, where, type DocumentData, type QueryConstraint } from "firebase/firestore";
 import { firebaseConfig } from "./firebase-config";
-import { ALERTS, FEED, ITEMS, POSKO, VILLAGES, type Alert, type Bi, type Intel, type Item, type Posko, type Verdict, type Village } from "./data";
+import { ALERTS, FEED, ITEMS, POSKO, VILLAGES, type Alert, type Bi, type Intel, type Item, type Level, type Posko, type Verdict, type Village } from "./data";
+import { useApp } from "./store";
+
+/** Current data mode; operators are always live */
+export const useDataMode = () => useApp((s) => (s.session?.uid ? "live" : (s.session?.mode ?? "demo")));
 
 /** Realtime Firestore reads for the console, with the bundled data as the offline/initial state. */
 
@@ -23,7 +27,9 @@ const bi = (v: unknown, fb: Bi = { id: "", en: "" }): Bi => (v && typeof v === "
 
 function useCollection<T>(name: string, initial: T[], map: (id: string, d: DocumentData) => T | null, constraints: QueryConstraint[] = [], key = ""): Live<T> {
   const [state, setState] = useState<Live<T>>({ data: initial, live: false, updatedAt: null });
+  const mode = useDataMode();
   useEffect(() => {
+    if (mode === "demo") return;
     let unsub = () => {};
     try {
       unsub = onSnapshot(
@@ -37,8 +43,8 @@ function useCollection<T>(name: string, initial: T[], map: (id: string, d: Docum
     return () => unsub();
     // constraints are rebuilt each render; `key` captures their identity
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, key]);
-  return state;
+  }, [name, key, mode]);
+  return mode === "demo" ? { data: initial, live: false, updatedAt: null } : state;
 }
 
 export type LiveVillage = Village & { id: string };
@@ -102,7 +108,9 @@ export type Forecast = { p: number; windowDays: number | null; drivers: string[]
 /** Model forecast written by the ML notebook to volcanoes/{id}.forecast */
 export function useForecast(volcano = "semeru"): Forecast {
   const [f, setF] = useState<Forecast>(null);
+  const mode = useDataMode();
   useEffect(() => {
+    if (mode === "demo") return;
     try {
       return onSnapshot(doc(firestore(), "volcanoes", volcano), (s) => {
         const fc = s.data()?.forecast;
@@ -112,8 +120,26 @@ export function useForecast(volcano = "semeru"): Forecast {
     } catch {
       return undefined;
     }
-  }, [volcano]);
-  return f;
+  }, [volcano, mode]);
+  return mode === "demo" ? null : f;
+}
+
+/** Official PVMBG level stored on volcanoes/{id}.level (live mode only) */
+export function useOfficialLevel(volcano = "semeru"): Level | null {
+  const [lv, setLv] = useState<Level | null>(null);
+  const mode = useDataMode();
+  useEffect(() => {
+    if (mode === "demo") return;
+    try {
+      return onSnapshot(doc(firestore(), "volcanoes", volcano), (s) => {
+        const n = Number(s.data()?.level);
+        setLv(n >= 1 && n <= 4 ? (n as Level) : null);
+      });
+    } catch {
+      return undefined;
+    }
+  }, [volcano, mode]);
+  return mode === "demo" ? null : lv;
 }
 
 /* ---------- writes (signed-in operators; enforced by Firestore rules) ---------- */
