@@ -96,7 +96,10 @@ export function StoreHydrator() {
     try {
       const raw = read("ms-session");
       const parsed = raw ? (JSON.parse(raw) as Session) : null;
-      if (parsed && parsed.role in PEOPLE) session = PEOPLE[parsed.role];
+      // Restore the stored session as-is (mode, operator uid, name). Writes are still enforced by Firebase Auth + Firestore rules.
+      if (parsed && parsed.role in PEOPLE && typeof parsed.name === "string") {
+        session = { ...PEOPLE[parsed.role], ...parsed, mode: parsed.uid ? "live" : parsed.mode === "live" ? "live" : "demo" };
+      }
     } catch {}
     useApp.setState({
       ...(lang === "en" || lang === "id" ? { lang } : {}),
