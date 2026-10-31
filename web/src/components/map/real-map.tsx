@@ -4,7 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Map as MLMap, Marker, StyleSpecification } from "maplibre-gl";
-import { Clapperboard, Flame, Globe2, Layers, Mountain, Pause, Play, RotateCcw, RotateCw, Satellite, Map as MapIcon, Wind, X } from "lucide-react";
+import { ChevronUp, Clapperboard, Flame, Globe2, Layers, Mountain, Pause, Play, RotateCcw, RotateCw, Satellite, Map as MapIcon, Wind, X } from "lucide-react";
 import { CITIES, EVENTS, PARAMS, SEMERU as SEMERU_LL, aqiBand, channelLngLat, cityImpacts, hasVillages, plumeState, regionalPlume, ringLabelPoint, rings, setOrigin, simulate, type CityImpact, type Scenario } from "./simulation";
 import { createEruptionLayer, type EruptionState } from "./eruption-layer";
 import { VOLCANOES } from "@/lib/geo";
@@ -511,24 +511,28 @@ export function RealMap({ start = "indonesia", className, autoSim }: { start?: "
     setSpin(true);
   };
 
-  const chip = (on: boolean) => cn("rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition", on ? "bg-bone text-night" : "text-bone/70 hover:text-bone");
+  // Phones: icon-only 40px targets with the label kept for screen readers; desktop unchanged
+  const chip = (on: boolean) => cn("rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition max-sm:flex max-sm:h-10 max-sm:min-w-10 max-sm:items-center max-sm:justify-center max-sm:whitespace-nowrap max-sm:px-2", on ? "bg-bone text-night" : "text-bone/70 hover:text-bone");
+  const ico = "inline h-3.5 w-3.5 sm:mr-1 max-sm:h-4 max-sm:w-4";
 
   return (
-    <div className={cn("relative overflow-hidden", sim && "ms-sim", className)}>
+    <div className={cn("ms-map relative overflow-hidden", sim && "ms-sim", className)}>
+      {/* Phones: map controls move under the top bar so they never meet the bottom sheet */}
+      <style>{`@media (max-width:639.98px){.ms-map .maplibregl-ctrl-bottom-right{top:calc(max(12px,env(safe-area-inset-top)) + 56px);bottom:auto}.ms-map .maplibregl-ctrl-bottom-right .maplibregl-ctrl{margin:0 12px 8px 0}.ms-map .maplibregl-ctrl-group button{width:40px;height:40px}}`}</style>
       <div ref={host} className="!absolute inset-0 h-full w-full" />
       <div className={cn("pointer-events-none absolute inset-0 grid place-items-center bg-night transition-opacity duration-700", ready ? "opacity-0" : "opacity-100")} aria-hidden><Globe2 className="h-8 w-8 animate-pulse text-bone/30" /></div>
 
-      <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-wrap items-start justify-between gap-2">
+      <div className="pointer-events-none absolute inset-x-3 top-[max(0.75rem,env(safe-area-inset-top))] flex items-start justify-between gap-2 max-sm:flex-nowrap sm:flex-wrap">
         <div className="pointer-events-auto flex gap-1 rounded-xl bg-night/75 p-1 ring-1 ring-white/10 backdrop-blur-md">
-          <button onClick={() => setBase("sat")} className={chip(base === "sat")}><Satellite className="mr-1 inline h-3.5 w-3.5" />{t("Satelit", "Satellite")}</button>
-          <button onClick={() => setBase("dark")} className={chip(base === "dark")}><MapIcon className="mr-1 inline h-3.5 w-3.5" />{t("Peta", "Map")}</button>
-          <button onClick={() => setTerrain(!terrain)} className={chip(terrain)}><Mountain className="mr-1 inline h-3.5 w-3.5" />3D</button>
+          <button onClick={() => setBase("sat")} className={chip(base === "sat")}><Satellite className={ico} /><span className="max-sm:sr-only">{t("Satelit", "Satellite")}</span></button>
+          <button onClick={() => setBase("dark")} className={chip(base === "dark")}><MapIcon className={ico} /><span className="max-sm:sr-only">{t("Peta", "Map")}</span></button>
+          <button onClick={() => setTerrain(!terrain)} className={chip(terrain)}><Mountain className={ico} /><span className="max-sm:sr-only">3D</span></button>
         </div>
         <div className="pointer-events-auto flex gap-1 rounded-xl bg-night/75 p-1 ring-1 ring-white/10 backdrop-blur-md">
-          <button data-tour="sim" onClick={sim ? stopSim : startSim} className={cn(chip(sim), !sim && "text-[#ffb27a]")}><Flame className="mr-1 inline h-3.5 w-3.5" />{t("Simulasi erupsi", "Eruption sim")}</button>
-          <button onClick={tour} disabled={touring || sim} className={cn(chip(touring), "disabled:opacity-40")}><Clapperboard className="mr-1 inline h-3.5 w-3.5" />{touring ? t("Tur berjalan…", "Touring…") : t("Tur sinematik", "Cinematic tour")}</button>
-          <button onClick={focus ? home : toSemeru} className={chip(false)}>{focus ? <><Globe2 className="mr-1 inline h-3.5 w-3.5" />Indonesia</> : <><Mountain className="mr-1 inline h-3.5 w-3.5" />{t("Terbang ke Semeru", "Fly to Semeru")}</>}</button>
-          <button onClick={() => setSpin(!spin)} className={chip(spin)} aria-label={t("Putar otomatis", "Auto-rotate")}><RotateCw className="h-3.5 w-3.5" /></button>
+          <button data-tour="sim" onClick={sim ? stopSim : startSim} className={cn(chip(sim), !sim && "text-[#ffb27a]")}><Flame className={cn(ico, !sim && "max-sm:mr-1")} /><span className={cn(sim && "max-sm:sr-only")}><span className="sm:hidden">{t("Simulasi", "Simulate")}</span><span className="max-sm:hidden">{t("Simulasi erupsi", "Eruption sim")}</span></span></button>
+          <button onClick={tour} disabled={touring || sim} className={cn(chip(touring), "disabled:opacity-40", sim && "max-sm:hidden")}><Clapperboard className={ico} /><span className="max-sm:sr-only">{touring ? t("Tur berjalan…", "Touring…") : t("Tur sinematik", "Cinematic tour")}</span></button>
+          <button onClick={focus ? home : toSemeru} className={chip(false)}>{focus ? <><Globe2 className={ico} /><span className="max-sm:sr-only">Indonesia</span></> : <><Mountain className={ico} /><span className="max-sm:sr-only">{t("Terbang ke Semeru", "Fly to Semeru")}</span></>}</button>
+          <button onClick={() => setSpin(!spin)} className={cn(chip(spin), "max-sm:hidden")} aria-label={t("Putar otomatis", "Auto-rotate")}><RotateCw className="h-3.5 w-3.5" /></button>
         </div>
       </div>
 
@@ -557,9 +561,9 @@ export function RealMap({ start = "indonesia", className, autoSim }: { start?: "
       <AnimatePresence>{sim && frame && <SimPanel t={simT} setT={(v) => { setPlaying(false); setSimT(v); }} playing={playing} setPlaying={setPlaying} scenario={scenario} setScenario={setScenario} wind={wind} setWind={setWind} early={early} setEarly={setEarly} speed={speed} setSpeed={setSpeed} frame={frame} close={stopSim} view={view} goView={goView} impacts={impacts} />}</AnimatePresence>
       <AnimatePresence>
         {focus && !sim && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute bottom-10 left-3 w-[250px] rounded-2xl bg-night/80 p-4 text-bone ring-1 ring-white/10 backdrop-blur-md">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] rounded-2xl bg-night/80 p-4 text-bone ring-1 ring-white/10 backdrop-blur-md max-sm:p-3 sm:inset-x-auto sm:bottom-10 sm:left-3 sm:w-[250px]">
             <p className="label !text-[9.5px] text-ember">{t("Gunung api", "Volcano")}</p>
-            <p className="mt-1 font-display text-[20px] font-semibold">{focus}</p>
+            <p className="mt-1 font-display text-[20px] font-semibold max-sm:mt-0.5 max-sm:text-[18px]">{focus}</p>
             {focus === "Semeru" ? (
               <>
                 <p className="text-[12px] text-bone/60">3.676 mdpl · Lumajang</p>
@@ -567,9 +571,9 @@ export function RealMap({ start = "indonesia", className, autoSim }: { start?: "
                   <span className="rounded-full bg-[#ea6a1f] px-2 py-0.5 text-[10.5px] font-semibold text-white">Level III · Siaga</span>
                   <span className="font-mono text-[11px] text-bone/70">71% · 7 {t("hari", "days")}</span>
                 </div>
-                <div className="mt-3 border-t border-white/10 pt-3">
+                <div className="mt-3 border-t border-white/10 pt-3 max-sm:mt-2 max-sm:pt-2">
                   <p className="mb-1.5 flex items-center gap-1 text-[11px] text-bone/50"><Layers className="h-3 w-3" /> {t("Lapisan", "Layers")}</p>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex gap-1 max-sm:-mx-3 max-sm:overflow-x-auto max-sm:px-3 max-sm:[scrollbar-width:none] sm:flex-wrap">
                     {([
                       ["krb", "KRB"],
                       ["ash", t("Abu", "Ash")],
@@ -577,16 +581,16 @@ export function RealMap({ start = "indonesia", className, autoSim }: { start?: "
                       ["hex", t("Heksagon 3D", "3D hexagons")],
                       ["places", t("Desa & posko", "Villages & posts")],
                     ] as const).map(([k, l]) => (
-                      <button key={k} onClick={() => setOverlays((o) => ({ ...o, [k]: !o[k] }))} className={cn("rounded-md px-2 py-1 text-[11px] ring-1 transition", overlays[k] ? "bg-white/15 text-bone ring-white/20" : "text-bone/45 ring-white/10")}>{l}</button>
+                      <button key={k} onClick={() => setOverlays((o) => ({ ...o, [k]: !o[k] }))} className={cn("rounded-md px-2 py-1 text-[11px] ring-1 transition max-sm:h-10 max-sm:shrink-0 max-sm:whitespace-nowrap max-sm:px-3 max-sm:text-[12px]", overlays[k] ? "bg-white/15 text-bone ring-white/20" : "text-bone/45 ring-white/10")}>{l}</button>
                     ))}
                   </div>
                 </div>
-                <button onClick={startSim} className="btn-shine shine-crimson mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-crimson py-2 text-[12px] font-semibold text-white"><Play className="h-3.5 w-3.5" /> {t("Simulasikan erupsi", "Simulate an eruption")}</button>
+                <button onClick={startSim} className="btn-shine shine-crimson mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-crimson py-2 text-[12px] font-semibold text-white max-sm:h-10 max-sm:text-[13px]"><Play className="h-3.5 w-3.5" /> {t("Simulasikan erupsi", "Simulate an eruption")}</button>
               </>
             ) : (
               <>
                 <p className="text-[12px] text-bone/60">{t("Dipantau lewat satelit. Zona & heksagon di sini adalah model umum; data desa & posko dibuka per kabupaten.", "Monitored by satellite. Zones & hexagons here are a generic model; village & post data opens per district.")}</p>
-                <button onClick={startSim} className="btn-shine shine-crimson mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-crimson py-2 text-[12px] font-semibold text-white"><Play className="h-3.5 w-3.5" /> {t("Simulasikan erupsi", "Simulate an eruption")}</button>
+                <button onClick={startSim} className="btn-shine shine-crimson mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-crimson py-2 text-[12px] font-semibold text-white max-sm:h-10 max-sm:text-[13px]"><Play className="h-3.5 w-3.5" /> {t("Simulasikan erupsi", "Simulate an eruption")}</button>
               </>
             )}
           </motion.div>
@@ -621,7 +625,7 @@ function SimPanel(p: {
   const n = (v: number) => v.toLocaleString("id-ID");
   return (
     <>
-      <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} className="absolute left-3 top-16 w-[250px] rounded-2xl bg-night/85 p-4 text-bone ring-1 ring-white/10 backdrop-blur-md">
+      <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} className="absolute left-3 top-16 hidden w-[250px] rounded-2xl bg-night/85 p-4 text-bone ring-1 ring-white/10 backdrop-blur-md sm:block">
         <div className="flex items-center justify-between">
           <p className="label !text-[9.5px] text-ember">{t("Simulasi · ilustrasi", "Simulation · illustrative")}</p>
           <button onClick={p.close} className="rounded p-0.5 text-bone/50 hover:text-bone" aria-label={t("Tutup simulasi", "Close simulation")}><X className="h-3.5 w-3.5" /></button>
@@ -692,7 +696,7 @@ function SimPanel(p: {
         </ul>
       </motion.div>
       )}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} className="absolute inset-x-3 bottom-10 rounded-2xl bg-night/85 p-3 text-bone ring-1 ring-white/10 backdrop-blur-md sm:left-[268px] md:right-[276px]">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} className="absolute inset-x-3 bottom-10 hidden rounded-2xl bg-night/85 p-3 text-bone ring-1 ring-white/10 backdrop-blur-md sm:left-[268px] sm:block md:right-[276px]">
         <div className="flex flex-wrap items-center gap-2">
           <button onClick={() => (p.t >= 72 ? (p.setT(-72), p.setPlaying(true)) : p.setPlaying(!p.playing))} className="btn-shine shine-crimson flex h-9 w-9 items-center justify-center rounded-full bg-crimson text-white" aria-label={p.playing ? "Pause" : "Play"}>
             {p.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
@@ -731,6 +735,132 @@ function SimPanel(p: {
         </div>
         <div className="flex justify-between font-mono text-[10px] text-bone/45"><span>T−3 {t("hari", "d")}</span><span>{t("Erupsi", "Eruption")}</span><span>T+3 {t("hari", "d")}</span></div>
       </motion.div>
+      <MobileSheet {...p} events={events} lvColor={lvColor} />
     </>
+  );
+}
+
+const SHORT: Record<Scenario, { id: string; en: string }> = {
+  small: { id: "Kecil", en: "Small" },
+  large: { id: "Besar + awan panas", en: "Large + PDC" },
+  lahar: { id: "Lahar hujan", en: "Rain lahar" },
+};
+
+/** Phones: one compact bottom sheet. Collapsed it is a summary row + timeline; expanded it shows one tab at a time. */
+function MobileSheet(p: Parameters<typeof SimPanel>[0] & { events: typeof EVENTS; lvColor: string }) {
+  const { t, tx, lang } = useT();
+  const id = lang === "id";
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<"sim" | "info">("sim");
+  const st = p.frame.stats;
+  const n = (v: number) => v.toLocaleString("id-ID");
+  const pct = (v: number) => ((v + 72) / 144) * 100;
+  const pill = (on: boolean) => cn("flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-[12px] font-medium transition", on ? "bg-bone text-night" : "bg-white/5 text-bone/70");
+  const row = "-mx-3 flex gap-1.5 overflow-x-auto px-3 [scrollbar-width:none] [mask-image:linear-gradient(90deg,#000_calc(100%-2rem),transparent)]";
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }} className="absolute inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] flex max-h-[calc(100%-14.5rem)] flex-col rounded-2xl bg-night/90 text-bone ring-1 ring-white/10 backdrop-blur-md sm:hidden">
+      <button onClick={() => setOpen(!open)} className="flex h-5 w-full shrink-0 items-center justify-center" aria-label={open ? t("Ciutkan panel", "Collapse panel") : t("Buka panel", "Expand panel")} aria-expanded={open}>
+        <span className="h-1 w-9 rounded-full bg-white/25" />
+      </button>
+      <div className="flex shrink-0 items-center gap-2 px-3">
+        <button onClick={() => (p.t >= 72 ? (p.setT(-72), p.setPlaying(true)) : p.setPlaying(!p.playing))} className="btn-shine shine-crimson flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-crimson text-white" aria-label={p.playing ? "Pause" : "Play"}>
+          {p.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </button>
+        <button onClick={() => setOpen(!open)} className="flex h-10 min-w-0 flex-1 items-center gap-2 text-left" aria-expanded={open}>
+          <span className="shrink-0 font-display text-[19px] font-semibold tabular">{fmtT(p.t, id)}</span>
+          <span className="shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold text-white" style={{ background: p.lvColor }}>Lv {["I", "II", "III", "IV"][p.frame.level - 1]}</span>
+          <span className="flex min-w-0 flex-col leading-tight"><span className="truncate text-[9.5px] text-bone/45">{t("Waktu bersiap", "Time to prep")}</span><span className="whitespace-nowrap font-mono text-[11px] text-bone/85">{p.early ? t("± 3 hari", "≈ 3 d") : t("< 1 jam", "< 1 h")}</span></span>
+          <ChevronUp className={cn("ml-auto h-4 w-4 shrink-0 text-bone/50 transition", open && "rotate-180")} />
+        </button>
+        <button onClick={p.close} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-bone/50 ring-1 ring-white/10" aria-label={t("Tutup simulasi", "Close simulation")}><X className="h-4 w-4" /></button>
+      </div>
+      <div className="shrink-0 px-3 pb-2">
+        <div className="relative h-10">
+          <div className="absolute inset-x-0 top-[18px] h-1 rounded-full bg-white/10" />
+          <div className="absolute left-0 top-[18px] h-1 rounded-full bg-gradient-to-r from-[#e0a100] via-[#ea6a1f] to-[#d1301f]" style={{ width: `${pct(p.t)}%` }} />
+          <div className="absolute top-2.5 h-5 w-px bg-white/50" style={{ left: "50%" }} />
+          {EVENTS.filter((e) => !e.early || p.early).map((e) => (
+            <span key={e.t + e.text.id} className={cn("absolute top-[14px] h-3 w-1 -translate-x-1/2 rounded-full", e.t <= p.t ? "bg-ember" : "bg-white/25")} style={{ left: `${pct(e.t)}%` }} />
+          ))}
+          <input type="range" min={-72} max={72} step={0.25} value={p.t} onChange={(e) => p.setT(Number(e.target.value))} className="absolute inset-0 w-full cursor-pointer opacity-0" aria-label={t("Waktu simulasi", "Simulation time")} />
+          <span className="pointer-events-none absolute top-2 h-6 w-0.5 -translate-x-1/2 rounded bg-bone shadow-[0_0_10px_#fff]" style={{ left: `${pct(p.t)}%` }} />
+        </div>
+        <div className="-mt-1 flex justify-between font-mono text-[9.5px] text-bone/45"><span>T−3 {t("hari", "d")}</span><span>{t("Erupsi", "Eruption")}</span><span>T+3 {t("hari", "d")}</span></div>
+      </div>
+      {open && (
+        <div className="min-h-0 overflow-y-auto overscroll-contain border-t border-white/10 px-3 pb-3 pt-2">
+          <div className="flex rounded-lg bg-white/5 p-0.5 text-[12px]" role="tablist">
+            {([["sim", t("Simulasi", "Simulation")], ["info", t("Info & dampak", "Info & impact")]] as const).map(([k, l]) => (
+              <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn("h-10 flex-1 rounded-md font-medium transition", tab === k ? "bg-bone text-night" : "text-bone/60")}>{l}</button>
+            ))}
+          </div>
+          {tab === "sim" ? (
+            <div className="mt-2 space-y-2">
+              <div className={row}>
+                {(Object.keys(PARAMS) as Scenario[]).map((k) => (
+                  <button key={k} onClick={() => p.setScenario(k)} className={pill(p.scenario === k)} title={tx(PARAMS[k].label)}>{tx(SHORT[k])}</button>
+                ))}
+              </div>
+              <div className={row}>
+                {[[100, t("Hujan → timur", "Wet → east")], [265, t("Kemarau → barat", "Dry → west")]].map(([deg, l]) => (
+                  <button key={deg} onClick={() => p.setWind(deg as number)} className={pill(p.wind === deg)}>{l}</button>
+                ))}
+                <span className="mx-0.5 w-px shrink-0 bg-white/10" />
+                {[3, 6, 12].map((v) => (
+                  <button key={v} onClick={() => p.setSpeed(v)} className={cn(pill(p.speed === v), "min-w-10 justify-center px-2 font-mono")}>{v / 3}×</button>
+                ))}
+                <span className="mx-0.5 w-px shrink-0 bg-white/10" />
+                {(["local", "region"] as const).map((v) => (
+                  <button key={v} onClick={() => p.goView(v)} className={pill(p.view === v)}>{v === "local" ? t("Lokal", "Local") : t("Regional", "Regional")}</button>
+                ))}
+              </div>
+              <label className="flex h-10 items-center gap-2 text-[11px] text-bone/60">
+                <Wind className="h-4 w-4 shrink-0" style={{ transform: `rotate(${p.wind - 90}deg)` }} />
+                <input type="range" min={0} max={359} value={p.wind} onChange={(e) => p.setWind(Number(e.target.value))} className="h-10 min-w-0 flex-1 accent-[#ea6a1f]" aria-label={t("Arah angin", "Wind direction")} />
+                <span className="w-9 shrink-0 text-right font-mono tabular">{p.wind}°</span>
+              </label>
+            </div>
+          ) : (
+            <div className="mt-2.5 space-y-2.5">
+              <div className="flex rounded-lg bg-white/5 p-0.5 text-[12px]">
+                {[true, false].map((v) => (
+                  <button key={String(v)} onClick={() => p.setEarly(v)} className={cn("h-10 flex-1 rounded-md px-2 font-medium transition", p.early === v ? (v ? "bg-leaf text-white" : "bg-crimson text-white") : "text-bone/60")}>{v ? t("Dengan MarketShield", "With MarketShield") : t("Tanpa peringatan", "No warning")}</button>
+                ))}
+              </div>
+              {!hasVillages() && <p className="rounded-lg bg-white/5 px-2 py-1.5 text-[10.5px] leading-snug text-bone/55">{t("Data desa belum tersedia untuk gunung ini; dampak kota & abu tetap dihitung.", "No village data for this volcano yet; city & ash impacts are still modelled.")}</p>}
+              <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11.5px]">
+                <div><dt className="text-bone/50">{t("Dievakuasi", "Evacuated")}</dt><dd className="font-mono tabular text-[#8fc0f0]">{n(st.evacuated)} / {n(st.exposed)}</dd></div>
+                <div><dt className="text-bone/50">{t("Terjebak aliran", "Caught by flows")}</dt><dd className={cn("font-mono tabular", st.hit ? "text-[#ff7a6e]" : "text-bone")}>{n(st.hit)}</dd></div>
+                <div><dt className="text-bone/50">{t("Terpapar abu", "Under ashfall")}</dt><dd className="font-mono tabular">{n(st.ashed)}</dd></div>
+                <div><dt className="text-bone/50">{t("Harga N95", "N95 price")}</dt><dd className={cn("font-mono tabular", st.n95 > 20000 ? "text-[#ff7a6e]" : "text-[#79d07d]")}>Rp{n(st.n95)}</dd></div>
+              </dl>
+              {p.view === "region" ? (
+                <ul className="space-y-1 border-t border-white/10 pt-2 text-[11px]">
+                  {[...p.impacts].sort((a, b) => b.aqi - a.aqi).slice(0, 4).map((c) => (
+                    <li key={c.city.name} className="flex items-center gap-2">
+                      <span className="w-9 shrink-0 rounded px-1 py-0.5 text-center font-mono font-semibold text-white" style={{ background: aqiBand(c.aqi).color }}>{c.aqi}</span>
+                      <span className="min-w-0 flex-1 truncate">{c.city.name} <span className="text-bone/45">· {c.km} km</span></span>
+                      <span className="shrink-0 font-mono text-bone/60">{c.arrival == null ? "—" : `T+${c.arrival}${t("j", "h")}`}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ul className="space-y-1 border-t border-white/10 pt-2">
+                  {p.events.slice(0, 2).map((e) => (
+                    <li key={e.t + e.text.id} className="text-[11px] leading-snug"><span className="font-mono text-[10px] text-ember">{fmtT(e.t, id)}{e.early ? " · MarketShield" : ""}</span> {tx(e.text)}</li>
+                  ))}
+                  {!p.events.length && <li className="text-[11px] text-bone/45">{t("Tekan putar untuk memulai.", "Press play to begin.")}</li>}
+                </ul>
+              )}
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10.5px] text-bone/60">
+                {[["#2e7d32", t("Aman", "Safe")], ["#9a8d88", t("Abu", "Ash")], ["#3d7fc4", t("Dievakuasi", "Evacuated")], ["#d1301f", t("Terdampak", "Hit")]].map(([c, l]) => (
+                  <span key={l} className="flex items-center gap-1"><span className="h-2 w-2 rounded-full ring-1 ring-white" style={{ background: c }} />{l}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </motion.div>
   );
 }
