@@ -70,11 +70,11 @@ function KitCanvas({ active, onPick }: { active: number; onPick: (i: number) => 
     // pedestals on an arc
     const n = KIT.length;
     const slots = KIT.map((_, i) => {
-      const x = ((i - (n - 1) / 2) / ((n - 1) / 2)) * 3.3;
-      return new THREE.Vector3(x, 0, 1.1 - (x / 3.3) ** 2 * 0.9);
+      const x = ((i - (n - 1) / 2) / ((n - 1) / 2)) * 3.4;
+      return new THREE.Vector3(x, 0, 1.1 - (x / 3.4) ** 2 * 0.9);
     });
     const pedestals = slots.map((p) => {
-      const m = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.68, 0.18, 48), new THREE.MeshStandardMaterial({ color: "#f3ede8", roughness: 0.6 }));
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.76, 0.18, 48), new THREE.MeshStandardMaterial({ color: "#f3ede8", roughness: 0.6 }));
       m.position.copy(p).setY(0.09);
       m.receiveShadow = true;
       scene.add(m);
@@ -96,7 +96,7 @@ function KitCanvas({ active, onPick }: { active: number; onPick: (i: number) => 
         const obj = gltf.scene;
         const box = new THREE.Box3().setFromObject(obj);
         const size = box.getSize(new THREE.Vector3());
-        const s = item.size / Math.max(size.x, size.y, size.z);
+        const s = (item.size * 1.18) / Math.max(size.x, size.y, size.z);
         obj.scale.setScalar(s);
         const b2 = new THREE.Box3().setFromObject(obj);
         const c = b2.getCenter(new THREE.Vector3());
@@ -155,7 +155,10 @@ function KitCanvas({ active, onPick }: { active: number; onPick: (i: number) => 
       renderer.domElement.style.width = "100%";
       renderer.domElement.style.height = "100%";
       camera.aspect = w / h;
-      camera.position.z = w < 640 ? 15 : 10.5;
+      // Fit the row of pedestals (≈ ±4.2 units, plus room for the pan) to the stage width, whatever its aspect
+      const d = 4.6 / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect);
+      camera.position.z = Math.min(17, Math.max(7.2, d + 0.7));
+      camera.position.y = 1.9 + camera.position.z * 0.12;
       camera.updateProjectionMatrix();
     };
     resize();
@@ -191,7 +194,8 @@ function KitCanvas({ active, onPick }: { active: number; onPick: (i: number) => 
     const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
     io.observe(el);
     const clock = new THREE.Clock();
-    const look = new THREE.Vector3(0, 0.9, 0);
+    const LOOK_Y = 2.0;
+    const look = new THREE.Vector3(0, LOOK_Y, 0);
     let raf = 0;
     const tick = () => {
       raf = requestAnimationFrame(tick);
@@ -211,7 +215,7 @@ function KitCanvas({ active, onPick }: { active: number; onPick: (i: number) => 
         mat.color.lerp(new THREE.Color(i === activeRef.current ? "#ea6a1f" : "#f3ede8"), Math.min(1, dt * 5));
       });
       const target = slots[activeRef.current];
-      look.lerp(new THREE.Vector3(target.x * 0.3, 0.9, 0), Math.min(1, dt * 3));
+      look.lerp(new THREE.Vector3(target.x * 0.3, LOOK_Y, 0), Math.min(1, dt * 3));
       camera.position.x += (target.x * 0.25 - camera.position.x) * Math.min(1, dt * 2);
       camera.lookAt(look);
       renderer.render(scene, camera);
@@ -275,10 +279,20 @@ export function KitSection() {
           </div>
         </Reveal>
         <div className="mt-10 grid gap-5 lg:grid-cols-[1.5fr_1fr]">
-          <div className="relative h-[340px] overflow-hidden rounded-3xl bg-[radial-gradient(ellipse_70%_60%_at_50%_75%,var(--t-peach),transparent_70%),linear-gradient(180deg,var(--t-surface),var(--t-sand))] ring-1 ring-line sm:h-[400px]">
-            <div className="grid-bg-light absolute inset-0 opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+          <div className="tex-topo relative h-[290px] overflow-hidden rounded-3xl bg-[linear-gradient(180deg,var(--t-surface)_0%,var(--t-cream)_55%,var(--t-sand-2)_100%)] ring-1 ring-line sm:h-[440px] lg:h-auto lg:min-h-[460px]">
+            {/* warm key light from above */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-2/3 bg-[radial-gradient(ellipse_45%_70%_at_50%_0%,rgba(255,214,186,0.55),transparent_70%)] dark:bg-[radial-gradient(ellipse_45%_70%_at_50%_0%,rgba(234,106,31,0.16),transparent_70%)]" aria-hidden />
+            {/* horizon / back wall line */}
+            <div className="pointer-events-none absolute inset-x-0 top-[46%] h-px bg-gradient-to-r from-transparent via-line-strong to-transparent" aria-hidden />
+            {/* receding grid floor */}
+            <div className="pointer-events-none absolute inset-x-[-30%] bottom-0 top-[46%] origin-top [transform:perspective(520px)_rotateX(58deg)]" aria-hidden>
+              <div className="grid-bg-light h-full w-full opacity-90 [background-size:56px_56px] [mask-image:linear-gradient(to_bottom,transparent,black_35%,black_80%,transparent)] dark:opacity-60 dark:[filter:invert(1)_hue-rotate(180deg)]" />
+            </div>
+            {/* warm spotlight pooled under the items */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-[6%] h-[45%] bg-[radial-gradient(ellipse_50%_45%_at_50%_55%,rgba(234,106,31,0.22),transparent_70%)] dark:bg-[radial-gradient(ellipse_50%_45%_at_50%_55%,rgba(234,106,31,0.2),transparent_70%)]" aria-hidden />
             <div ref={stageRef} className="absolute inset-0">{stageSeen && <KitCanvas active={active} onPick={pick} />}</div>
-            <p className="label pointer-events-none absolute bottom-4 left-5 !text-[9.5px] text-muted/70">3D · NVIDIA SimReady Assets (CC BY 4.0)</p>
+            <p className="label pointer-events-none absolute left-5 top-4 flex items-center gap-2 !text-[9.5px] text-muted"><span className="h-1.5 w-1.5 rounded-full bg-ember" />{t("Ketuk barang untuk harga", "Tap an item for its price")}</p>
+            <p className="label pointer-events-none absolute bottom-3 right-4 !text-[9px] text-muted/60">3D · NVIDIA SimReady Assets (CC BY 4.0)</p>
           </div>
           <div className="flex flex-col gap-3">
             <AnimatePresence mode="wait">
@@ -287,7 +301,7 @@ export function KitSection() {
                 <h3 className="mt-2 font-display text-[24px] font-semibold tracking-tight text-wine">{tx(item.name)}</h3>
                 <p className="mt-1 text-[14px] text-muted">{tx(item.note)}</p>
                 <div className="mt-5 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-[#e6f2e7] p-3">
+                  <div className="rounded-xl bg-[#e6f2e7] p-3 dark:bg-[#16301a]">
                     <p className="text-[11.5px] text-leaf">HET</p>
                     <p className="font-display text-[19px] font-semibold tabular text-leaf">{rupiah(item.het)}</p>
                   </div>
