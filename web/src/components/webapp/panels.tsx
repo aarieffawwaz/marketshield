@@ -5,7 +5,8 @@ import { AnimatePresence, motion } from "motion/react";
 import dynamic from "next/dynamic";
 import { Area, AreaChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AlertTriangle, ArrowDownRight, ArrowRight, ArrowUpRight, Box, CheckCircle2, ChevronDown, Flag, Map as MapIcon, Megaphone, Minus, PackageCheck, Radio, Satellite, Search, Truck, Users } from "lucide-react";
-import { ALERTS, DRIVERS, FEED, ITEMS, LEVELS, POSKO, VILLAGES, VERDICTS, deviation, indicators, priceHistory, priority, riskSeries, rupiah, type Alert, type Level, type Verdict } from "@/lib/data";
+import { DRIVERS, LEVELS, VILLAGES, VERDICTS, type Posko, deviation, indicators, priceHistory, priority, riskSeries, rupiah, type Alert, type Level, type Verdict } from "@/lib/data";
+import { broadcastAlert, setPoskoStatus, useAlerts, useForecast, useIntel, usePosko, usePrices, useVillages } from "@/lib/live";
 import { useApp, useT, type Role } from "@/lib/store";
 import { classify, type Check } from "@/lib/classify";
 import { Rolling, Stagger, staggerItem } from "@/components/ui/rolling";
@@ -27,11 +28,16 @@ export function Overview({ go, role }: { go: (tab: string) => void; role: Role }
   const L = LEVELS[level];
   const series = useMemo(() => riskSeries(level), [level]);
   const inds = indicators(level);
-  const exposed = VILLAGES.reduce((s, v) => s + v.exposed, 0);
+  const villages = useVillages().data;
+  const posko = usePosko().data;
+  const alerts = useAlerts(5).data;
+  const fc = useForecast();
+  const exposed = villages.reduce((s, v) => s + v.exposed, 0);
+  const prob = fc && level === 3 ? fc.p : L.prob;
   const kpis = [
-    { k: t("Peluang eskalasi 7 hari", "7-day escalation odds"), v: `${Math.round(L.prob * 100)}%`, s: tx(L.eaw), c: L.color },
+    { k: t("Peluang eskalasi 7 hari", "7-day escalation odds"), v: `${Math.round(prob * 100)}%`, s: fc && level === 3 ? t(`Model XGBoost · jendela ${fc.windowDays ?? "–"} hari`, `XGBoost model · ${fc.windowDays ?? "–"}-day window`) : tx(L.eaw), c: L.color },
     { k: t("Penduduk terpapar", "Exposed population"), v: fmt(Math.round(exposed * [0, 0.35, 0.7, 1, 1.15][level])), s: "WorldPop × KRB", c: "#7b1e26" },
-    { k: t("Posko buka", "Open aid posts"), v: `${POSKO.filter((p) => p.status === "open").length}/${POSKO.length}`, s: t("1 penuh, 1 dipindah", "1 full, 1 moved"), c: "#2e7d32" },
+    { k: t("Posko buka", "Open aid posts"), v: `${posko.filter((p) => p.status === "open").length}/${posko.length}`, s: t(`${posko.filter((p) => p.status === "full").length} penuh, ${posko.filter((p) => p.status === "closed").length} tutup`, `${posko.filter((p) => p.status === "full").length} full, ${posko.filter((p) => p.status === "closed").length} closed`), c: "#2e7d32" },
     { k: t("Hoaks dibantah 24 jam", "Hoaxes debunked 24 h"), v: String([2, 5, 14, 23][level - 1]), s: t("dari 61 pesan dicek", "of 61 messages checked"), c: "#b51a14" },
   ];
 
@@ -86,7 +92,7 @@ export function Overview({ go, role }: { go: (tab: string) => void; role: Role }
         </Card>
 
         <Card title={t("Peringatan terbaru", "Latest alerts")} action={<button onClick={() => go("alerts")} className="text-[12px] font-medium text-maroon">{t("Semua", "All")}</button>}>
-          <AlertList items={ALERTS.slice(0, 5)} />
+          <AlertList items={alerts.slice(0, 5)} />
         </Card>
       </div>
 
@@ -254,7 +260,8 @@ export function AidPanel() {
   const [open, setOpen] = useState<string | null>(null);
   const [pending, setPending] = useState<{ desa: string; key: number } | null>(null);
   const seq = useRef(0);
-  const rows = VILLAGES.map((v) => ({ ...v, aid: v.aid + (extra[v.desa] ?? 0) }))
+  const villages = useVillages().data;
+  const rows = villages.map((v) => ({ ...v, aid: v.aid + (extra[v.desa] ?? 0) }))
     .map((v) => ({ v, score: priority(v, level) }))
     .sort((a, b) => b.score - a.score);
   const max = rows[0]?.score || 1;
@@ -340,7 +347,8 @@ export function AidPanel() {
 export function PricePanel({ toast }: { toast: (m: string) => void }) {
   const { t, tx } = useT();
   const [sel, setSel] = useState(0);
-  const item = ITEMS[sel];
+  const items = usePrices().data;
+  const item = items[Math.min(sel, items.length - 1)];
   const hist = useMemo(() => priceHistory(item), [item]);
   const devBadge = (d: number) => (d > 0.3 ? { c: "#b51a14", s: "#f8dedc", l: t("Penimbunan?", "Gouging?") } : d > 0.1 ? { c: "#c2610f", s: "#fce7da", l: t("Naik", "Rising") } : { c: "#2e7d32", s: "#e6f2e7", l: t("Wajar", "Fair") });
   return (
@@ -358,7 +366,7 @@ export function PricePanel({ toast }: { toast: (m: string) => void }) {
               </tr>
             </thead>
             <tbody>
-              {ITEMS.map((it, i) => {
+              {items.map((it, i) => {
                 const d = deviation(it);
                 const b = devBadge(d);
                 return (
@@ -427,16 +435,26 @@ export function SignalPanel() {
   const [text, setText] = useState("Katanya lahar sudah masuk Pronojiwo, segera tinggalkan rumah! Sebarkan ke grup lain!!!");
   const [res, setRes] = useState<{ text: string; r: Check } | null>(null);
   const [thinking, setThinking] = useState(false);
-  const run = () => {
+  const run = async () => {
     setThinking(true);
     setRes(null);
-    window.setTimeout(() => {
-      setRes({ text, r: classify(text, lang) });
-      setThinking(false);
-    }, 1300);
+    const local = classify(text, lang);
+    let r: Check = local;
+    try {
+      const resp = await fetch("/api/v1/signals/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, lang }) });
+      if (resp.ok) {
+        const j = await resp.json();
+        r = { ...local, verdict: j.label, conf: j.confidence, triggers: j.triggers ?? local.triggers };
+      }
+    } catch {
+      /* offline: keep the on-device result */
+    }
+    setRes({ text, r });
+    setThinking(false);
   };
   const [filter, setFilter] = useState<"all" | Verdict>("all");
-  const feed = FEED.filter((f) => filter === "all" || f.verdict === filter);
+  const intel = useIntel().data;
+  const feed = intel.filter((f) => filter === "all" || f.verdict === filter);
   const V = (v: Check["verdict"]) => (v === "UNVERIFIED" ? { label: { id: "BELUM TERVERIFIKASI", en: "UNVERIFIED" }, color: "#6b5856", soft: "#f3ede8" } : VERDICTS[v]);
   return (
     <div className="grid gap-5 xl:grid-cols-[1fr_1fr]">
@@ -499,7 +517,10 @@ export function SignalPanel() {
 
 export function PoskoPanel({ toast }: { toast: (m: string) => void }) {
   const { t, tx } = useT();
-  const [posts, setPosts] = useState(POSKO);
+  const live = usePosko();
+  const session = useApp((s) => s.session);
+  const [local, setLocal] = useState<Record<string, Posko["status"]>>({});
+  const posts = live.data.map((p) => (local[p.id] ? { ...p, status: local[p.id], updated: { id: "baru saja", en: "just now" } } : p));
   const opts = [
     { value: "open" as const, label: t("Buka", "Open"), color: "#2e7d32", soft: "#e6f2e7" },
     { value: "full" as const, label: t("Penuh", "Full"), color: "#c2610f", soft: "#fce7da" },
@@ -507,11 +528,11 @@ export function PoskoPanel({ toast }: { toast: (m: string) => void }) {
   ];
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-      {posts.map((p, i) => {
+      {posts.map((p) => {
         const fill = p.capacity ? p.filled / p.capacity : 0;
         return (
           <Card
-            key={p.name}
+            key={p.id}
             title={p.name}
             sub={`${tx(p.kind)} · ${p.km.toString().replace(".", ",")} km`}
             action={
@@ -519,8 +540,14 @@ export function PoskoPanel({ toast }: { toast: (m: string) => void }) {
                 value={p.status}
                 options={opts}
                 onChange={(st) => {
-                  setPosts((ps) => ps.map((x, j) => (j === i ? { ...x, status: st, updated: { id: "baru saja", en: "just now" } } : x)));
-                  toast(t(`Status ${p.name} diperbarui untuk semua pengguna.`, `${p.name} status updated for all users.`));
+                  if (!session?.uid) {
+                    setLocal((m) => ({ ...m, [p.id]: st }));
+                    toast(t(`Mode demo: status ${p.name} hanya berubah di layar Anda.`, `Demo mode: ${p.name} status changed on your screen only.`));
+                    return;
+                  }
+                  setPoskoStatus(p.id, st)
+                    .then(() => toast(t(`Status ${p.name} diperbarui untuk semua pengguna.`, `${p.name} status updated for all users.`)))
+                    .catch(() => toast(t("Gagal menyimpan: akun Anda tidak berhak mengubah posko ini.", "Couldn't save: your account can't edit this post.")));
                 }}
               />
             }
@@ -576,14 +603,19 @@ export function AlertList({ items, animate }: { items: Alert[]; animate?: boolea
 export function AlertsPanel() {
   const { t, tx } = useT();
   const level = useApp((s) => s.level);
-  const [items, setItems] = useState<Alert[]>(ALERTS);
+  const live = useAlerts();
+  const session = useApp((s) => s.session);
+  const [demo, setDemo] = useState<Alert[]>([]);
+  const items = [...demo, ...live.data];
   const [msg, setMsg] = useState("");
   const [area, setArea] = useState("Candipuro, Pronojiwo");
   const send = () => {
     if (!msg.trim()) return;
     const now = new Date();
     const hh = `${String(now.getHours()).padStart(2, "0")}.${String(now.getMinutes()).padStart(2, "0")}`;
-    setItems((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: `${area}: ${msg}`, en: `${area}: ${msg}` } }, ...x]);
+    const text = `${area}: ${msg}`;
+    if (session?.uid) broadcastAlert(text).catch(() => setDemo((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: text, en: text } }, ...x]));
+    else setDemo((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: text, en: text } }, ...x]);
     setMsg("");
   };
   return (
