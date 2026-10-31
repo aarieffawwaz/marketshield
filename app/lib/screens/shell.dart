@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core.dart';
+import '../data/repository.dart';
 import '../theme.dart';
 import '../widgets.dart';
 import 'intel.dart';
@@ -129,6 +130,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Time of the latest official status from the API, or the bundled bulletin time.
+  String _pvmbgTime(BuildContext context) {
+    final at = context.repo.volcano.value?.updatedAt;
+    return at == null ? '09:15 WIB' : context.l(clock(at));
+  }
+
   // ---------------------------------------------------------------- Level I–II
   List<Widget> _waspada(BuildContext context, int lvl) {
     final s = snapshots[lvl]!;
@@ -169,7 +176,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(children: [
                   const Icon(Icons.verified_outlined, size: 14, color: C.l1),
-                  Text(' PVMBG • 09:15 WIB', style: inter(11, c: C.textMuted)),
+                  Text(' PVMBG • ${_pvmbgTime(context)}', style: inter(11, c: C.textMuted)),
                 ]),
               ]),
             ]),
@@ -613,7 +620,12 @@ class _SignalGrid extends StatelessWidget {
 
 class _IntelTeaser extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => MsCard(
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final hoaxes = context.repo.intel.value
+        .where((f) => f.v == Verdict.hoax && (f.at == null || now.difference(f.at!).inHours < 24))
+        .length;
+    return MsCard(
         onTap: () => tabIndex.value = 2,
         child: Row(children: [
           Container(
@@ -625,7 +637,11 @@ class _IntelTeaser extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(context.t('2 hoaks baru terbantah hari ini', '2 new hoaxes debunked today'),
+              Text(
+                  hoaxes == 0
+                      ? context.t('Belum ada hoaks baru hari ini', 'No new hoaxes today')
+                      : context.t('$hoaxes hoaks baru terbantah hari ini',
+                          '$hoaxes new hoax${hoaxes == 1 ? '' : 'es'} debunked today'),
                   style: inter(14, w: FontWeight.w600, c: C.wine)),
               Text(context.t('IndoBERT + cek silang citra satelit', 'IndoBERT + satellite cross-check'),
                   style: inter(12, c: C.textMuted)),
@@ -634,4 +650,5 @@ class _IntelTeaser extends StatelessWidget {
           const Icon(Icons.chevron_right, color: C.textMuted),
         ]),
       );
+  }
 }

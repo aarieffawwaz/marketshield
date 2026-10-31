@@ -16,7 +16,8 @@ class L {
 
 class AppState extends ChangeNotifier {
   Lang lang = Lang.id;
-  int level = 2; // PVMBG status I–IV, driven by Demo Mode
+  int level = 2; // PVMBG status I–IV, driven by Demo Mode or the live PVMBG feed
+  bool _levelPinned = false; // true once the user (or a deep link) picks a level
   Persona persona = Persona.petani;
   final Set<int> kitDone = {0, 1, 2, 4, 5};
   final Set<int> protocolDone = {};
@@ -27,6 +28,14 @@ class AppState extends ChangeNotifier {
   }
 
   void setLevel(int v) {
+    _levelPinned = true;
+    level = v;
+    notifyListeners();
+  }
+
+  /// Applies the official level from the live API unless the user is driving Demo Mode.
+  void applyLiveLevel(int v) {
+    if (_levelPinned || v < 1 || v > 4 || v == level) return;
     level = v;
     notifyListeners();
   }
@@ -146,8 +155,22 @@ class HetItem {
   final int avg;
   final int stores;
   final IconData icon;
-  const HetItem(this.name, this.unit, this.het, this.avg, this.stores, this.icon);
-  double get diffPct => (avg - het) / het * 100;
+  final bool flagged;
+  const HetItem(this.name, this.unit, this.het, this.avg, this.stores, this.icon, {this.flagged = false});
+  String get id => slugId(name.en);
+  double get diffPct => het == 0 ? 0 : (avg - het) / het * 100;
+}
+
+/// Price-cap board for one region (bundled default: Candipuro).
+class PriceBoard {
+  final String region;
+  final List<HetItem> items;
+  const PriceBoard(this.region, this.items);
+  HetItem get featured => items.firstWhere((h) => h.id == 'n95-mask', orElse: () => items.first);
+  List<HetItem> get others {
+    final f = featured;
+    return [for (final h in items) if (!identical(h, f)) h];
+  }
 }
 
 const hetItems = [
@@ -159,7 +182,7 @@ const hetItems = [
   HetItem(L('Paracetamol', 'Paracetamol'), L('strip 10 tab', 'strip of 10'), 7000, 6500, 11, Icons.medical_services_outlined),
 ];
 
-enum Verdict { hoax, official, check }
+enum Verdict { hoax, panic, verified, official, check }
 
 class FeedItem {
   final Verdict v;
@@ -167,7 +190,9 @@ class FeedItem {
   final L title;
   final L body;
   final L time;
-  const FeedItem(this.v, this.pct, this.title, this.body, this.time);
+  final DateTime? at; // set for live items; [time] is then derived from it
+  const FeedItem(this.v, this.pct, this.title, this.body, this.time, {this.at});
+  L get when => at == null ? time : ago(at!);
 }
 
 const feed = [
@@ -201,12 +226,20 @@ const feed = [
 class Posko {
   final String name;
   final L type;
-  final double km;
+  final double? km; // null when the distance is unknown
   final int capacityPct;
   final List<L> available;
   final List<L> needed;
   final bool open24;
-  const Posko(this.name, this.type, this.km, this.capacityPct, this.available, this.needed, this.open24);
+  final String status; // open | full | closed
+  final DateTime? updatedAt;
+  const Posko(this.name, this.type, this.km, this.capacityPct, this.available, this.needed, this.open24,
+      {this.status = 'open', this.updatedAt});
+  String get id => slugId(name);
+  bool get isShelter {
+    final t = type.en.toLowerCase();
+    return t.contains('shelter') && !t.startsWith('aid');
+  }
 }
 
 const poskoList = [
@@ -225,10 +258,12 @@ class Village {
   final String name;
   final String kec;
   final int pop; // WorldPop 100 m sum inside hazard polygon
-  final String krb;
+  final String krb; // '' when unknown
   final double api; // Aid Priority Index = exposure × hazard × unmet need
   final int unmetPct;
-  const Village(this.name, this.kec, this.pop, this.krb, this.api, this.unmetPct);
+  final List<L> needs;
+  const Village(this.name, this.kec, this.pop, this.krb, this.api, this.unmetPct, {this.needs = const []});
+  String get id => slugId(name);
 }
 
 const villages = [
@@ -286,3 +321,107 @@ const sectorProtocols = {
         L('Lansia & anak berangkat pertama saat Level III.', 'Elderly & children leave first at Level III.'), L('Hari ini', 'Today')),
   ],
 };
+
+/// Inbox alert (bundled fallback for `GET /alerts`).
+class AlertItem {
+  final String kind; // level | sat | hoax | price | sector | posko
+  final L text;
+  final L meta; // "source • time" line for bundled items
+  final DateTime? at;
+  const AlertItem(this.kind, this.text, this.meta, {this.at});
+}
+
+const bundledAlerts = [
+  AlertItem('sat', L('SO₂ naik 3 hari berturut-turut', 'SO₂ up 3 days in a row'), L('Sentinel-5P • 6 jam lalu', 'Sentinel-5P • 6 hrs ago')),
+  AlertItem('hoax', L('Hoaks jembatan Gladak Perak terbantah', 'Gladak Perak bridge hoax debunked'), L('IndoBERT • 24 mnt lalu', 'IndoBERT • 24 min ago')),
+];
+
+/// Known distances for live posko IDs (same seed as web/src/lib/data.ts); the API does not send them.
+const poskoKmById = {
+  'balai-desa-sumbermujur': 3.1,
+  'lapangan-candipuro': 4.6,
+  'sdn-penanggal-02': 6.2,
+  'puskesmas-pasirian': 11.8,
+  'posko-pronojiwo': 9.4,
+};
+
+// ------------------------------------------------------------------ live-data helpers
+
+const _accents = {
+  'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a', 'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
+  'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i', 'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o', 'ù': 'u',
+  'ú': 'u', 'û': 'u', 'ü': 'u', 'ý': 'y', 'ÿ': 'y', '₂': '2',
+};
+
+/// Slug id used to match API rows to bundled data: lowercase, accents stripped, non-alphanumerics → "-".
+String slugId(String s) {
+  final b = StringBuffer();
+  for (final ch in s.toLowerCase().split('')) {
+    b.write(_accents[ch] ?? ch);
+  }
+  return b.toString().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
+}
+
+/// Indonesian wording for English-only API strings (posko kind/has/needs, price item/unit, village needs).
+/// Bundled app text wins; the extra terms mirror the bilingual seed in web/src/lib/data.ts.
+final Map<String, L> idGlossary = () {
+  final m = <String, L>{};
+  void add(L v) => m.putIfAbsent(slugId(v.en), () => v);
+  for (final p in poskoList) {
+    add(p.type);
+    p.available.forEach(add);
+    p.needed.forEach(add);
+  }
+  for (final h in hetItems) {
+    add(h.name);
+    add(h.unit);
+  }
+  for (final k in kitItems) {
+    add(k.name);
+  }
+  const extra = [
+    L('Posko & shelter', 'Aid post & shelter'), L('Shelter terbuka', 'Open shelter'), L('Shelter', 'Shelter'),
+    L('Pos medis', 'Medical post'), L('Makanan', 'Food'), L('Air', 'Water'), L('P3K', 'First aid'),
+    L('Tenda', 'Tents'), L('Dapur umum', 'Field kitchen'), L('Terpal', 'Tarps'), L('Oksigen', 'Oxygen'),
+    L('Nebulizer', 'Nebulizers'), L('Masker anak', "Children's masks"), L('Makanan bayi', 'Baby food'),
+    L('Dipindah ke Sumbermujur', 'Moved to Sumbermujur'), L('Masker', 'Masks'), L('Senter', 'Torches'),
+    L('Air galon 19 L', '19 L water'), L('Kacamata pelindung', 'Goggles'), L('Pakan ternak', 'Livestock feed'),
+    L('Tas siaga', 'Go-bag'), L('Senter LED', 'LED torch'), L('Oksigen portabel', 'Portable oxygen'),
+    L('Kacamata pelindung', 'Safety goggles'), L('Masker bedah (50)', 'Surgical masks (50)'),
+    L('per galon', 'per jug'), L('per botol', 'per bottle'), L('per pcs', 'each'), L('per kaleng', 'per can'),
+    L('per kotak', 'per box'),
+  ];
+  extra.forEach(add);
+  return m;
+}();
+
+/// Bilingual pair for an English API string: bundled Indonesian when the slug matches, else the API text.
+L bi(String en) {
+  final hit = idGlossary[slugId(en)];
+  return L(hit?.id ?? en, en);
+}
+
+/// Splits an API list string ("Food, water, first aid") into bilingual chips; "-" means none.
+List<L> biList(String? csv) {
+  final s = (csv ?? '').trim();
+  if (s.isEmpty || s == '-') return const [];
+  return [for (final t in s.split(',')) if (t.trim().isNotEmpty) bi(t.trim())];
+}
+
+/// Relative time ("12 mnt lalu" / "12 min ago").
+L ago(DateTime at, [DateTime? now]) {
+  final d = (now ?? DateTime.now()).difference(at);
+  if (d.inMinutes < 1) return const L('baru saja', 'just now');
+  if (d.inMinutes < 60) return L('${d.inMinutes} mnt lalu', '${d.inMinutes} min ago');
+  if (d.inHours < 24) return L('${d.inHours} jam lalu', '${d.inHours} hr${d.inHours == 1 ? '' : 's'} ago');
+  return L('${d.inDays} hari lalu', '${d.inDays} day${d.inDays == 1 ? '' : 's'} ago');
+}
+
+/// Clock time in the local zone: "14.05" (id) / "14:05" (en); prefixed with the date when not today.
+L clock(DateTime at) {
+  final t = at.toLocal();
+  final now = DateTime.now();
+  String two(int n) => n.toString().padLeft(2, '0');
+  final day = t.year == now.year && t.month == now.month && t.day == now.day ? '' : '${t.day}/${t.month} ';
+  return L('$day${two(t.hour)}.${two(t.minute)}', '$day${two(t.hour)}:${two(t.minute)}');
+}

@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'core.dart';
+import 'data/repository.dart';
 import 'deeplink.dart';
+import 'screens/credits.dart';
 import 'screens/intel.dart';
 import 'screens/map.dart';
 import 'screens/onboarding.dart';
@@ -14,7 +16,7 @@ import 'theme.dart';
 
 final navKey = GlobalKey<NavigatorState>();
 
-const _tabs = {'home': 0, 'map': 1, 'intel': 2, 'posko': 3, 'profile': 4};
+const _tabs = {'home': 0, 'map': 1, 'intel': 2, 'posko': 3, 'profile': 4, 'credits': 4};
 
 /// Jumps straight to a screen, skipping onboarding (used by the website's "Try this" links).
 void openScreen(AppState state, String screen) {
@@ -27,6 +29,7 @@ void openScreen(AppState state, String screen) {
     'sos' => const SosScreen() as Widget,
     'evac' => const EvacScreen(),
     'kit' => const KitScreen(),
+    'credits' => const CreditsScreen(),
     _ => null,
   };
   if (extra != null) nav.push(MaterialPageRoute(builder: (_) => extra));
@@ -43,7 +46,15 @@ void main() {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
   final state = AppState();
-  runApp(MarketShieldApp(state: state));
+  final repo = DataRepo();
+  // Follow the official PVMBG level from the API until the user drives Demo Mode themselves.
+  repo.addListener(() {
+    final lvl = repo.volcano.value?.level;
+    if (lvl != null) state.applyLiveLevel(lvl);
+  });
+  runApp(MarketShieldApp(state: state, repo: repo));
+  // Bundled data paints first; cached and live data swap in when ready.
+  repo.start();
   final first = initialScreen();
   if (first != null) WidgetsBinding.instance.addPostFrameCallback((_) => openScreen(state, first));
   listenScreens((s) => openScreen(state, s));
@@ -51,18 +62,22 @@ void main() {
 
 class MarketShieldApp extends StatelessWidget {
   final AppState state;
-  const MarketShieldApp({super.key, required this.state});
+  final DataRepo repo;
+  const MarketShieldApp({super.key, required this.state, required this.repo});
 
   @override
   Widget build(BuildContext context) {
     return AppScope(
       state: state,
-      child: MaterialApp(
-        navigatorKey: navKey,
-        title: 'MarketShield',
-        debugShowCheckedModeBanner: false,
-        theme: buildTheme(),
-        home: const SplashScreen(),
+      child: DataScope(
+        repo: repo,
+        child: MaterialApp(
+          navigatorKey: navKey,
+          title: 'MarketShield',
+          debugShowCheckedModeBanner: false,
+          theme: buildTheme(),
+          home: const SplashScreen(),
+        ),
       ),
     );
   }
