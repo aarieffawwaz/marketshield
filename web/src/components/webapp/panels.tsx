@@ -35,7 +35,7 @@ export function Overview({ go, role }: { go: (tab: string) => void; role: Role }
   const exposed = villages.reduce((s, v) => s + v.exposed, 0);
   const prob = fc && level === 3 ? fc.p : L.prob;
   const kpis = [
-    { k: t("Peluang eskalasi 7 hari", "7-day escalation odds"), v: `${Math.round(prob * 100)}%`, s: fc && level === 3 ? t(`Model XGBoost · jendela ${fc.windowDays ?? "–"} hari`, `XGBoost model · ${fc.windowDays ?? "–"}-day window`) : tx(L.eaw), c: L.color },
+    { k: t("Peluang eskalasi 7 hari", "7-day escalation odds"), v: `${Math.round(prob * 100)}%`, s: fc && level === 3 ? t(`Model satelit XGBoost · aktivitas panas ${fc.windowDays ?? 7} hari`, `Satellite XGBoost model · thermal activity, ${fc.windowDays ?? 7} days`) : tx(L.eaw), c: L.color },
     { k: t("Penduduk terpapar", "Exposed population"), v: fmt(Math.round(exposed * [0, 0.35, 0.7, 1, 1.15][level])), s: "WorldPop × KRB", c: "#7b1e26" },
     { k: t("Posko buka", "Open aid posts"), v: `${posko.filter((p) => p.status === "open").length}/${posko.length}`, s: t(`${posko.filter((p) => p.status === "full").length} penuh, ${posko.filter((p) => p.status === "closed").length} tutup`, `${posko.filter((p) => p.status === "full").length} full, ${posko.filter((p) => p.status === "closed").length} closed`), c: "#2e7d32" },
     { k: t("Hoaks dibantah 24 jam", "Hoaxes debunked 24 h"), v: String([2, 5, 14, 23][level - 1]), s: t("dari 61 pesan dicek", "of 61 messages checked"), c: "#b51a14" },

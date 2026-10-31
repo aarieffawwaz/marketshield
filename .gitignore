@@ -24,3 +24,5 @@ web/public/downloads/
 web/public/vendor/
 app/build/
 app/.dart_tool/
+__pycache__/
+*.pyc

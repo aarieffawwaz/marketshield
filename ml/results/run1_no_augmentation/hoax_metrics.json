@@ -1,0 +1,93 @@
+{
+  "model": "indobenchmark/indobert-base-p1",
+  "dataset": "mzuama/IndonesianHoaxdetection",
+  "device": "mps",
+  "seed": 42,
+  "hyperparameters": {
+    "epochs": 2,
+    "max_len": 128,
+    "batch": 32,
+    "lr": 3e-05
+  },
+  "data": {
+    "rows_raw": 12150,
+    "rows_clean": 12136,
+    "train": 9708,
+    "validation": 1214,
+    "test": 1214,
+    "label_counts": {
+      "FAKTA": 5270,
+      "HOAKS": 6866
+    },
+    "test_disaster_subset": 70
+  },
+  "baseline_tfidf_logreg": {
+    "test": {
+      "accuracy": 0.9679,
+      "precision_hoax": 0.9642,
+      "recall_hoax": 0.9796,
+      "f1_hoax": 0.9718,
+      "f1_macro": 0.9672,
+      "n": 1214
+    },
+    "test_disaster": {
+      "accuracy": 0.9857,
+      "precision_hoax": 1.0,
+      "recall_hoax": 0.9737,
+      "f1_hoax": 0.9867,
+      "f1_macro": 0.9856,
+      "n": 70
+    }
+  },
+  "indobert": {
+    "test": {
+      "accuracy": 0.9827,
+      "precision_hoax": 0.9868,
+      "recall_hoax": 0.9825,
+      "f1_hoax": 0.9847,
+      "f1_macro": 0.9824,
+      "n": 1214
+    },
+    "test_disaster": {
+      "accuracy": 0.9857,
+      "precision_hoax": 1.0,
+      "recall_hoax": 0.9737,
+      "f1_hoax": 0.9867,
+      "f1_macro": 0.9856,
+      "n": 70
+    }
+  },
+  "confusion_matrix_test": [
+    [
+      518,
+      9
+    ],
+    [
+      12,
+      675
+    ]
+  ],
+  "training_log": [
+    {
+      "epoch": 1,
+      "train_loss": 0.1231,
+      "val_accuracy": 0.9852,
+      "val_precision_hoax": 0.9941,
+      "val_recall_hoax": 0.9796,
+      "val_f1_hoax": 0.9868,
+      "val_f1_macro": 0.9849,
+      "val_n": 1214
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0176,
+      "val_accuracy": 0.9901,
+      "val_precision_hoax": 0.9941,
+      "val_recall_hoax": 0.9884,
+      "val_f1_hoax": 0.9912,
+      "val_f1_macro": 0.9899,
+      "val_n": 1214
+    }
+  ],
+  "runtime_seconds": 684
+}

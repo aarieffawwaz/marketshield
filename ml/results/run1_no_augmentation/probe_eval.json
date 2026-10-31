@@ -1,0 +1,13 @@
+{
+  "model": "run1 (no augmentation)",
+  "probe": {
+    "accuracy": 0.5,
+    "precision_hoax": 0.5,
+    "recall_hoax": 1.0,
+    "f1_hoax": 0.6667,
+    "f1_macro": 0.3333,
+    "n": 40
+  },
+  "predicted_hoax": 40,
+  "of": 40
+}

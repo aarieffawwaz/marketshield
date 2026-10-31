@@ -230,16 +230,18 @@ Firebase Auth with email/password and Google. Roles are custom claims (`admin`, 
 
 ### 7.2 Risk engine
 
-An XGBoost classifier built by the team in Google Colab on PVMBG status history with Earth Engine features. It writes `forecast.p_escalation_7d`, `forecast.window_days` and `forecast.shap_top3` (top SHAP drivers) to `volcanoes/{id}`. The console overview and `/api/v1/volcanoes/{id}/risk` (`model` field) show it next to the official level. Contract: [firebase/ML-CONTRACT.md](../firebase/ML-CONTRACT.md).
+XGBoost + SHAP in [`ml/risk_engine.py`](../ml/risk_engine.py). Weekly Earth Engine features for 25 volcanoes, January 2019 – October 2026 (10,067 rows): FIRMS hotspot fraction (this week, previous 3 weeks), Sentinel-5P SO₂ and its trend, Sentinel-1 VV backscatter change, GPM IMERG rainfall. Target: any FIRMS hotspot within 5 km of the summit in the next 7 days, an objective satellite proxy because PVMBG level history is not machine-readable. Time split: train 2019–2023, test 2024–2026.
+
+Test results: ROC-AUC **0.899** (persistence baseline 0.784), PR-AUC 0.674 (0.455), recall 78 % (63 %); on onset weeks ROC-AUC 0.81. `web/scripts/publish-forecast.ts` writes `forecast.{p_escalation_7d, window_days, shap_top3, model}` to `volcanoes/{id}`; the console overview and `/api/v1/volcanoes/{id}/risk` (`model`) read it. Full report: [ml/README.md](../ml/README.md#2-satellite-risk-engine).
 
 ### 7.3 Hoax filter
 
 Two layers behind one contract (`label`, `confidence`, `triggers`, `satellite_check`, `nearest_fact`):
 
-1. **Rule-based classifier** (`web/src/lib/classify.ts`, `rules-v1`): trigger phrases for hoaxes ("sudah masuk", "sebarkan", "katanya") and panic, plus a satellite cross-check for lahar and ash claims. Used today by the API, the console and the app's offline mode.
-2. **IndoBERT** (`indobenchmark/indobert-base-p1`) fine-tuned by the team on a self-curated corpus of Indonesian disaster chain messages and posts. Status: fine-tuning in progress; the notebook writes outcomes to `signals` and curated public claims to `intel`.
+1. **Rule-based classifier** (`web/src/lib/classify.ts`, `rules-v1`): serves the API, the console and the app's offline mode today.
+2. **IndoBERT** (`indobenchmark/indobert-base-p1`) fine-tuned in [`ml/train_hoax.py`](../ml/train_hoax.py) on `mzuama/IndonesianHoaxdetection` (12,136 texts after de-duplication, 80/10/10 split) with short-crop augmentation and 60 team-written short disaster messages: **98.4 %** test accuracy (TF-IDF 96.9 %), 96.6 % on short crops, **90 %** on a 40-message probe set (the first run scored 50 % there; the fix is documented). Serving it behind the API is the next step.
 
-No layer stores the checked message text.
+No layer stores the checked message text. Full report: [ml/README.md](../ml/README.md#1-indobert-hoax-filter).
 
 ### 7.4 Aid priority and price watch
 

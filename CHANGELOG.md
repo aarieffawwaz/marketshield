@@ -6,6 +6,10 @@ The competition asks for a changelog from the `submission-24h` tag to the `final
 
 ## Unreleased
 
+### Added
+- Trained models with reports in `ml/`: satellite risk engine (XGBoost + SHAP on Earth Engine, ROC-AUC 0.90) and IndoBERT hoax filter (98.4 %); forecasts published to Firestore.
+- Detailed architecture diagram.
+
 ## APK v1.0.1 (2026-11-01)
 
 - Demo vs Live data mode, 3D map button (in-app WebView), tidier map controls, 22 px gutter, SOS above toasts, fact-check layout fix (#20). First release signed with the MarketShield release key: uninstall v1.0.0 once before installing.

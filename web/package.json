@@ -9,7 +9,8 @@
     "lint": "eslint",
     "postinstall": "mkdir -p public/vendor/maplibre && cp node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs node_modules/maplibre-gl/dist/maplibre-gl-shared.mjs public/vendor/maplibre/",
     "seed": "tsx scripts/seed.ts",
-    "set-role": "tsx scripts/set-role.ts"
+    "set-role": "tsx scripts/set-role.ts",
+    "publish-forecast": "tsx scripts/publish-forecast.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
