@@ -213,10 +213,17 @@ export const DATASETS = [
   { id: "COPERNICUS/S2_SR_HARMONIZED", what: { id: "Perubahan vegetasi lereng", en: "Slope vegetation change" } },
 ];
 
+export const REPO = "aarieffawwaz/marketshield";
+
+/** Fallback values; the download page refreshes them from the latest GitHub Release. */
 export const APK = {
   version: "1.0.0",
-  file: "/downloads/marketshield-1.0.0-arm64.apk",
-  fileLegacy: "/downloads/marketshield-1.0.0-armv7.apk",
+  file: `https://github.com/${REPO}/releases/latest/download/marketshield-arm64.apk`,
+  fileLegacy: `https://github.com/${REPO}/releases/latest/download/marketshield-armv7.apk`,
+  sha: {
+    arm64: "fcc028915bcc661055188f1ac80bf9bdd78d8915c8274ea86120444ea74f2155",
+    armv7: "884800d3bbc6d4f8875ed5aaa6101171af210b2f6461d4272df630b5b2b94b10",
+  },
   size: "20,8 MB",
   sizeLegacy: "18,3 MB",
   minAndroid: "Android 7.0+",

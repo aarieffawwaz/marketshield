@@ -9,13 +9,9 @@ import { BadgeCheck, ChevronDown, Cpu, Download, Languages, MonitorSmartphone, S
 import { PageShell } from "@/components/site/page";
 import { CopyButton } from "@/components/ui/interactions";
 import { APK } from "@/lib/data";
+import { useLatestRelease } from "@/lib/release";
 import { useT } from "@/lib/store";
 import { cn } from "@/lib/utils";
-
-const SHA = {
-  arm64: "fcc028915bcc661055188f1ac80bf9bdd78d8915c8274ea86120444ea74f2155",
-  armv7: "884800d3bbc6d4f8875ed5aaa6101171af210b2f6461d4272df630b5b2b94b10",
-};
 
 const SHOTS = [
   { s: "05_home3a", id: "Beranda adaptif", en: "Adaptive home" },
@@ -39,6 +35,7 @@ function PhoneShot({ src, className }: { src: string; className?: string }) {
 export function DownloadPage() {
   const { t, tx } = useT();
   const [open, setOpen] = useState<number | null>(0);
+  const rel = useLatestRelease();
   const steps = [
     { h: t("Unduh APK", "Download the APK"), p: t("Ketuk tombol unduh di ponsel Android. Ukurannya sekitar 20 MB.", "Tap download on your Android phone. It's about 20 MB.") },
     { h: t("Izinkan pemasangan", "Allow the install"), p: t("Jika diminta, aktifkan “Instal aplikasi tidak dikenal” untuk browser Anda.", "If asked, enable “Install unknown apps” for your browser.") },
@@ -56,18 +53,18 @@ export function DownloadPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_70%_at_75%_45%,rgba(123,30,38,0.6),transparent_70%)]" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:py-20">
           <div>
-            <p className="label flex items-center gap-2 text-ember"><Smartphone className="h-3.5 w-3.5" /> Android · v{APK.version}</p>
+            <p className="label flex items-center gap-2 text-ember"><Smartphone className="h-3.5 w-3.5" /> Android · v{rel.version}</p>
             <h1 className="mt-4 font-display text-[clamp(2.2rem,5.4vw,4rem)] font-semibold leading-[1.03] tracking-[-0.035em]">{t("Peringatan dini erupsi, di saku Anda.", "Eruption early warning, in your pocket.")}</h1>
             <p className="mt-5 max-w-lg text-[16.5px] leading-relaxed text-bone/65">{t("Ringan untuk sinyal lemah di lereng gunung. Bahasa Indonesia & Inggris. Gratis untuk warga, tanpa iklan.", "Light enough for weak signal on the slopes. Indonesian & English. Free for residents, no ads.")}</p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a href={APK.file} download className="btn-shine shine-bone group inline-flex items-center gap-3 rounded-2xl bg-bone py-3 pl-3 pr-5 text-night">
+              <a href={rel.arm64.url} className="btn-shine shine-bone group inline-flex items-center gap-3 rounded-2xl bg-bone py-3 pl-3 pr-5 text-night">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-maroon text-white"><Download className="h-5 w-5" /></span>
-                <span className="text-left leading-tight"><span className="block text-[15px] font-semibold">{t("Unduh APK", "Download APK")}</span><span className="block text-[12px] text-night/60">arm64 · {APK.size}</span></span>
+                <span className="text-left leading-tight"><span className="block text-[15px] font-semibold">{t("Unduh APK", "Download APK")}</span><span className="block text-[12px] text-night/60">arm64 · {rel.arm64.size}</span></span>
               </a>
               <Link href="/mobile" className="inline-flex items-center gap-2 rounded-2xl px-5 py-4 text-[14px] text-bone ring-1 ring-white/20 transition hover:bg-white/5"><MonitorSmartphone className="h-4 w-4" /> {t("Coba di browser", "Try in the browser")}</Link>
             </div>
             <StoreBadges dark apk={false} className="mt-5" />
-            <a href={APK.fileLegacy} download className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] text-bone/55 underline decoration-white/20 underline-offset-4 hover:text-bone"><Cpu className="h-3.5 w-3.5" /> {t("Ponsel lama 32-bit (armeabi-v7a", "Older 32-bit phones (armeabi-v7a")} · {APK.sizeLegacy})</a>
+            <a href={rel.armv7.url} className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] text-bone/55 underline decoration-white/20 underline-offset-4 hover:text-bone"><Cpu className="h-3.5 w-3.5" /> {t("Ponsel lama 32-bit (armeabi-v7a", "Older 32-bit phones (armeabi-v7a")} · {rel.armv7.size})</a>
             <div className="mt-10 grid max-w-lg grid-cols-3 gap-px overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10">
               {[[Smartphone, APK.minAndroid], [WifiOff, t("Bisa offline", "Works offline")], [Languages, "ID · EN"]].map(([I, l]) => {
                 const Icon = I as typeof Smartphone;
@@ -105,7 +102,7 @@ export function DownloadPage() {
           <div className="space-y-4">
             <div className="glass-card p-5">
               <p className="flex items-center gap-2 text-[14px] font-semibold text-wine"><ShieldCheck className="h-4 w-4 text-leaf" /> {t("Verifikasi file (SHA-256)", "Verify the file (SHA-256)")}</p>
-              {[["arm64-v8a", SHA.arm64], ["armeabi-v7a", SHA.armv7]].map(([k, v]) => (
+              {[["arm64-v8a", rel.arm64.sha], ["armeabi-v7a", rel.armv7.sha]].map(([k, v]) => (
                 <div key={k} className="mt-3 flex items-center gap-3 rounded-xl bg-sand p-3">
                   <div className="min-w-0 flex-1"><p className="text-[11.5px] font-medium text-muted">{k}</p><p className="truncate font-mono text-[11.5px] text-ink">{v}</p></div>
                   <CopyButton text={v} label={t("Salin", "Copy")} doneLabel={t("Tersalin", "Copied")} />
