@@ -716,7 +716,7 @@ class KitScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(children: [
-          SubHeader(context.t('Kit Siaga Bencana', 'Disaster Ready Kit'),
+          SubHeader(context.t('Kit Siaga', 'Ready Kit'),
               trailing: Pill('Level ${levelRoman[app.level - 1]} ${context.l(levelName[app.level - 1])}', bg: C.pink, size: 10.5)),
           Expanded(
             child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [

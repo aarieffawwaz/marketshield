@@ -480,7 +480,7 @@ class HomeScreen extends StatelessWidget {
                   side: const BorderSide(color: Color(0x66FFFFFF)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(R.control))),
               icon: const Icon(Icons.near_me_outlined, color: Colors.white, size: 18),
-              label: Text(context.t('Cari Posko Terdekat & Jalur Aman', 'Find Nearest Post & Safe Route'),
+              label: Text(context.t('Cari Posko & Jalur Aman', 'Find Post & Safe Route'),
                   style: inter(14, w: FontWeight.w600, c: Colors.white)),
             ),
           ),

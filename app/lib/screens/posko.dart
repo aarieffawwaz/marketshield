@@ -340,10 +340,15 @@ class _AidPriorityScreenState extends State<AidPriorityScreen> {
                       height: 170,
                       child: Stack(fit: StackFit.expand, children: [
                         const GeoMap(mode: GeoMode.risk, showAsh: false),
+                        // Stops short of the Satelit toggle on the right so they never overlap on phones.
                         Positioned(
                           left: mapInset,
+                          right: mapInset + 96,
                           bottom: attributionHeight + 8,
-                          child: Pill(context.t('Zona Aliran Lahar Besuk Kobokan', 'Besuk Kobokan lahar zone'), bg: Colors.black54, fg: Colors.white, size: 10),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Pill(context.t('Zona Aliran Lahar Besuk Kobokan', 'Besuk Kobokan lahar zone'), bg: Colors.black54, fg: Colors.white, size: 10),
+                          ),
                         ),
                         Positioned(right: mapInset, top: mapInset, child: Pill(context.t('Resolusi 100 m', '100 m grid'), bg: Colors.black54, fg: Colors.white, size: 10)),
                       ]),
