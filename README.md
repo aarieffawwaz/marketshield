@@ -8,87 +8,46 @@
 
 **Gunung dibaca dari orbit. Warga bertindak sebelum panik.**
 
-Satellite-based eruption early warning for residents, markets and aid posts around Indonesia's active volcanoes: satellites sense, a model forecasts, and the app tells every resident the one next step.
+Satellite-based eruption early warning for residents, markets and aid posts around Indonesia's active volcanoes.
 
-[**Live site**](https://marketshield-inception.vercel.app) · [**Web console**](https://marketshield-inception.vercel.app/app/login) · [**Resident app**](https://marketshield-inception.vercel.app/mobile) · [**Download APK**](https://github.com/aarieffawwaz/marketshield/releases/latest) · [**Technical documentation**](docs/TECHNICAL_DOCUMENTATION.md)
-
-<img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white" />
-<img alt="React 19" src="https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white" />
-<img alt="Flutter 3.41" src="https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter&logoColor=white" />
-<img alt="Cloud Firestore" src="https://img.shields.io/badge/Firestore-asia--southeast2-FFCA28?logo=firebase&logoColor=black" />
-<img alt="Google Earth Engine" src="https://img.shields.io/badge/Google_Earth_Engine-10_datasets-4285F4?logo=googleearth&logoColor=white" />
-<img alt="MapLibre GL" src="https://img.shields.io/badge/MapLibre_GL-6.16-396CB2" />
-<img alt="Deployed on Vercel" src="https://img.shields.io/badge/web-Vercel-111111?logo=vercel&logoColor=white" />
-<img alt="Latest APK" src="https://img.shields.io/github/v/release/aarieffawwaz/marketshield?label=APK&color=7B1E26" />
+[![Deploy](https://github.com/aarieffawwaz/marketshield/actions/workflows/deploy.yml/badge.svg)](https://github.com/aarieffawwaz/marketshield/actions/workflows/deploy.yml)
+[![Release APK](https://github.com/aarieffawwaz/marketshield/actions/workflows/release-apk.yml/badge.svg)](https://github.com/aarieffawwaz/marketshield/actions/workflows/release-apk.yml)
+[![Latest APK](https://img.shields.io/github/v/release/aarieffawwaz/marketshield?label=APK&color=7B1E26)](https://github.com/aarieffawwaz/marketshield/releases/latest)
+[![Live site](https://img.shields.io/badge/live-marketshield--inception.vercel.app-111111?logo=vercel&logoColor=white)](https://marketshield-inception.vercel.app)
+<br/>
+![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
+![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Flutter 3.41](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter&logoColor=white)
+![Cloud Firestore](https://img.shields.io/badge/Firestore-asia--southeast2-FFCA28?logo=firebase&logoColor=black)
+![Google Earth Engine](https://img.shields.io/badge/Google_Earth_Engine-10_datasets-4285F4?logo=googleearth&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-ROC--AUC_0.899-189FDD)
+![IndoBERT](https://img.shields.io/badge/IndoBERT-98.4%25_test_accuracy-FFD21E?logo=huggingface&logoColor=black)
+![MapLibre GL](https://img.shields.io/badge/MapLibre_GL-6.16-396CB2)
 
 *BRAIN – Ayam Jago · BINUS University*
 
 </div>
 
-> **Prototype.** Volcano levels follow PVMBG; MarketShield forecasts complement, never replace, official information. Villages, aid posts, prices and alerts in the database are seeded demo records shaped like the real pipeline outputs. See [Known limitations](#known-limitations).
+MarketShield is a disaster-readiness system for communities around Indonesia's active volcanoes. It reads public satellite data from Google Earth Engine, estimates the chance of thermal activity at a volcano in the next 7 days with an XGBoost model, and turns the official PVMBG alert level into one concrete next step for each resident. Residents use a free Flutter app (Android and web). BPBD officers, aid-post coordinators and donors use a Next.js web console. A public REST API exposes the same data. All three read one Cloud Firestore database in Jakarta, so a change made by an aid-post coordinator shows up on every screen within about a second.
+
+> **Prototype.** Volcano levels follow PVMBG; MarketShield forecasts sit next to the official level and never replace it. Villages, aid posts, prices and alerts in the database are seeded demo records shaped like the real pipeline outputs. See [Known limitations](#known-limitations).
+
+## Live links
 
 | | |
 |:-|:-|
 | **Live site** | <https://marketshield-inception.vercel.app> |
-| **Web console** | <https://marketshield-inception.vercel.app/app/login>: choose *Data contoh* or *Data live*, no account needed |
-| **Resident app** | Android APK on [GitHub Releases](https://github.com/aarieffawwaz/marketshield/releases/latest) · same app in the browser at [/mobile](https://marketshield-inception.vercel.app/mobile) |
+| **Web console (demo)** | <https://marketshield-inception.vercel.app/app/login>: choose *Data contoh* (sample data) or *Data live*, then pick a role. No account needed |
+| **Resident app in the browser** | <https://marketshield-inception.vercel.app/mobile> (the same Flutter code as the APK) |
+| **Android APK** | [GitHub Releases, latest](https://github.com/aarieffawwaz/marketshield/releases/latest) · [/download](https://marketshield-inception.vercel.app/download) |
+| **3D map and eruption simulation** | <https://marketshield-inception.vercel.app/embed/peta?sim=1> |
 | **Public API** | <https://marketshield-inception.vercel.app/api/v1/volcanoes> · [API reference](docs/API.md) |
-| **System status** | <https://marketshield-inception.vercel.app/status>: live checks from your browser |
+| **System status** | <https://marketshield-inception.vercel.app/status>: live checks from your browser every 30 seconds |
+| **Demo video** | ⟨link video demo⟩ |
+| **Technical documentation** | [docs/TECHNICAL_DOCUMENTATION.md](docs/TECHNICAL_DOCUMENTATION.md) |
 
-## Contents
-
-[Overview](#overview) · [Key capabilities](#key-capabilities) · [Product tour](#product-tour) · [How it works](#how-it-works) · [Models](#models) · [Demo or real](#demo-or-real) · [Architecture](#architecture) · [Technology stack](#technology-stack) · [Getting started](#getting-started) · [Delivery](#delivery) · [Security overview](#security-overview) · [Testing and evidence](#testing-and-evidence) · [AI Use and Third-Party Declaration](#ai-use-and-third-party-declaration) · [Documentation](#documentation) · [Known limitations](#known-limitations) · [Next steps](#next-steps) · [Team](#team)
-
----
-
-## Overview
-
-**The problem.** Semeru's eruption on 4 December 2021 sent pyroclastic flows down Besuk Kobokan within an afternoon. PVMBG's alert level is precise, but it reaches residents as a status, not as an instruction. Around every escalation three things go wrong at once: chain messages on WhatsApp spread panic faster than corrections ("lahar has reached Pronojiwo, leave now!"), mask and clean-water prices jump while shelves empty, and aid goes to the villages that are easiest to reach rather than those that need it most.
-
-**What MarketShield is.** A disaster-readiness system that turns public satellite data into one clear next step for each person:
-
-- **Residents** get a free Android app whose home screen changes shape with the PVMBG level: prepare a go-kit at Level I, stock up fairly at Level II, know your route at Level III, evacuate at Level IV. Chain messages can be checked in seconds, and the nearest aid post shows whether it is open or full.
-- **Local government (BPBD) and aid posts** get a web console with a satellite forecast, an Aid Priority Index per village, price-cap (HET) monitoring and broadcasts staggered by cohort so they do not trigger panic buying.
-- **Everyone reads the same live database.** An aid post marked *Penuh* by its coordinator turns orange on every console within a second.
-
-**Who it serves.** Residents of the hazard zones (KRB) around Semeru and 24 other mapped volcanoes; BPBD operations officers; aid-post and village coordinators; pharmacies and distributors who want proof of fair pricing.
-
-**Why it fits "Building Resilient Communities Through Human-Centered Digital Innovation".** The design starts from the resident's questions (*am I in danger, what should I buy, where do I go, is this message true?*) and answers them in plain Bahasa Indonesia, on a low-end phone, with weak signal, offline if needed. Safety features are never behind a paywall. No field sensor has to be installed or maintained on an active volcano: every input comes from public satellite catalogues and official sources.
-
-## Key capabilities
-
-| Area | What is implemented | Details |
-|:-|:-|:-|
-| Adaptive resident app | Flutter app (Android + web); home, primary action and highlighted features follow PVMBG levels I–IV; demo/live data modes; offline cache | [Technical §4](docs/TECHNICAL_DOCUMENTATION.md#4-resident-app-flutter) |
-| Satellite risk engine | XGBoost on 10,067 volcano-weeks of Earth Engine features (FIRMS, Sentinel-5P SO₂, Sentinel-1, GPM IMERG): **ROC-AUC 0.90** vs 0.78 baseline on 2024–2026, with SHAP drivers; forecast published to Firestore, shown in the console and the risk API | [ML report](ml/README.md#2-satellite-risk-engine) |
-| Hoax filter | Fine-tuned IndoBERT: **98.4 %** test accuracy (TF-IDF baseline 96.9 %), **90 %** on short WhatsApp-style messages; API and app use a rule-based classifier with trigger words and a satellite cross-check; outcomes stored, never message text | [ML report](ml/README.md#1-indobert-hoax-filter) |
-| Live database | Cloud Firestore in Jakarta with security rules; realtime listeners in the console | [Technical §6](docs/TECHNICAL_DOCUMENTATION.md#6-backend-database-and-auth) |
-| Operator console | Overview, hazard map, Aid Priority Index, posts and shelters, broadcasts, signal filter, price watch, guided tour; Firebase Auth (email or Google) with role claims | [Technical §5](docs/TECHNICAL_DOCUMENTATION.md#5-web-console) |
-| Demo and live modes | Sample-data demo for exploring, live view-only for proof, operator mode for writes; a badge always shows which | [Demo or real](#demo-or-real) |
-| 3D map and eruption simulation | MapLibre globe on Sentinel-2 imagery with terrain; three.js ash column, ejecta and pyroclastic flow; regional ash plume with per-city AQI and price impact; opened from the app's **3D** button | [Technical §5.3](docs/TECHNICAL_DOCUMENTATION.md#53-map-3d-and-eruption-simulation) |
-| Public API | 8 REST endpoints under `/api/v1`, CORS-enabled; each response says whether it came from Firestore or the fallback | [API reference](docs/API.md) |
-| Delivery | GitHub Actions: build check per PR, production deploy on merge, signed APK release per tag | [Delivery](#delivery) |
-
-## Product tour
-
-Open **[marketshield-inception.vercel.app](https://marketshield-inception.vercel.app)**.
-
-1. **Watch the volcano.** The landing page opens on a live 3D map. Press **Simulasi erupsi** to see the ash column, the pyroclastic flow down Besuk Kobokan and the villages in its path, with and without MarketShield.
-2. **Use the resident app.** Open **[/mobile](https://marketshield-inception.vercel.app/mobile)** or install the APK. Pick *Mode demo* to move the level from I to IV and watch the home screen change, or *Data live* to read the real database. Paste a chain message into **Intel**. Tap **3D** on the map.
-3. **Run the console.** Open **[/app/login](https://marketshield-inception.vercel.app/app/login)**, pick **Data contoh** or **Data live**, then jump in as BPBD, an aid-post coordinator or a donor. A guided tour starts on the first visit.
-4. **Change something for real.** Sign in as an operator (email or Google) and switch an aid post from *Buka* to *Penuh*: every open console updates.
-5. **Check it yourself.** Call the [API](docs/API.md), or open **[/status](https://marketshield-inception.vercel.app/status)**, which pings the API and map servers from your browser every 30 seconds.
-
-| Surface | Route | For |
-|:-|:-|:-|
-| Landing | `/` | Judges, partners, BPBD, donors |
-| Web console | `/app` | BPBD operators, aid posts, donors, distributors |
-| Resident app | `/mobile`, Android APK | Residents |
-| 3D map | `/embed/peta` | Opened from the app's **3D** button |
-| Product pages | `/fitur` `/harga` `/docs` `/bantuan` `/kemitraan` `/blog` | Features, pricing, docs, help, partnerships, articles |
-| Trust pages | `/tentang` `/pers` `/keamanan` `/status` `/changelog` | About, press kit, security and compliance, live status, release notes |
-| Legal | `/privasi` `/syarat` `/kredit` | Privacy (UU PDP 27/2022), terms, photo and data credits |
-| API | `/api/v1/*` | [API reference](docs/API.md) |
+## Preview
 
 <div align="center">
 <img src="docs/readme/console-overview.png" alt="Web console overview in live mode" width="860" />
@@ -101,26 +60,136 @@ Open **[marketshield-inception.vercel.app](https://marketshield-inception.vercel
 <br/><sub>The resident app is the same Flutter code on Android and on the web.</sub>
 </div>
 
-## How it works
+<p align="center">
+  <img src="docs/evidence/site-status.webp" alt="Status page with live checks of the API and map providers" width="49%" />
+  <img src="docs/evidence/api-risk.webp" alt="Risk API serving the model forecast from Firestore" width="49%" />
+</p>
+<p align="center"><sub>Left: <code>/status</code> checks the API and map providers from the visitor's browser. Right: <code>/api/v1/volcanoes/semeru/risk</code> returns the official level and the model forecast.</sub></p>
+
+## Contents
+
+[Problem](#problem) · [Solution](#solution-four-pillars) · [Features by role](#features-by-role) · [Product tour](#product-tour) · [Architecture](#architecture) · [Technology stack](#technology-stack) · [Models](#models) · [Data sources and licences](#data-sources-and-licences) · [API](#api-reference) · [Repository structure](#repository-structure) · [Getting started](#getting-started) · [Demo mode and live mode](#demo-mode-and-live-mode) · [CI/CD](#cicd) · [Testing](#testing) · [Security](#security) · [Known limitations](#known-limitations) · [Roadmap](#roadmap) · [Team](#team) · [Credits](#credits-and-third-party-licences) · [License](#license)
+
+---
+
+## Problem
+
+Semeru's eruption on 4 December 2021 sent pyroclastic flows down Besuk Kobokan within an afternoon. PVMBG's alert level is precise, but it reaches residents as a status with no instruction attached, and they still have to guess what to do. Around every escalation three things go wrong at the same time:
+
+1. **Rumours travel faster than corrections.** Chain messages on WhatsApp ("lahar has reached Pronojiwo, leave now!") spread panic before anyone can check them.
+2. **Prices jump and shelves empty.** Residents buy masks and clean water all at once; pharmacies sell out in a day and get accused of price gouging.
+3. **Aid goes to the easiest villages.** Villages closest to the road get supplies first, while the most exposed villages wait.
+
+The people involved are residents of the hazard zones (KRB) around the volcano, BPBD operations officers, aid-post and village coordinators, and local pharmacies and distributors. They work in Bahasa Indonesia, often on low-end phones with weak signal.
+
+## Solution: four pillars
 
 <p align="center">
   <img src="docs/readme/how-it-works.png" alt="Sense, filter, act, fair" width="100%" />
 </p>
 
+| Pillar | What it does | Answers |
+|:-|:-|:-|
+| **1. GeoAI predictive engine** (early action window) | Earth Engine features (NASA FIRMS, Sentinel-5P SO₂, Sentinel-1, GPM IMERG) go into an XGBoost model that gives a 7-day activity probability and its top drivers (SHAP), shown next to the official level | Time to prepare before the level rises |
+| **2. Pre-emptive procurement nudge** | At Level II (Waspada) the app asks residents to build their go-kit in stages, by cohort, at price-cap (HET) prices, so demand is spread over days | Panic buying |
+| **3. Anti-hoax feed** | Paste a chain message: trigger words, a satellite cross-check and the nearest official fact come back in seconds. IndoBERT is trained (98.4 % test accuracy); the API serves a rule-based classifier for now | Rumours and panic |
+| **4. Emergency price tracker** | Market prices compared with the government price cap (HET); deviation above 30 % is flagged | Price speculation |
+
+These reach people through three surfaces: the adaptive resident app, the operator console with the Aid Priority Index, and the public API (8 endpoints under `/api/v1`).
+
 <p align="center">
   <img src="docs/readme/levels.png" alt="The resident home screen at PVMBG levels I to IV" width="100%" />
 </p>
 
-**Where AI is used, and where it is not.** Models appear only where a rule cannot do the job: combining many weak satellite signals into one escalation probability, and reading informal Indonesian chain messages. Everything that decides safety stays official or deterministic.
+The resident home screen follows the PVMBG level and always puts one main action at the top: prepare a go-kit at Level I, shop fairly at Level II, know your route at Level III, evacuate at Level IV.
+
+**Where models are used, and where they are not.** Models appear only where a rule cannot do the job: combining many weak satellite signals into one probability, and reading informal Indonesian chain messages. Safety decisions stay official or deterministic.
 
 | Responsibility | Model | Official source or deterministic code |
 |:-|:-|:-|
 | Volcano alert level | – | PVMBG status, stored as `volcanoes/{id}.level` |
 | 7-day activity probability | XGBoost risk engine on Earth Engine features ([report](ml/README.md#2-satellite-risk-engine)) | Shown next to the official level, never replacing it |
-| Message check | IndoBERT fine-tuned on 12k Indonesian texts ([report](ml/README.md#1-indobert-hoax-filter)) | Trigger words, satellite cross-check, nearest official fact; rule-based classifier serves the API and app today |
+| Message check | IndoBERT fine-tuned on 12k Indonesian texts ([report](ml/README.md#1-indobert-hoax-filter)) | Trigger words, satellite cross-check, nearest official fact; the rule-based classifier serves the API and app today |
 | Aid priority | – | exposure × hazard × vulnerability ÷ (aid received + 1) |
-| Price watch | – | (market − HET) ÷ HET, flagged above 30% |
+| Price watch | – | (market − HET) ÷ HET, flagged above 30 % |
 | Broadcasts | – | Signed-in BPBD operators only, staggered by cohort |
+
+**Design choices for the people using it.** Plain Bahasa Indonesia first, with English everywhere. Works on a low-end phone and offline, from cached or bundled data. Residents need no account. Safety features are free. No field sensor has to be installed or maintained on an active volcano: every input comes from public satellite catalogues and official sources.
+
+## Features by role
+
+### Residents (warga): Flutter app, Android and web
+
+- **Adaptive home** (*Beranda*): hero, main button and highlighted features change with PVMBG levels I–IV.
+- **Hazard map** (*Peta*): KRB rings, ash and lahar areas, evacuation route and shelters (flutter_map); a **3D** button opens the eruption simulation in an in-app WebView.
+- **Intel**: paste a chain message to get a label, trigger words, satellite cross-check and nearest official fact; verified intel feed.
+- **Posko**: nearest aid posts and shelters with *Buka* / *Penuh* / *Tutup* status, capacity and needs, updated by coordinators.
+- **Kit Siaga** with HET price anchors, and a price report form (on screen only in this prototype, nothing is sent yet).
+- **Sector protocols**, for example farmers and livestock keepers.
+- **SOS**: hold for 3 seconds.
+- **Profil**: Indonesian/English, demo or live data, level simulation in demo mode, data sources and photo credits.
+- **Offline**: last good data is cached per endpoint; bundled data is used when there is nothing cached. A chip shows *Live*, *Offline · data tersimpan* or *Offline · data bawaan*.
+- No account needed.
+
+### Aid-post coordinators (posko): web console
+
+- Sign in with email or Google; role comes from a Firebase custom claim.
+- Change an aid post's status (*Buka*, *Penuh*, *Tutup*), occupancy, stock and needs. Firestore rules let this role change only those fields.
+- See the overview, hazard map, Aid Priority Index, and alerts and broadcasts.
+
+### BPBD operators: web console
+
+- **Overview**: KPIs, next actions, forecast chart from the risk engine, latest alerts.
+- **Hazard map**: satellite 3D, model view and 2D.
+- **Aid Priority Index** per village, and logging a delivery (which moves the next delivery to another village).
+- **Posts and shelters**: status, capacity, stock.
+- **Broadcasts** staggered by cohort so an announcement does not trigger panic buying.
+- **Signal filter**: message check and intel feed.
+- **Price watch**: HET deviation and history.
+- ⌘K command palette, notifications, Indonesian/English, dark mode, guided tour (Driver.js) on the first visit.
+
+### Donors and distributors: web console
+
+- Overview, hazard map, Aid Priority Index and price watch, to see where supplies are needed and prove fair pricing.
+
+### Admins
+
+- Full write access in Firestore rules, including the official volcano level and price caps.
+- Assign operator roles with `npm run set-role` (writes the custom claim and `users/{uid}`).
+- Load or refresh data with `npm run seed` and publish model forecasts with `npm run publish-forecast`.
+- In the console an admin gets the BPBD view.
+
+| Console tab | BPBD | Posko | Donor |
+|:-|:-:|:-:|:-:|
+| Overview | ✓ | ✓ | ✓ |
+| Hazard map | ✓ | ✓ | ✓ |
+| Aid priority | ✓ | ✓ | ✓ |
+| Posts and shelters | ✓ | ✓ | |
+| Alerts and broadcasts | ✓ | ✓ | |
+| Signal filter | ✓ | | |
+| Price watch | ✓ | | ✓ |
+
+## Product tour
+
+Open **[marketshield-inception.vercel.app](https://marketshield-inception.vercel.app)**.
+
+1. **Watch the volcano.** The landing page opens on a live 3D map. Press **Simulasi erupsi** to see the ash column, the pyroclastic flow down Besuk Kobokan and the villages in its path, with and without MarketShield.
+2. **Use the resident app.** Open **[/mobile](https://marketshield-inception.vercel.app/mobile)** or install the APK. Pick *Mode demo* to move the level from I to IV and watch the home screen change, or *Data live* to read the real database. Paste a chain message into **Intel**. Tap **3D** on the map.
+3. **Run the console.** Open **[/app/login](https://marketshield-inception.vercel.app/app/login)**, pick **Data contoh** or **Data live**, then enter as BPBD, an aid-post coordinator or a donor. A guided tour starts on the first visit.
+4. **Change something for real.** With an operator account, switch an aid post from *Buka* to *Penuh*: every open console updates. See [Demo mode and live mode](#demo-mode-and-live-mode) for how to get operator access.
+5. **Check it yourself.** Call the [API](docs/API.md), or open **[/status](https://marketshield-inception.vercel.app/status)**.
+
+| Surface | Route | For |
+|:-|:-|:-|
+| Landing | `/` | Public, partners, BPBD, donors |
+| Web console | `/app` | BPBD operators, aid posts, donors, distributors |
+| Resident app | `/mobile`, Android APK | Residents |
+| 3D map | `/embed/peta` | Opened from the app's **3D** button |
+| Product pages | `/fitur` `/harga` `/docs` `/bantuan` `/kemitraan` `/blog` | Features, pricing, docs, help, partnerships, articles |
+| Trust pages | `/tentang` `/pers` `/keamanan` `/status` `/changelog` | About, press kit, security and compliance, live status, release notes |
+| Legal | `/privasi` `/syarat` `/kredit` | Privacy (UU PDP 27/2022), terms, photo and data credits |
+| Download | `/download` | Latest APK, size and SHA-256 from GitHub Releases |
+| API | `/api/v1/*` | [API reference](docs/API.md) |
 
 ## Models
 
