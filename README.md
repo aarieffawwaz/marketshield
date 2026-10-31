@@ -380,76 +380,167 @@ marketshield/
 
 ## Getting started
 
-**Requirements:** Node.js 20+, Flutter 3.41 (stable). A Firebase service account is needed only for live data.
+**Requirements**
+
+| Part | Needs |
+|:-|:-|
+| Website, console, API | Node.js 20+ and npm |
+| Resident app | Flutter 3.41 stable (CI uses 3.41.6); Android SDK for device builds; Java 17 for release APKs |
+| Firebase rules | Firebase CLI (`npm install -g firebase-tools`), optional |
+| Models | Python 3 with pip; an Earth Engine–registered Google Cloud project for the risk engine; a GPU helps for IndoBERT |
+
+Nothing below needs a secret unless you want live data. Without credentials every surface serves the bundled demo dataset.
+
+### Web (site, console, API)
 
 ```bash
 git clone https://github.com/aarieffawwaz/marketshield.git
 cd marketshield/web
 npm install          # also copies the MapLibre worker into public/vendor
 npm run dev          # http://localhost:3000, serves bundled demo data
+npm run lint         # ESLint
+npm run build        # production build
 ```
 
-Live data locally (optional):
+**Environment variables.** The only server variable is listed in [`web/.env.example`](web/.env.example):
+
+| Variable | Purpose |
+|:-|:-|
+| `FIREBASE_SERVICE_ACCOUNT` | Service-account JSON (raw or base64) for the Firebase Admin SDK. Leave empty to serve bundled demo data. |
 
 ```bash
-cp .env.example .env.local
-# FIREBASE_SERVICE_ACCOUNT=<service-account JSON or base64>
-npm run seed         # load the demo dataset into Firestore (idempotent)
+cp .env.example .env.local     # used by `npm run dev`; never commit it (.env* is git-ignored)
+```
+
+The browser-side Firebase config in `web/src/lib/firebase-config.ts` is public by design and its key is restricted to the project's domains. To run against your own Firebase project, replace that config and use a service account from your project.
+
+**Admin scripts** read `FIREBASE_SERVICE_ACCOUNT` from the shell:
+
+```bash
+export FIREBASE_SERVICE_ACCOUNT="$(cat path/to/your-service-account.json)"
+npm run seed                                   # load the demo dataset into Firestore (idempotent)
 npm run set-role -- operator@example.org bpbd "Nama Operator" "BPBD Kab. Lumajang"
+npm run publish-forecast -- ../ml/results/risk_latest.json
 ```
 
-Resident app:
+`set-role` accepts the roles `admin`, `bpbd`, `posko` and `donor`. Passing `google` as a fifth argument creates a Google-only account.
+
+### Resident app (Flutter)
 
 ```bash
-cd ../app
+cd app
 flutter pub get
+flutter analyze
+flutter test
 flutter run                     # Android device or emulator
 flutter run -d chrome           # web; add ?mode=demo or ?mode=live
 ```
 
-To serve the app at `/mobile` locally: `flutter build web --release --base-href /mobile-app/ --no-web-resources-cdn && cp -R build/web/. ../web/public/mobile-app/`.
+To serve the app at `/mobile` locally:
 
-## Delivery
+```bash
+flutter build web --release --base-href /mobile-app/ --no-web-resources-cdn
+cp -R build/web/. ../web/public/mobile-app/
+```
+
+Android builds: `flutter build apk --release --split-per-abi`. Without `android/key.properties` the build falls back to the debug key; release signing happens in CI.
+
+### Firebase (rules and indexes)
+
+`firebase.json` points the Firebase CLI at `firebase/firestore.rules` and `firebase/firestore.indexes.json`.
+
+```bash
+firebase login
+firebase deploy --only firestore:rules,firestore:indexes --project <your-project-id>
+```
+
+To try the rules locally, `firebase emulators:start --only firestore --project demo-marketshield` starts the Firestore emulator with the same rules file. The web and app code are not wired to the emulator, so this is only useful for testing rules. Collections and fields are documented in [firebase/SCHEMA.md](firebase/SCHEMA.md).
+
+### Models (Python)
+
+```bash
+cd ml
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+# IndoBERT hoax filter (about 21 min on an Apple M5 GPU, about 10 min on a Colab T4)
+python train_hoax.py --epochs 2 --crop-aug --domain-aug --out results
+
+# Satellite risk engine (needs Earth Engine access)
+pip install earthengine-api xgboost shap
+gcloud auth application-default login \
+  --scopes=https://www.googleapis.com/auth/earthengine,https://www.googleapis.com/auth/cloud-platform
+python risk_engine.py --project <your-gcp-project> --out results
+```
+
+The hoax notebook [`ml/hoax_classifier.ipynb`](ml/hoax_classifier.ipynb) runs the same pipeline in Colab. Keys for notebooks go in Colab Secrets, never in cells ([firebase/ML-CONTRACT.md](firebase/ML-CONTRACT.md)).
+
+## Demo mode and live mode
+
+<p align="center">
+  <img src="docs/readme/data-modes.png" alt="Three modes: demo, live view-only, live operator" width="100%" />
+</p>
+
+| Mode | How to get it | Data | Writes |
+|:-|:-|:-|:-|
+| **Demo** | Console: *Data contoh* + a quick role. App: *Mode demo* or `?mode=demo` | Bundled scenario | Stay on screen only, never saved |
+| **Live, view only** | Console: *Data live* + a quick role, or a Google account without a role. App: *Data live* or `?mode=live` | Firestore in realtime | Refused with a message |
+| **Live, operator** | Sign in with an operator account (email or Google) that has a role claim | Firestore in realtime | Saved, and checked by Firestore rules |
+
+A badge on every screen shows which mode is active. Live never goes blank: the app falls back to the last cached data, then to bundled data, and says so in the header (*Offline · data tersimpan 14.05*).
+
+**Operator access for a demo.** Demo and live view-only modes need no account and show every screen. To try a real write (for example switching an aid post to *Penuh*), contact the team through the [repository owner's GitHub profile](https://github.com/aarieffawwaz) and we will create an operator account for you. Credentials are never published in this repository. If you run your own copy, create operators with `npm run set-role`.
+
+## CI/CD
 
 <p align="center">
   <img src="docs/readme/cicd.png" alt="Pull request build check, merge to production, tag to signed APK release" width="100%" />
 </p>
 
-- **Website and console:** every PR runs the full Flutter web and Next.js build as a check; merging to `main` deploys to production. Preview uploads were turned off after they used up Vercel's free daily upload quota.
-- **Android:** bump `version` in `app/pubspec.yaml`, then `git tag v1.0.1 && git push --tags`. CI builds signed APKs and publishes the release; [/download](https://marketshield-inception.vercel.app/download) reads the latest one.
+| Trigger | Workflow | What happens |
+|:-|:-|:-|
+| Pull request | [`deploy.yml`](.github/workflows/deploy.yml) | Flutter web build copied into `web/public/mobile-app`, then `vercel build` as a check. Nothing is uploaded |
+| Merge to `main` | [`deploy.yml`](.github/workflows/deploy.yml) | Same build, then `vercel deploy --prebuilt --prod` to production |
+| Tag `v*` | [`release-apk.yml`](.github/workflows/release-apk.yml) | Signed arm64 and armv7 APKs, `SHA256SUMS.txt`, GitHub Release with generated notes |
 
-Repository secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Vercel holds `FIREBASE_SERVICE_ACCOUNT`.
+PR previews were switched to build-only after they used up Vercel's free daily upload quota. To release the app, bump `version` in `app/pubspec.yaml`, then `git tag vX.Y.Z && git push --tags`; [/download](https://marketshield-inception.vercel.app/download) reads the latest release from the GitHub API.
 
-## Security overview
+Repository secrets (names only): `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Vercel holds `FIREBASE_SERVICE_ACCOUNT`.
 
-- **Roles are enforced by the database.** Firestore rules allow public reads only for reference data; aid-post coordinators can change only status fields; `signals`, `reports` and `users` are private. Checked from an anonymous client: `volcanoes` 200, `signals` 403.
-- **Least-privilege keys.** The API's service account has Datastore User and Firebase Auth Admin only; notebooks use a separate Datastore-only account. The browser key is restricted to our domains.
-- **Data minimisation (UU PDP 27/2022).** The hoax check stores label, confidence and trigger words, never the message text. The resident app works without an account.
-- **Secrets stay out of git.** Keys live in GitHub and Vercel secrets; `.env*`, keystores and AI helper files are git-ignored.
+## Testing
 
-The full self-assessment, including a notebook key that was exposed and disabled during development, is in [SECURITY_SELF_ASSESSMENT.md](docs/SECURITY_SELF_ASSESSMENT.md).
+| Check | How | Result |
+|:-|:-|:-|
+| Flutter | `flutter analyze`, `flutter test` | No issues; 7 tests pass (data mapping and widgets) |
+| Web | TypeScript strict, `npm run lint`, `npm run build` (also run on every PR) | Builds in CI |
+| Page audit | Playwright, 23 routes at 1440 px and 390 px | No console errors, no horizontal overflow, no broken images after three fixes |
+| Firestore rules, anonymous client | REST reads per collection | Public collections 200; `signals`, `reports`, `users` 403 |
+| Operator write, end to end | Posko coordinator signs in and changes *Posko Pronojiwo* | Firestore updated, then reverted |
+| Demo and live view-only | Same change in both modes | Demo stays on screen; view-only is refused; Firestore untouched |
+| Live API | All 7 GET endpoints in production | Served from Firestore; risk endpoint includes the model forecast |
+| Models | Held-out test sets, time split for the risk engine | See [Models](#models) |
+| APK integrity | SHA-256 per release | `SHA256SUMS.txt` in each release and on `/download` |
 
-## Testing and evidence
-
-| Check | Result |
-|:-|:-|
-| Production deploys | Merges to `main` deploy through GitHub Actions: 6 succeeded on 31 Oct, 4 were cancelled by a newer merge, 1 hit Vercel's daily upload quota |
-| Live API | All 7 read endpoints answer from Firestore in production; the risk endpoint includes the model forecast |
-| Firestore rules, anonymous client | Public collections 200; `signals` and `users` 403 |
-| Operator write, end to end | Posko coordinator signs in, sets *Posko Pronojiwo* to open, Firestore updates, then reverted |
-| Demo and live view-only | Demo change stays on screen only; live view-only change is refused; Firestore untouched |
-| Page audit | 23 routes at 1440 px and 390 px: no console errors, no horizontal overflow, no broken images |
-| Flutter | `flutter analyze` clean, 7 tests pass, web release build succeeds |
-| APK integrity | v1.0.0 SHA-256 published in the release (`SHA256SUMS.txt`) and on `/download` |
-
-Commands, timestamps, sample responses and a **screenshot gallery** (Firebase, Earth Engine, Colab, Vercel, GitHub): [EXECUTION_EVIDENCE.md](docs/EXECUTION_EVIDENCE.md#8-screenshot-gallery).
+Commands, timestamps, sample responses and a screenshot gallery (Firebase, Earth Engine, Colab, Vercel, GitHub): [docs/EXECUTION_EVIDENCE.md](docs/EXECUTION_EVIDENCE.md).
 
 <p align="center">
   <img src="docs/evidence/firestore-semeru.webp" alt="Firestore: volcanoes/semeru with the published XGBoost forecast" width="49%" />
-  <img src="docs/evidence/vercel-deployments.webp" alt="Vercel deployment history" width="49%" />
+  <img src="docs/evidence/firestore-rules.webp" alt="Deployed Firestore security rules" width="49%" />
+  <img src="docs/evidence/github-actions.webp" alt="GitHub Actions build checks and deploys" width="49%" />
+  <img src="docs/evidence/github-releases.webp" alt="Signed APK releases with SHA-256" width="49%" />
   <img src="docs/evidence/colab-hoax.webp" alt="IndoBERT notebook in Colab" width="49%" />
   <img src="docs/evidence/earthengine-codeeditor.webp" alt="Google Earth Engine Code Editor" width="49%" />
 </p>
+
+## Security
+
+- **Roles are enforced by the database.** Firestore rules allow public reads only for reference data. Aid-post coordinators can change only status fields; `signals`, `reports` and `users` are private. Checked from an anonymous client: `volcanoes` 200, `signals` 403.
+- **The browser session is never trusted.** The console session in `localStorage` only controls the UI; every write is checked by Firestore against the ID token's custom claim.
+- **Least-privilege keys.** The API's service account has Datastore User and Firebase Auth Admin only; notebooks use a separate Datastore-only account. The browser key is restricted to the project's domains.
+- **Data minimisation (UU PDP 27/2022).** The hoax check stores label, confidence and trigger words, never the message text. The resident app works without an account.
+- **Secrets stay out of git.** Keys live in GitHub and Vercel secrets; `.env*`, keystores, `key.properties` and AI helper files are git-ignored. APKs from v1.0.1 are signed with a release key kept outside the repository.
+
+Open items include per-post scoping for the `posko` role and a rate limit on `POST /signals/check`. The full self-assessment, including a notebook key that was exposed and disabled during development, is in [docs/SECURITY_SELF_ASSESSMENT.md](docs/SECURITY_SELF_ASSESSMENT.md). Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/aarieffawwaz/marketshield/security/advisories/new).
 
 ## AI Use and Third-Party Declaration
 
