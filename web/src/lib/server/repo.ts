@@ -89,3 +89,19 @@ export async function logSignal(s: { label: string; confidence: number; triggers
 }
 
 export const priceView = (i: PriceRow) => ({ id: i.id, item: i.name.en, unit: i.unit.en, het: i.het, market_avg: i.market, deviation: Number(deviation(i).toFixed(3)), verified_outlets: i.stock, flagged: deviation(i) > 0.3, updated_at: i.updatedAt });
+
+export type ForecastRow = { p: number; windowDays: number | null; drivers: string[]; model: string | null; updatedAt: string | null } | null;
+/** Model forecast merged into volcanoes/{id} by the risk-engine notebook */
+export async function getForecast(volcanoId: string): Promise<ForecastRow> {
+  const store = db();
+  if (!store) return null;
+  try {
+    const d = (await store.collection("volcanoes").doc(volcanoId).get()).data();
+    const f = d?.forecast;
+    const p = Number(f?.p_escalation_7d);
+    if (!f || !Number.isFinite(p)) return null;
+    return { p, windowDays: Number(f.window_days) || null, drivers: Array.isArray(f.shap_top3) ? f.shap_top3.map(String) : [], model: f.model ?? null, updatedAt: iso(d?.forecastUpdatedAt ?? d?.status_updated_at) };
+  } catch {
+    return null;
+  }
+}

@@ -113,9 +113,13 @@ export default function DocsPage() {
               <tr><td>GET</td><td><code>/volcanoes/{"{id}"}/risk?level=3</code></td><td>Level resmi, peluang eskalasi, jendela aksi, indikator, riwayat</td></tr>
               <tr><td>GET</td><td><code>/villages/priority?level=3</code></td><td>Peringkat desa untuk distribusi bantuan</td></tr>
               <tr><td>GET</td><td><code>/prices</code></td><td>HET, rata-rata pasar dan deviasi barang darurat</td></tr>
+              <tr><td>GET</td><td><code>/posko?volcano=semeru</code></td><td>Status, kapasitas, stok dan kebutuhan posko</td></tr>
+              <tr><td>GET</td><td><code>/alerts</code></td><td>Peringatan terbaru dari BPBD dan satelit</td></tr>
+              <tr><td>GET</td><td><code>/intel</code></td><td>Klaim yang sudah diverifikasi: hoaks, panik, terverifikasi, resmi</td></tr>
               <tr><td>POST</td><td><code>/signals/check</code></td><td>Klasifikasi pesan dan cek silang satelit</td></tr>
             </tbody>
           </table>
+          <p>Setiap respons punya kolom <code>source</code>: <code>firestore</code> untuk data langsung dari basis data, <code>static</code> bila basis data sedang tidak terjangkau. Endpoint risiko juga menyertakan <code>model</code> berisi prakiraan XGBoost terbaru bila tersedia. Isi pesan yang dicek tidak pernah disimpan.</p>
           <p>Contoh: cek sebuah pesan berantai.</p>
           <pre><code>{`curl -X POST ${BASE}/signals/check \\
   -H "Content-Type: application/json" \\
