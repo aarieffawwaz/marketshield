@@ -1,6 +1,9 @@
-import { ITEMS, deviation } from "@/lib/data";
+import { getPrices, priceView } from "@/lib/server/repo";
 import { json } from "../_shared";
 
-export function GET() {
-  return json({ region: "Kab. Lumajang", currency: "IDR", data: ITEMS.map((i) => ({ item: i.name.en, unit: i.unit.en, het: i.het, market_avg: i.market, deviation: Number(deviation(i).toFixed(3)), verified_outlets: i.stock, flagged: deviation(i) > 0.3 })) });
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const { source, data } = await getPrices();
+  return json({ source, region: data[0]?.region ?? "Kab. Lumajang", currency: "IDR", data: data.map(priceView) });
 }
