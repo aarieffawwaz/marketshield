@@ -4,7 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Map as MLMap, Marker, StyleSpecification } from "maplibre-gl";
-import { Clapperboard, Flame, Globe2, Layers, Mountain, Pause, Play, RotateCcw, RotateCw, Satellite, Map as MapIcon, Wind, X } from "lucide-react";
+import { ChevronUp, Clapperboard, Flame, Globe2, Layers, Mountain, Pause, Play, RotateCcw, RotateCw, Satellite, Map as MapIcon, Wind, X } from "lucide-react";
 import { CITIES, EVENTS, PARAMS, SEMERU as SEMERU_LL, aqiBand, channelLngLat, cityImpacts, hasVillages, plumeState, regionalPlume, ringLabelPoint, rings, setOrigin, simulate, type CityImpact, type Scenario } from "./simulation";
 import { createEruptionLayer, type EruptionState } from "./eruption-layer";
 import { VOLCANOES } from "@/lib/geo";
@@ -511,24 +511,28 @@ export function RealMap({ start = "indonesia", className, autoSim }: { start?: "
     setSpin(true);
   };
 
-  const chip = (on: boolean) => cn("rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition", on ? "bg-bone text-night" : "text-bone/70 hover:text-bone");
+  // Phones: icon-only 40px targets with the label kept for screen readers; desktop unchanged
+  const chip = (on: boolean) => cn("rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition max-sm:flex max-sm:h-10 max-sm:min-w-10 max-sm:items-center max-sm:justify-center max-sm:whitespace-nowrap max-sm:px-2", on ? "bg-bone text-night" : "text-bone/70 hover:text-bone");
+  const ico = "inline h-3.5 w-3.5 sm:mr-1 max-sm:h-4 max-sm:w-4";
 
   return (
-    <div className={cn("relative overflow-hidden", sim && "ms-sim", className)}>
+    <div className={cn("ms-map relative overflow-hidden", sim && "ms-sim", className)}>
+      {/* Phones: map controls move under the top bar so they never meet the bottom sheet */}
+      <style>{`@media (max-width:639.98px){.ms-map .maplibregl-ctrl-bottom-right{top:calc(max(12px,env(safe-area-inset-top)) + 56px);bottom:auto}.ms-map .maplibregl-ctrl-bottom-right .maplibregl-ctrl{margin:0 12px 8px 0}.ms-map .maplibregl-ctrl-group button{width:40px;height:40px}}`}</style>
       <div ref={host} className="!absolute inset-0 h-full w-full" />
       <div className={cn("pointer-events-none absolute inset-0 grid place-items-center bg-night transition-opacity duration-700", ready ? "opacity-0" : "opacity-100")} aria-hidden><Globe2 className="h-8 w-8 animate-pulse text-bone/30" /></div>
 
-      <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-wrap items-start justify-between gap-2">
+      <div className="pointer-events-none absolute inset-x-3 top-[max(0.75rem,env(safe-area-inset-top))] flex items-start justify-between gap-2 max-sm:flex-nowrap sm:flex-wrap">
         <div className="pointer-events-auto flex gap-1 rounded-xl bg-night/75 p-1 ring-1 ring-white/10 backdrop-blur-md">
-          <button onClick={() => setBase("sat")} className={chip(base === "sat")}><Satellite className="mr-1 inline h-3.5 w-3.5" />{t("Satelit", "Satellite")}</button>
-          <button onClick={() => setBase("dark")} className={chip(base === "dark")}><MapIcon className="mr-1 inline h-3.5 w-3.5" />{t("Peta", "Map")}</button>
-          <button onClick={() => setTerrain(!terrain)} className={chip(terrain)}><Mountain className="mr-1 inline h-3.5 w-3.5" />3D</button>
+          <button onClick={() => setBase("sat")} className={chip(base === "sat")}><Satellite className={ico} /><span className="max-sm:sr-only">{t("Satelit", "Satellite")}</span></button>
+          <button onClick={() => setBase("dark")} className={chip(base === "dark")}><MapIcon className={ico} /><span className="max-sm:sr-only">{t("Peta", "Map")}</span></button>
+          <button onClick={() => setTerrain(!terrain)} className={chip(terrain)}><Mountain className={ico} /><span className="max-sm:sr-only">3D</span></button>
         </div>
         <div className="pointer-events-auto flex gap-1 rounded-xl bg-night/75 p-1 ring-1 ring-white/10 backdrop-blur-md">
-          <button data-tour="sim" onClick={sim ? stopSim : startSim} className={cn(chip(sim), !sim && "text-[#ffb27a]")}><Flame className="mr-1 inline h-3.5 w-3.5" />{t("Simulasi erupsi", "Eruption sim")}</button>
-          <button onClick={tour} disabled={touring || sim} className={cn(chip(touring), "disabled:opacity-40")}><Clapperboard className="mr-1 inline h-3.5 w-3.5" />{touring ? t("Tur berjalan…", "Touring…") : t("Tur sinematik", "Cinematic tour")}</button>
-          <button onClick={focus ? home : toSemeru} className={chip(false)}>{focus ? <><Globe2 className="mr-1 inline h-3.5 w-3.5" />Indonesia</> : <><Mountain className="mr-1 inline h-3.5 w-3.5" />{t("Terbang ke Semeru", "Fly to Semeru")}</>}</button>
-          <button onClick={() => setSpin(!spin)} className={chip(spin)} aria-label={t("Putar otomatis", "Auto-rotate")}><RotateCw className="h-3.5 w-3.5" /></button>
+          <button data-tour="sim" onClick={sim ? stopSim : startSim} className={cn(chip(sim), !sim && "text-[#ffb27a]")}><Flame className={cn(ico, !sim && "max-sm:mr-1")} /><span className={cn(sim && "max-sm:sr-only")}><span className="sm:hidden">{t("Simulasi", "Simulate")}</span><span className="max-sm:hidden">{t("Simulasi erupsi", "Eruption sim")}</span></span></button>
+          <button onClick={tour} disabled={touring || sim} className={cn(chip(touring), "disabled:opacity-40", sim && "max-sm:hidden")}><Clapperboard className={ico} /><span className="max-sm:sr-only">{touring ? t("Tur berjalan…", "Touring…") : t("Tur sinematik", "Cinematic tour")}</span></button>
+          <button onClick={focus ? home : toSemeru} className={chip(false)}>{focus ? <><Globe2 className={ico} /><span className="max-sm:sr-only">Indonesia</span></> : <><Mountain className={ico} /><span className="max-sm:sr-only">{t("Terbang ke Semeru", "Fly to Semeru")}</span></>}</button>
+          <button onClick={() => setSpin(!spin)} className={cn(chip(spin), "max-sm:hidden")} aria-label={t("Putar otomatis", "Auto-rotate")}><RotateCw className="h-3.5 w-3.5" /></button>
         </div>
       </div>
 
