@@ -157,9 +157,9 @@ class _MapScreenState extends State<MapScreen> {
               ),
               const SizedBox(height: 12),
               Row(children: [
-                Expanded(child: _thumb('assets/img/semeru_cctv.jpg', 'CCTV Pos Sawur', () {})),
+                Expanded(child: _thumb('assets/img/semeru_cctv.webp', 'CCTV Pos Sawur', () {})),
                 const SizedBox(width: 10),
-                Expanded(child: _thumb('assets/img/sar_lahar.jpg', 'Radar Sentinel-1', () => push(context, const VolcanoScreen()))),
+                Expanded(child: _thumb('assets/img/sar_lahar.webp', 'Radar Sentinel-1', () => push(context, const VolcanoScreen()))),
               ]),
               const SizedBox(height: 14),
               MsCard(
@@ -236,7 +236,7 @@ class VolcanoScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 210,
                   child: Stack(fit: StackFit.expand, children: [
-                    Image.asset('assets/img/mahameru.jpg', fit: BoxFit.cover),
+                    Image.asset('assets/img/mahameru.webp', fit: BoxFit.cover),
                     const DecoratedBox(
                       decoration: BoxDecoration(
                           gradient: LinearGradient(

@@ -287,7 +287,7 @@ class _FeedCard extends StatelessWidget {
             child: Row(children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(6),
-                  child: Image.asset('assets/img/factcheck_sat.jpg', width: 44, height: 34, fit: BoxFit.cover)),
+                  child: Image.asset('assets/img/factcheck_sat.webp', width: 44, height: 34, fit: BoxFit.cover)),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -442,7 +442,7 @@ class FactResultScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(R.control),
                     child: Stack(children: [
                       // Archive photo of the 2021 eruption (not a live satellite image).
-                      Image.asset('assets/img/bridge.jpg', height: 160, width: double.infinity, fit: BoxFit.cover),
+                      Image.asset('assets/img/bridge.webp', height: 160, width: double.infinity, fit: BoxFit.cover),
                       Positioned(
                         left: 8,
                         top: 8,
@@ -774,9 +774,9 @@ class KitScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Row(children: [
-                Expanded(child: _img('assets/img/kit_bag.jpg', context.t('Tas Siaga Kedap Air', 'Waterproof go-bag'))),
+                Expanded(child: _img('assets/img/kit_bag.webp', context.t('Tas Siaga Kedap Air', 'Waterproof go-bag'))),
                 const SizedBox(width: 10),
-                Expanded(child: _img('assets/img/kit_med.jpg', context.t('Paket Khusus Lansia', 'Elderly pack'))),
+                Expanded(child: _img('assets/img/kit_med.webp', context.t('Paket Khusus Lansia', 'Elderly pack'))),
               ]),
               const SizedBox(height: 16),
               SectionTitle(context.t('Daftar Kebutuhan Kit', 'Kit Checklist'),

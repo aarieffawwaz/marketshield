@@ -184,7 +184,7 @@ class HomeScreen extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _Photo('assets/img/semeru_calm.jpg',
+            child: _Photo('assets/img/semeru_calm.webp',
                 caption: context.t('Kamera Pantau Kawah Jonggring Saloko', 'Jonggring Saloko crater camera'), height: 150),
           ),
           Padding(
@@ -454,7 +454,7 @@ class HomeScreen extends StatelessWidget {
                   'Pyroclastic flow confirmed towards Besuk Kobokan. Hazard radius extended to 7 km from the summit. Leave the red zone now.'),
               style: inter(15, c: Colors.white, h: 1.5)),
           const SizedBox(height: 14),
-          _Photo('assets/img/semeru_erupt.jpg',
+          _Photo('assets/img/semeru_erupt.webp',
               caption: context.t('Kamera Pemantau Curah Kobokan', 'Curah Kobokan monitoring camera'), height: 150),
           const SizedBox(height: 14),
           Btn(context.t('Mulai Panduan Evakuasi', 'Start Evacuation Guide'),

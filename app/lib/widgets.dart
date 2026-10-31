@@ -8,7 +8,7 @@ import 'screens/sector.dart';
 import 'screens/sos.dart';
 import 'theme.dart';
 
-Widget logo([double s = 34]) => Image.asset('assets/img/logo.png', width: s, height: s);
+Widget logo([double s = 34]) => Image.asset('assets/img/logo.webp', width: s, height: s);
 
 Widget avatar([double s = 36]) => Container(
       width: s,
@@ -17,7 +17,7 @@ Widget avatar([double s = 36]) => Container(
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
         boxShadow: shadow1,
-        image: const DecorationImage(image: AssetImage('assets/img/avatar.jpg'), fit: BoxFit.cover),
+        image: const DecorationImage(image: AssetImage('assets/img/avatar.webp'), fit: BoxFit.cover),
       ),
     );
 
