@@ -136,7 +136,12 @@ class _MapScreenState extends State<MapScreen> {
                         ]),
                       ),
                     ),
-                    const Positioned(left: mapInset, bottom: attributionHeight + 8, child: SatChip('Sentinel-1 • NOAA-20 VIIRS • GPM')),
+                    // Leaves room for the 3D / Satelit buttons on the right.
+                    const Positioned(
+                        left: mapInset,
+                        right: mapInset + 96,
+                        bottom: attributionHeight + 8,
+                        child: Align(alignment: Alignment.centerLeft, child: SatChip('Sentinel-1 • NOAA-20 VIIRS • GPM'))),
                   ]),
                 ),
               ),
