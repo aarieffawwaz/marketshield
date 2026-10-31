@@ -6,6 +6,10 @@ The competition asks for a changelog from the `submission-24h` tag to the `final
 
 ## Unreleased
 
+## APK v1.0.1 (2026-11-01)
+
+- Demo vs Live data mode, 3D map button (in-app WebView), tidier map controls, 22 px gutter, SOS above toasts, fact-check layout fix (#20). First release signed with the MarketShield release key: uninstall v1.0.0 once before installing.
+
 ### Added
 - Resident app: Demo vs Live data mode with a header badge; **3D** map button opening the eruption simulation in an in-app WebView; tidy map controls (#20).
 - Website and console documentation, diagrams and declarations (this README, `docs/`).
