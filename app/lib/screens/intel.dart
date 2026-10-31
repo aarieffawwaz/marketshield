@@ -429,21 +429,34 @@ class FactResultScreen extends StatelessWidget {
               const SizedBox(height: 14),
               MsCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Icon(Icons.satellite_alt_rounded, color: C.sat),
                     const SizedBox(width: 8),
                     Expanded(child: Text(context.t('Cek Silang Citra Satelit', 'Satellite Cross-check'), style: outfit(18, w: FontWeight.w600))),
-                    const SatChip('Sentinel-1 SAR'),
                   ]),
+                  const SizedBox(height: 8),
+                  // Chip on its own line so it never collides with the title on narrow screens.
+                  const Align(alignment: Alignment.centerLeft, child: SatChip('Sentinel-1 SAR')),
                   const SizedBox(height: 12),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(R.control),
                     child: Stack(children: [
+                      // Archive photo of the 2021 eruption (not a live satellite image).
                       Image.asset('assets/img/bridge.jpg', height: 160, width: double.infinity, fit: BoxFit.cover),
                       Positioned(
-                        right: 8,
+                        left: 8,
                         top: 8,
-                        child: Pill(context.t('Jembatan utuh', 'Bridge intact'), icon: Icons.check_circle, bg: C.l1, fg: Colors.white, size: 10.5),
+                        child: Pill(context.t('Arsip 2021: permukiman tertimbun abu', 'Archive 2021: homes buried in ash'),
+                            icon: Icons.photo_library_outlined, bg: Colors.black54, fg: Colors.white, size: 10.5),
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          color: Colors.black45,
+                          child: Text('Foto: Antara TV • CC BY 3.0', style: inter(9, c: Colors.white)),
+                        ),
                       ),
                     ]),
                   ),
