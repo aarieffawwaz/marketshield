@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, Check, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, ArrowUp, Check, Mail, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/brand";
 import { BrandIcon } from "@/components/ui/brand-icons";
 import { StoreBadges } from "@/components/ui/store-badges";
@@ -11,24 +11,44 @@ import { LangToggle } from "@/components/ui/lang-toggle";
 import { SOCIALS } from "@/lib/site";
 import { useT } from "@/lib/store";
 
-/** Live ping of our own API so the footer status dot is real, not decorative */
+const LEVEL_NAME: Record<number, [string, string]> = { 1: ["Normal", "Normal"], 2: ["Waspada", "Advisory"], 3: ["Siaga", "Watch"], 4: ["Awas", "Warning"] };
+const LEVEL_COLOR: Record<number, string> = { 1: "#4caf50", 2: "#f5b544", 3: "#ea6a1f", 4: "#e5372f" };
+
+/** Live ping of our own API: the status dot and Semeru's level are real, not decorative */
 function useApiStatus() {
-  const [s, setS] = useState<"checking" | "ok" | "down">("checking");
+  const [s, setS] = useState<{ api: "checking" | "ok" | "down"; level: number | null }>({ api: "checking", level: null });
   useEffect(() => {
     const ctl = new AbortController();
     fetch("/api/v1/volcanoes", { signal: ctl.signal, cache: "no-store" })
-      .then((r) => setS(r.ok ? "ok" : "down"))
-      .catch((e) => { if (e.name !== "AbortError") setS("down"); });
+      .then(async (r) => {
+        const j = r.ok ? await r.json() : null;
+        const lv = j?.data?.find((v: { id: string }) => v.id === "semeru")?.level;
+        setS({ api: r.ok ? "ok" : "down", level: Number(lv) || null });
+      })
+      .catch((e) => { if (e.name !== "AbortError") setS({ api: "down", level: null }); });
     return () => ctl.abort();
   }, []);
   return s;
+}
+
+/** Jakarta time, ticking each minute */
+function useWib() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    const tick = () => setNow(new Date());
+    tick();
+    const id = setInterval(tick, 15000);
+    return () => clearInterval(id);
+  }, []);
+  return now ? new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" }).format(now) : "--.--";
 }
 
 export function SiteFooter() {
   const { t } = useT();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
-  const status = useApiStatus();
+  const { api: status, level } = useApiStatus();
+  const wib = useWib();
   const cols = [
     {
       h: t("Produk", "Product"),
@@ -176,6 +196,29 @@ export function SiteFooter() {
           </div>
           <p className="max-w-md lg:text-right">{t("Status level mengikuti PVMBG. Prakiraan MarketShield melengkapi, tidak menggantikan, informasi resmi.", "Levels follow PVMBG. MarketShield forecasts complement, never replace, official information.")}</p>
         </div>
+      </div>
+
+      {/* live strip + oversized wordmark */}
+      <div className="relative overflow-hidden border-t border-white/10">
+        <div className="relative z-10 mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 pt-6 text-[12px] text-bone/55 sm:px-6">
+          <span className="inline-flex items-center gap-2">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inset-0 animate-ping rounded-full opacity-60" style={{ background: level ? LEVEL_COLOR[level] : "#888" }} />
+              <span className="relative h-2.5 w-2.5 rounded-full" style={{ background: level ? LEVEL_COLOR[level] : "#888" }} />
+            </span>
+            Semeru · {level ? `Level ${["I", "II", "III", "IV"][level - 1]} ${t(LEVEL_NAME[level][0], LEVEL_NAME[level][1])}` : t("memuat…", "loading…")}
+          </span>
+          <span className="tabular">Jakarta {wib} WIB</span>
+          <span className="hidden sm:inline">-8.108°, 112.922°</span>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="ml-auto inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-bone/70 ring-1 ring-white/15 transition hover:bg-white/10 hover:text-bone">
+            {t("Kembali ke atas", "Back to top")} <ArrowUp className="h-3.5 w-3.5" />
+          </button>
+        </div>
+        <div aria-hidden className="tex-topo pointer-events-none absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_40%)]" />
+        <div aria-hidden className="pointer-events-none absolute -bottom-40 left-1/2 h-80 w-[70%] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(234,106,31,0.45),transparent)] blur-2xl" />
+        <p aria-hidden className="relative select-none whitespace-nowrap px-2 pt-4 text-center font-display text-[14.6vw] font-semibold leading-[0.78] tracking-[-0.06em] text-transparent [background-clip:text] [-webkit-background-clip:text] [background-image:linear-gradient(180deg,rgba(244,237,228,0.22)_0%,rgba(244,237,228,0.06)_70%,transparent_100%)] [margin-bottom:-2.6vw]">
+          MarketShield
+        </p>
       </div>
     </footer>
   );
