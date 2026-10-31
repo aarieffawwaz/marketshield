@@ -44,9 +44,10 @@ class _SectorScreenState extends State<SectorScreen> {
     final factor = [.25, .6, 1.0, 1.35][lvl - 1];
     final protocols = sectorProtocols[_p]!;
     final base = Persona.values.indexOf(_p) * 10;
+    final pvmbgAt = context.repo.volcano.value?.updatedAt;
     final inbox = [
       (Icons.warning_amber_rounded, C.level(lvl), context.t('Status Semeru: Level ${levelRoman[lvl - 1]} ${context.l(levelName[lvl - 1])}', 'Semeru status: Level ${levelRoman[lvl - 1]} ${context.l(levelName[lvl - 1])}'),
-          context.t('PVMBG • 09:15 WIB', 'PVMBG • 09:15 WIB')),
+          'PVMBG • ${pvmbgAt == null || !app.isLive ? '09:15 WIB' : context.l(clock(pvmbgAt))}'),
       // Live alerts from GET /alerts (bundled fallback); the level line above already covers "level".
       for (final a in context.repo.alerts.value.where((a) => a.kind != 'level').take(4)) _alertRow(context, a),
     ];
@@ -113,7 +114,7 @@ class _SectorScreenState extends State<SectorScreen> {
                     ]),
                   ),
                   const SizedBox(height: 10),
-                  const SatChip('ESA WorldCover & Sentinel-2 • 12 jam'),
+                  SatChip('ESA WorldCover & Sentinel-2 • ${context.t('12 jam lalu', '12 hrs ago')}'),
                 ]),
               ),
               const SizedBox(height: 16),
