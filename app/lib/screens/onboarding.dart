@@ -52,7 +52,7 @@ class SplashScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: ListView(padding: const EdgeInsets.fromLTRB(20, 28, 20, 20), children: [
+        child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 28, R.gutter, 20), children: [
           Center(
             child: Container(
               width: 112,
@@ -194,7 +194,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onPageChanged: (i) => setState(() => _i = i),
               itemBuilder: (_, i) {
                 final p = pages[i];
-                return ListView(padding: const EdgeInsets.symmetric(horizontal: 20), children: [
+                return ListView(padding: const EdgeInsets.symmetric(horizontal: R.gutter), children: [
                   _Illustration(icon: p.$1, caption: p.$5),
                   const SizedBox(height: 22),
                   Text(p.$2, style: outfit(28, w: FontWeight.w700, h: 1.15)),
@@ -229,7 +229,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+            padding: const EdgeInsets.fromLTRB(R.gutter, 8, R.gutter, 16),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 for (var k = 0; k < pages.length; k++)
@@ -361,9 +361,9 @@ class PersonaScreen extends StatelessWidget {
               const Icon(Icons.shield_outlined, color: C.wine),
             ]),
           ),
-          const Padding(padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: Bar(1, height: 5)),
+          const Padding(padding: EdgeInsets.fromLTRB(R.gutter, 10, R.gutter, 0), child: Bar(1, height: 5)),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(20, 18, 20, 20), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 18, R.gutter, 20), children: [
               Align(
                 alignment: Alignment.centerLeft,
                 child: Pill(context.t('Kecamatan Candipuro, Lumajang', 'Candipuro District, Lumajang'),
@@ -421,7 +421,7 @@ class PersonaScreen extends StatelessWidget {
             ]),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+            padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 16),
             child: Btn(context.t('Simpan & Mulai Pemantauan', 'Save & Start Monitoring'),
                 icon: Icons.arrow_forward,
                 trailingIcon: true,

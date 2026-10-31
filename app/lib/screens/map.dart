@@ -41,7 +41,7 @@ class _MapScreenState extends State<MapScreen> {
         child: Column(children: [
           const AppHeader(),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: R.gutter),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(color: C.surfaceLow, borderRadius: BorderRadius.circular(R.control)),
             child: Row(children: [
@@ -57,7 +57,7 @@ class _MapScreenState extends State<MapScreen> {
             ]),
           ),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 24), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 12, R.gutter, 24), children: [
               SizedBox(
                 height: 44,
                 child: ListView.separated(
@@ -225,7 +225,7 @@ class VolcanoScreen extends StatelessWidget {
         child: Column(children: [
           SubHeader(context.t('Detail Gunung Api', 'Volcano Detail')),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(R.card),
                 child: SizedBox(
@@ -462,7 +462,7 @@ class _EvacScreenState extends State<EvacScreen> {
         child: Column(children: [
           SubHeader(context.t('Panduan Evakuasi', 'Evacuation Guide')),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               MsCard(
                 color: C.pink,
                 border: const Color(0xFFF5C9C9),

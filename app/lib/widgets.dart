@@ -30,7 +30,7 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(R.gutter, 8, R.gutter, 8),
       child: Row(children: [
         logo(32),
         const SizedBox(width: 10),
@@ -189,7 +189,7 @@ class SubHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 6, 16, 6),
+      padding: const EdgeInsets.fromLTRB(4, 6, R.gutter, 6),
       child: Row(children: [
         IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: C.wine)),
         logo(28),

@@ -41,7 +41,7 @@ class _IntelScreenState extends State<IntelScreen> {
         child: Column(children: [
           const AppHeader(),
           Container(
-            margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            margin: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 8),
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(color: C.surfaceMid, borderRadius: BorderRadius.circular(R.control + 2)),
             child: Row(children: [
@@ -144,7 +144,7 @@ class _FactCheckTabState extends State<_FactCheckTab> {
             _filter == 0 ||
             (_filter == 1 ? (f.v == Verdict.hoax || f.v == Verdict.panic) : f.v == Verdict.official))
         .toList();
-    return ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
+    return ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 24), children: [
       MsCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
@@ -362,7 +362,7 @@ class FactResultScreen extends StatelessWidget {
         child: Column(children: [
           SubHeader(context.t('Verifikasi Berita', 'News Verification')),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               Row(children: [
                 const Icon(Icons.arrow_back, size: 15, color: C.primary),
                 const SizedBox(width: 4),
@@ -529,7 +529,7 @@ class _HetTab extends StatelessWidget {
         : d <= 10
             ? (context.t('HARGA NAIK (SEDIKIT DI ATAS HET)', 'RISING (JUST ABOVE CAP)'), C.l2, Icons.trending_up)
             : (context.t('DI ATAS HET • LAPORKAN', 'ABOVE CAP • REPORT IT'), C.crimson, Icons.warning_amber_rounded);
-    return ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
+    return ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 24), children: [
       MsCard(
         color: C.surfaceLow,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -640,7 +640,7 @@ class _HetTab extends StatelessWidget {
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(R.sheet))),
       builder: (sheet) => Padding(
-        padding: EdgeInsets.fromLTRB(20, 12, 20, 20 + MediaQuery.of(sheet).viewInsets.bottom),
+        padding: EdgeInsets.fromLTRB(R.gutter, 12, R.gutter, 20 + MediaQuery.of(sheet).viewInsets.bottom),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Center(child: Container(width: 36, height: 4, decoration: BoxDecoration(color: C.handle, borderRadius: BorderRadius.circular(9)))),
           const SizedBox(height: 16),
@@ -696,7 +696,7 @@ class KitScreen extends StatelessWidget {
           SubHeader(context.t('Kit Siaga Bencana', 'Disaster Ready Kit'),
               trailing: Pill('Level ${levelRoman[app.level - 1]} ${context.l(levelName[app.level - 1])}', bg: C.pink, size: 10.5)),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               MsCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -51,6 +51,8 @@ class _ShellState extends State<Shell> {
     return ValueListenableBuilder<int>(
       valueListenable: tabIndex,
       builder: (context, i, _) => Scaffold(
+        // SOS lives on the outer Scaffold so the floating toast and the bottom bar push it up instead of covering it.
+        floatingActionButton: i == 0 && context.app.level >= 3 ? const SosFab() : null,
         body: IndexedStack(index: i, children: const [
           HomeScreen(),
           MapScreen(),
@@ -105,7 +107,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final lvl = context.app.level;
     return Scaffold(
-      floatingActionButton: lvl >= 3 ? const SosFab() : null,
       body: SafeArea(
         bottom: false,
         child: Column(children: [
@@ -116,7 +117,7 @@ class HomeScreen extends StatelessWidget {
               duration: const Duration(milliseconds: 350),
               child: ListView(
                 key: ValueKey(lvl),
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+                padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 100),
                 children: switch (lvl) {
                   4 => _awas(context),
                   3 => _siaga(context),
@@ -530,7 +531,7 @@ class _CriticalBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         color: C.crimson,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+        padding: const EdgeInsets.symmetric(horizontal: R.gutter, vertical: 9),
         child: Row(children: [
           const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
           const SizedBox(width: 8),

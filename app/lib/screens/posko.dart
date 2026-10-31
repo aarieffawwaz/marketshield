@@ -47,7 +47,7 @@ class _PoskoScreenState extends State<PoskoScreen> {
         child: Column(children: [
           const AppHeader(),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 24), children: [
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(color: C.surfaceMid, borderRadius: BorderRadius.circular(R.control + 2)),
@@ -299,7 +299,7 @@ class _AidPriorityScreenState extends State<AidPriorityScreen> {
           SubHeader(context.t('Logistik Bencana', 'Disaster Logistics'),
               trailing: Freshness(feed, compact: true)),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               const Wrap(spacing: 6, runSpacing: 6, children: [
                 SatChip('WorldPop & GEE • H-0'),
                 Pill('Sentinel-1 / MODIS', icon: Icons.radar, bg: C.pink, fg: C.crimson, size: 10.5),
