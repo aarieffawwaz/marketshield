@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'core.dart';
+import 'data/repository.dart';
 import 'deeplink.dart';
 import 'screens/intel.dart';
 import 'screens/map.dart';
@@ -43,7 +44,15 @@ void main() {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
   final state = AppState();
-  runApp(MarketShieldApp(state: state));
+  final repo = DataRepo();
+  // Follow the official PVMBG level from the API until the user drives Demo Mode themselves.
+  repo.addListener(() {
+    final lvl = repo.volcano.value?.level;
+    if (lvl != null) state.applyLiveLevel(lvl);
+  });
+  runApp(MarketShieldApp(state: state, repo: repo));
+  // Bundled data paints first; cached and live data swap in when ready.
+  repo.start();
   final first = initialScreen();
   if (first != null) WidgetsBinding.instance.addPostFrameCallback((_) => openScreen(state, first));
   listenScreens((s) => openScreen(state, s));
@@ -51,18 +60,22 @@ void main() {
 
 class MarketShieldApp extends StatelessWidget {
   final AppState state;
-  const MarketShieldApp({super.key, required this.state});
+  final DataRepo repo;
+  const MarketShieldApp({super.key, required this.state, required this.repo});
 
   @override
   Widget build(BuildContext context) {
     return AppScope(
       state: state,
-      child: MaterialApp(
-        navigatorKey: navKey,
-        title: 'MarketShield',
-        debugShowCheckedModeBanner: false,
-        theme: buildTheme(),
-        home: const SplashScreen(),
+      child: DataScope(
+        repo: repo,
+        child: MaterialApp(
+          navigatorKey: navKey,
+          title: 'MarketShield',
+          debugShowCheckedModeBanner: false,
+          theme: buildTheme(),
+          home: const SplashScreen(),
+        ),
       ),
     );
   }

@@ -25,7 +25,7 @@ class _PoskoScreenState extends State<PoskoScreen> {
       final isShelter = p.type.id.startsWith('Shelter');
       if (_seg == 0 && !isShelter) return false;
       if (_seg == 1 && isShelter) return false;
-      if (_filters.contains(0) && p.km > 3) return false;
+      if (_filters.contains(0) && (p.km ?? double.infinity) > 3) return false;
       if (_filters.contains(1) && !p.open24) return false;
       if (_q.isNotEmpty && !p.name.toLowerCase().contains(_q.toLowerCase())) return false;
       return true;

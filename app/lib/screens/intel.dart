@@ -282,6 +282,18 @@ class FactResultScreen extends StatelessWidget {
               'Pesan ini berisi disinformasi yang menggunakan rekaman kejadian lama untuk memicu kepanikan warga di jalur evakuasi Curah Kobokan. Citra radar terbaru tidak menunjukkan kerusakan jembatan.',
               'This message reuses old footage to spark panic along the Curah Kobokan evacuation route. The latest radar imagery shows no bridge damage.')
         ),
+      Verdict.panic => (
+          C.l3,
+          context.t('PEMICU PANIK', 'PANIC BAIT'),
+          context.t('Pesan ini membesar-besarkan kelangkaan untuk memicu panic buying. Cek stok dan harga resmi di Pantau HET sebelum membeli.',
+              'This message exaggerates shortages to trigger panic buying. Check verified stock and capped prices before you buy.')
+        ),
+      Verdict.verified => (
+          C.l1,
+          context.t('TERVERIFIKASI', 'VERIFIED'),
+          context.t('Laporan ini cocok dengan lapisan satelit dan laporan warga lain. Tetap ikuti instruksi resmi.',
+              'This report matches satellite layers and other resident reports. Keep following official instructions.')
+        ),
       Verdict.official => (
           C.l1,
           context.t('SINYAL / INFO RESMI', 'SIGNAL / OFFICIAL INFO'),
