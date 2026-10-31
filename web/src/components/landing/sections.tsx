@@ -203,7 +203,7 @@ export function Levels() {
           <Phone className="w-[290px] sm:w-[320px]">
             <AnimatePresence mode="wait">
               <motion.div key={lv} initial={{ opacity: 0, scale: 1.02 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="absolute inset-0">
-                <Image src={LEVEL_SHOT[lv]} alt={`MarketShield Level ${L.roman}`} fill sizes="320px" className="object-cover object-top" />
+                <Image src={LEVEL_SHOT[lv]} alt={`MarketShield Level ${L.roman}`} fill sizes="320px" className="object-contain object-top" />
               </motion.div>
             </AnimatePresence>
           </Phone>
