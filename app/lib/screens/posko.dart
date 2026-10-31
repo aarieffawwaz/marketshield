@@ -19,6 +19,14 @@ class _PoskoScreenState extends State<PoskoScreen> {
   int _seg = 1; // 0 shelter, 1 aid post
   final Set<int> _filters = {};
   String _q = '';
+  final _satellite = ValueNotifier(false);
+  static const _footer = 44.0;
+
+  @override
+  void dispose() {
+    _satellite.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +77,10 @@ class _PoskoScreenState extends State<PoskoScreen> {
                 child: SizedBox(
                   height: 170,
                   child: Stack(fit: StackFit.expand, children: [
-                    const GeoMap(mode: GeoMode.posts, showAsh: false, showLahar: false),
+                    GeoMap(mode: GeoMode.posts, showAsh: false, showLahar: false, showLayerToggle: false, satellite: _satellite, bottomInset: _footer),
                     Positioned(
-                        left: 10,
-                        top: 10,
+                        left: mapInset,
+                        top: mapInset,
                         child: Pill('$active ${context.t('Posko Terverifikasi Aktif', 'Verified Active Posts')}',
                             icon: Icons.circle, bg: Colors.white, fg: C.wine, size: 10.5)),
                     Positioned(
@@ -80,18 +88,19 @@ class _PoskoScreenState extends State<PoskoScreen> {
                       right: 0,
                       bottom: 0,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        height: _footer,
+                        padding: const EdgeInsets.symmetric(horizontal: mapInset),
                         color: Colors.black.withValues(alpha: .45),
                         child: Row(children: [
                           const Icon(Icons.satellite_alt_rounded, size: 14, color: Colors.white),
                           const SizedBox(width: 6),
                           Expanded(
                               child: Text(context.t('Peta Satelit Radar Semeru', 'Semeru radar satellite map'),
-                                  style: inter(11.5, c: Colors.white, w: FontWeight.w500))),
-                          GestureDetector(
-                            onTap: () => push(context, const EvacScreen()),
-                            child: const Pill('⤢ Rute', bg: Colors.white, fg: C.wine, size: 10.5),
-                          ),
+                                  overflow: TextOverflow.ellipsis, style: inter(11.5, c: Colors.white, w: FontWeight.w500))),
+                          // Map controls live in the caption strip so they never cover posko labels.
+                          SatelliteToggle(_satellite),
+                          const SizedBox(width: 8),
+                          MapPill(Icons.directions_outlined, context.t('Rute', 'Route'), onTap: () => push(context, const EvacScreen())),
                         ]),
                       ),
                     ),
@@ -327,11 +336,11 @@ class _AidPriorityScreenState extends State<AidPriorityScreen> {
                       child: Stack(fit: StackFit.expand, children: [
                         const GeoMap(mode: GeoMode.risk, showAsh: false),
                         Positioned(
-                          left: 10,
-                          bottom: 10,
+                          left: mapInset,
+                          bottom: attributionHeight + 8,
                           child: Pill(context.t('Zona Aliran Lahar Besuk Kobokan', 'Besuk Kobokan lahar zone'), bg: Colors.black54, fg: Colors.white, size: 10),
                         ),
-                        Positioned(right: 10, bottom: 10, child: Pill(context.t('Resolusi 100 m', '100 m grid'), bg: Colors.black54, fg: Colors.white, size: 10)),
+                        Positioned(right: mapInset, top: mapInset, child: Pill(context.t('Resolusi 100 m', '100 m grid'), bg: Colors.black54, fg: Colors.white, size: 10)),
                       ]),
                     ),
                   ),

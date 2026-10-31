@@ -41,6 +41,9 @@ const mapVillages = [
 
 enum GeoMode { hazard, route, posts, risk }
 
+/// Height of the attribution strip drawn in the map's bottom-right corner.
+const attributionHeight = 15.0;
+
 List<LatLng> _cone(LatLng o, double km, double bearing, double spread) {
   final kx = 111.32 * math.cos(o.latitude * math.pi / 180);
   final pts = <LatLng>[o];
@@ -61,6 +64,18 @@ class GeoMap extends StatefulWidget {
   final bool navigating;
   final MapController? controller;
   final VoidCallback? onVolcano;
+
+  /// Extra map buttons (e.g. "3D"), stacked above the Satelit toggle at the bottom-right.
+  final List<Widget> actions;
+
+  /// Hide the built-in Satelit toggle when the host places its own (see [satellite]).
+  final bool showLayerToggle;
+
+  /// Optional shared basemap state so a host can render the toggle elsewhere.
+  final ValueNotifier<bool>? satellite;
+
+  /// Space reserved at the bottom by an overlay drawn by the host (e.g. a caption strip).
+  final double bottomInset;
   const GeoMap({
     super.key,
     this.mode = GeoMode.hazard,
@@ -72,14 +87,77 @@ class GeoMap extends StatefulWidget {
     this.navigating = false,
     this.controller,
     this.onVolcano,
+    this.actions = const [],
+    this.showLayerToggle = true,
+    this.satellite,
+    this.bottomInset = 0,
   });
 
   @override
   State<GeoMap> createState() => _GeoMapState();
 }
 
+/// Inset between map edges and floating controls.
+const mapInset = 12.0;
+
+/// Compact white pill button used for map controls.
+class MapPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const MapPill(this.icon, this.label, {super.key, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(99),
+        elevation: 2,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(99),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icon, size: 14, color: C.wine),
+              const SizedBox(width: 4),
+              Text(label, style: inter(11, w: FontWeight.w700, c: C.wine)),
+            ]),
+          ),
+        ),
+      );
+}
+
+/// Satelit / Peta basemap switch bound to a shared notifier.
+class SatelliteToggle extends StatelessWidget {
+  final ValueNotifier<bool> satellite;
+  const SatelliteToggle(this.satellite, {super.key});
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+        valueListenable: satellite,
+        builder: (_, on, _) => MapPill(on ? Icons.map_outlined : Icons.satellite_alt_outlined, on ? 'Peta' : 'Satelit',
+            onTap: () => satellite.value = !on),
+      );
+}
+
 class _GeoMapState extends State<GeoMap> {
-  bool _satellite = false;
+  late final ValueNotifier<bool> _sat = widget.satellite ?? ValueNotifier(false);
+  bool get _satellite => _sat.value;
+
+  @override
+  void initState() {
+    super.initState();
+    _sat.addListener(_onSat);
+  }
+
+  void _onSat() => setState(() {});
+
+  @override
+  void dispose() {
+    _sat.removeListener(_onSat);
+    if (widget.satellite == null) _sat.dispose();
+    super.dispose();
+  }
 
   Widget _pin(String label, Color color, {IconData? icon, bool big = false}) => Column(mainAxisSize: MainAxisSize.min, children: [
         Container(
@@ -173,30 +251,32 @@ class _GeoMapState extends State<GeoMap> {
                 ),
               ),
           ]),
-          RichAttributionWidget(attributions: [TextSourceAttribution(_satellite ? 'Esri, Maxar, Earthstar Geographics' : 'Esri, HERE, Garmin, © OpenStreetMap')], alignment: AttributionAlignment.bottomRight),
         ],
       ),
+      // Plain-text attribution in the corner (no collapsible badge), always legible.
       Positioned(
-        right: 10,
-        bottom: 34,
-        child: Material(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(99),
-          elevation: 2,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(99),
-            onTap: () => setState(() => _satellite = !_satellite),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(_satellite ? Icons.map_outlined : Icons.satellite_alt_outlined, size: 14, color: C.wine),
-                const SizedBox(width: 4),
-                Text(_satellite ? 'Peta' : 'Satelit', style: inter(11, w: FontWeight.w700, c: C.wine)),
-              ]),
-            ),
+        right: 0,
+        bottom: widget.bottomInset,
+        child: IgnorePointer(
+          child: Container(
+            height: attributionHeight,
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: .8), borderRadius: const BorderRadius.only(topLeft: Radius.circular(6))),
+            child: Text(_satellite ? '© Esri, Maxar, Earthstar Geographics' : '© Esri, HERE, Garmin, OpenStreetMap',
+                style: inter(8.5, w: FontWeight.w500, c: C.textMuted)),
           ),
         ),
       ),
+      if (widget.actions.isNotEmpty || widget.showLayerToggle)
+        Positioned(
+          right: mapInset,
+          bottom: widget.bottomInset + attributionHeight + 8,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            for (final a in widget.actions) ...[a, const SizedBox(height: 8)],
+            if (widget.showLayerToggle) SatelliteToggle(_sat),
+          ]),
+        ),
     ]);
   }
 }
