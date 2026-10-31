@@ -61,12 +61,12 @@ export function UseCases() {
   return (
     <section className="tex-topo-b tex-glow bg-cream py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Reveal>
+        <Reveal className="flex flex-col items-center text-center">
           <Kicker n="—">{t("Untuk siapa", "Who it's for")}</Kicker>
           <h2 className="mt-6 max-w-3xl font-display text-[clamp(1.9rem,4.2vw,3.4rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-wine">{t("Satu sumber kebenaran, langkah berbeda untuk tiap peran.", "One source of truth, different steps for every role.")}</h2>
         </Reveal>
         <div className="mt-8 flex justify-center">
-          <FluidTabs label={t("Peran", "Role")} value={k} onChange={setK} className="max-w-full flex-wrap justify-center gap-1 rounded-[1.6rem] bg-sand-2 p-1 sm:rounded-full" itemClassName="rounded-full px-3.5 py-2 text-[13.5px] font-medium sm:px-4" options={cases.map((x) => ({ value: x.key, label: <span className="flex items-center gap-1.5"><x.icon className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />{x.label}</span> }))} />
+          <FluidTabs label={t("Peran", "Role")} value={k} onChange={setK} className="max-w-full flex-wrap justify-center gap-0.5 rounded-[1.6rem] bg-sand-2 p-1 sm:gap-1 sm:rounded-full" itemClassName="rounded-full px-2.5 py-2 text-[13px] font-medium sm:px-4 sm:text-[13.5px]" options={cases.map((x) => ({ value: x.key, label: <span className="flex items-center gap-1.5"><x.icon className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" strokeWidth={2} aria-hidden />{x.label}</span> }))} />
         </div>
         <AnimatePresence mode="wait">
           <motion.div key={k} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.28 }} className="card mt-6 grid overflow-hidden md:grid-cols-[1.15fr_0.85fr]">
