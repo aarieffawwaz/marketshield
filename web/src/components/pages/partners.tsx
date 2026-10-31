@@ -86,7 +86,7 @@ export function PartnersPage() {
                   className="mt-2 flex-wrap gap-1 rounded-2xl bg-sand p-1"
                   itemClassName="rounded-xl px-3 py-1.5 text-[12.5px] font-medium"
                   pillClassName="rounded-xl bg-maroon"
-                  options={types.map((x) => ({ value: x.key, label: x.h.split(" ")[0] }))}
+                  options={types.map((x) => ({ value: x.key, label: x.h.split(" ")[0].replace(/[,&]+$/, "") }))}
                 />
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   {[

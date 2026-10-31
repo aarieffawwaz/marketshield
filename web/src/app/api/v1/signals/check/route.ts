@@ -2,6 +2,11 @@ import { classify } from "@/lib/classify";
 import { logSignal } from "@/lib/server/repo";
 import { json } from "../../_shared";
 
+/** CORS preflight so browsers on other origins (e.g. the Flutter web build) can POST JSON */
+export function OPTIONS() {
+  return new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Max-Age": "86400" } });
+}
+
 export async function POST(req: Request) {
   let body: { text?: unknown; lang?: unknown };
   try {
