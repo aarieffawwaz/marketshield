@@ -19,10 +19,10 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
-  deploy:
+  # Pull requests: full Flutter web + Next.js build as a check, no upload
+  build:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    # Secrets are not available to PRs from forks
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: read
     steps:
@@ -58,14 +58,58 @@ jobs:
         working-directory: web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          PROD: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
         run: |
-          if [ "$PROD" = "true" ]; then ENV=production; FLAG=--prod; else ENV=preview; FLAG=; fi
-          vercel pull --yes --environment=$ENV --token="$VERCEL_TOKEN"
-          vercel build $FLAG --token="$VERCEL_TOKEN"
+          vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+          vercel build --token="$VERCEL_TOKEN"
+
+  # main: same build, then deploy; recorded as the "production" environment on GitHub
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    environment:
+      name: production
+      url: https://marketshield-inception.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Build Flutter web
+        working-directory: app
+        run: |
+          flutter pub get
+          flutter build web --release --base-href /mobile-app/ --no-web-resources-cdn
+
+      - name: Copy Flutter build into the site
+        run: |
+          rm -rf web/public/mobile-app
+          cp -r app/build/web web/public/mobile-app
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Build
+        working-directory: web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
 
       - name: Deploy to production
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         working-directory: web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
