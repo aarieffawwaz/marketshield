@@ -1,6 +1,6 @@
 # AI Use and Third-Party Declaration
 
-Required by the competition rules ("README lengkap termasuk AI Use and Third-Party Declaration"). Last updated 31 October 2026.
+We disclose AI use and third-party assets here. Last updated 31 October 2026.
 
 ## 1. AI inside the product
 
@@ -18,9 +18,9 @@ Safety-relevant decisions (official level, evacuation, broadcasts) are never mad
 |:-|:-|:-|:-|
 | Claude Code | Anthropic | Writing and refactoring code for the website, console, API, Flutter app and CI workflows; debugging; automated browser checks; writing this documentation and drawing its diagrams | Every change went through a pull request that the team reviewed, tested and merged |
 
-Team members who used other AI assistants (for example in notebooks or for copywriting) should add them here before submission.
+Team members who used other AI assistants (for example in notebooks or for copywriting) should be added here.
 
-No AI-generated photographs are used to depict real events; the volcano and disaster photos are credited below. Three illustrative images have no recorded source yet and must be confirmed or replaced before submission (see §5).
+No AI-generated photographs are used to depict real events; the volcano and disaster photos are credited below. Three illustrative images have no recorded source yet and must be confirmed or replaced (see §5).
 
 ## 3. Data sources
 

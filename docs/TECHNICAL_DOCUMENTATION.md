@@ -56,10 +56,10 @@ Three surfaces (resident app, console, public API) share one Firestore project. 
 | Public satellite data (Earth Engine) instead of field sensors | Seismometers, gas sensors, CCTV | No hardware on an active volcano; national coverage from day one; reproducible from public catalogues |
 | Cloud Firestore | PostgreSQL + WebSocket server, Supabase | Realtime listeners without running a server; security rules enforce roles in the database; free tier; Jakarta region |
 | Next.js route handlers for the API | Separate Express/FastAPI service | One deployment, same domain (no CORS for the console), Admin SDK on the server only |
-| Flutter for the resident app | React Native, PWA only | One codebase for a small Android APK and a web build judges can open |
+| Flutter for the resident app | React Native, PWA only | One codebase for a small Android APK and a web build anyone can open in a browser |
 | MapLibre + three.js | Mapbox GL, Cesium | Open source, globe projection and terrain, custom WebGL layer for the eruption without a licence key |
 | Bundled data + fallback on every surface | Fail closed | A disaster app must not go blank; each surface states when it is not live |
-| Demo / live / operator modes | Separate demo site | Judges see concept and reality in the same UI; writes only for authenticated operators |
+| Demo / live / operator modes | Separate demo site | Visitors see the concept and the real system in the same UI; writes only for authenticated operators |
 | Message text never stored | Store for retraining | UU PDP data minimisation; training data is curated separately |
 
 ## 4. Resident app (Flutter)
