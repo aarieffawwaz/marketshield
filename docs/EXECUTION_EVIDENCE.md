@@ -89,3 +89,38 @@ marketshield-armv7.apk  18,270,566 B  sha256:884800d3bbc6d4f8875ed5aaa6101171af2
 ```
 
 Verify: `shasum -a 256 marketshield-arm64.apk`.
+
+## 8. Screenshot gallery
+
+Captured on 1 November 2026 from the team's own accounts (emails, user IDs and key IDs blurred). Every image links to the full-size file.
+
+### Backend: Firebase and Google Cloud
+
+| | |
+|:-:|:-:|
+| [![Firebase project](evidence/firebase-overview.webp)](evidence/firebase-overview.webp)<br><sub>Firebase project `marketshield-brain` (Spark plan)</sub> | [![Firestore volcanoes/semeru](evidence/firestore-semeru.webp)](evidence/firestore-semeru.webp)<br><sub>`volcanoes/semeru` with the published XGBoost forecast (`xgboost-thermal-v1`)</sub> |
+| [![Firestore posko](evidence/firestore-posko.webp)](evidence/firestore-posko.webp)<br><sub>`posko` collection, live aid-post status</sub> | [![Firestore rules](evidence/firestore-rules.webp)](evidence/firestore-rules.webp)<br><sub>Deployed security rules (role claims)</sub> |
+| [![Firebase Auth](evidence/firebase-auth.webp)](evidence/firebase-auth.webp)<br><sub>Firebase Auth: operator accounts (email/password and Google)</sub> | [![Service accounts](evidence/gcp-iam-sa.webp)](evidence/gcp-iam-sa.webp)<br><sub>Least-privilege service accounts: `ms-server` (API), `ms-colab` (notebook)</sub> |
+
+### Data and models: Earth Engine, Colab, Hugging Face
+
+| | |
+|:-:|:-:|
+| [![Earth Engine console](evidence/earthengine-console.webp)](evidence/earthengine-console.webp)<br><sub>Earth Engine registered (non-commercial) for the feature pipeline</sub> | [![Earth Engine Code Editor](evidence/earthengine-codeeditor.webp)](evidence/earthengine-codeeditor.webp)<br><sub>Earth Engine Code Editor on the same project</sub> |
+| [![Colab notebook](evidence/colab-hoax.webp)](evidence/colab-hoax.webp)<br><sub>`ml/hoax_classifier.ipynb` opened in Colab</sub> | [![Hugging Face dataset](evidence/hf-dataset.webp)](evidence/hf-dataset.webp)<br><sub>Training data: `mzuama/IndonesianHoaxdetection`</sub> |
+| [![FIRMS](evidence/gee-firms.webp)](evidence/gee-firms.webp)<br><sub>Earth Engine catalog: NASA FIRMS</sub> | [![Sentinel-5P SO2](evidence/gee-s5p-so2.webp)](evidence/gee-s5p-so2.webp)<br><sub>Earth Engine catalog: Sentinel-5P SO₂</sub> |
+| [![Sentinel-1](evidence/gee-s1.webp)](evidence/gee-s1.webp)<br><sub>Earth Engine catalog: Sentinel-1 GRD</sub> | [![Model results](../ml/results/risk_results.png)](../ml/results/risk_results.png)<br><sub>Risk engine results (ROC-AUC 0.899)</sub> |
+
+### Delivery: Vercel and GitHub
+
+| | |
+|:-:|:-:|
+| [![Vercel project](evidence/vercel-project.webp)](evidence/vercel-project.webp)<br><sub>Vercel production deployment</sub> | [![Vercel deployments](evidence/vercel-deployments.webp)](evidence/vercel-deployments.webp)<br><sub>Deployment history: one per merged PR</sub> |
+| [![Vercel env](evidence/vercel-env.webp)](evidence/vercel-env.webp)<br><sub>Encrypted environment variable (names only)</sub> | [![GitHub Actions](evidence/github-actions.webp)](evidence/github-actions.webp)<br><sub>GitHub Actions: build checks and deploys</sub> |
+| [![GitHub releases](evidence/github-releases.webp)](evidence/github-releases.webp)<br><sub>Signed APK releases with SHA-256</sub> | [![Merged PRs](evidence/github-prs.webp)](evidence/github-prs.webp)<br><sub>Merged pull requests, built step by step</sub> |
+
+### Live product
+
+| | |
+|:-:|:-:|
+| [![Status page](evidence/site-status.webp)](evidence/site-status.webp)<br><sub>`/status`: live checks of the API and map providers</sub> | [![Risk API](evidence/api-risk.webp)](evidence/api-risk.webp)<br><sub>`/api/v1/volcanoes/semeru/risk` serving the model forecast</sub> |

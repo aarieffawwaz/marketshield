@@ -272,7 +272,14 @@ The full self-assessment, including a notebook key that was exposed and disabled
 | Flutter | `flutter analyze` clean, 7 tests pass, web release build succeeds |
 | APK integrity | v1.0.0 SHA-256 published in the release (`SHA256SUMS.txt`) and on `/download` |
 
-Commands, timestamps and sample responses: [EXECUTION_EVIDENCE.md](docs/EXECUTION_EVIDENCE.md).
+Commands, timestamps, sample responses and a **screenshot gallery** (Firebase, Earth Engine, Colab, Vercel, GitHub): [EXECUTION_EVIDENCE.md](docs/EXECUTION_EVIDENCE.md#8-screenshot-gallery).
+
+<p align="center">
+  <img src="docs/evidence/firestore-semeru.webp" alt="Firestore: volcanoes/semeru with the published XGBoost forecast" width="49%" />
+  <img src="docs/evidence/vercel-deployments.webp" alt="Vercel deployment history" width="49%" />
+  <img src="docs/evidence/colab-hoax.webp" alt="IndoBERT notebook in Colab" width="49%" />
+  <img src="docs/evidence/earthengine-codeeditor.webp" alt="Google Earth Engine Code Editor" width="49%" />
+</p>
 
 ## AI Use and Third-Party Declaration
 
