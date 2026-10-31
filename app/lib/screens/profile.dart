@@ -73,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(color: C.surfaceLow, borderRadius: BorderRadius.circular(R.control)),
                     child: Row(children: [
-                      const Icon(Icons.circle, size: 10, color: C.crimson),
+                      const Icon(Icons.circle, size: 10, color: C.l1),
                       const SizedBox(width: 8),
                       Expanded(child: Text(context.t('Data Satelit GEE Tersinkron', 'GEE satellite data synced'), style: inter(12.5, w: FontWeight.w500))),
                       const Icon(Icons.signal_cellular_alt, size: 16, color: C.wine),
@@ -216,20 +216,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   Text(context.t('Bahasa', 'Language'), style: inter(13, w: FontWeight.w600, c: C.wine)),
                   const SizedBox(height: 8),
-                  SegmentedButton<Lang>(
-                    segments: const [
-                      ButtonSegment(value: Lang.id, label: Text('Indonesia')),
-                      ButtonSegment(value: Lang.en, label: Text('English')),
-                    ],
-                    selected: {app.lang},
-                    showSelectedIcon: false,
-                    onSelectionChanged: (s) => app.setLang(s.first),
-                    style: SegmentedButton.styleFrom(
-                      selectedBackgroundColor: C.primary,
-                      selectedForegroundColor: Colors.white,
-                      foregroundColor: C.wine,
-                      side: const BorderSide(color: C.outline),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(R.control)),
+                  SizedBox(
+                    width: double.infinity,
+                    child: SegmentedButton<Lang>(
+                      segments: const [
+                        ButtonSegment(value: Lang.id, label: Text('Indonesia')),
+                        ButtonSegment(value: Lang.en, label: Text('English')),
+                      ],
+                      selected: {app.lang},
+                      showSelectedIcon: false,
+                      onSelectionChanged: (s) => app.setLang(s.first),
+                      style: SegmentedButton.styleFrom(
+                        selectedBackgroundColor: C.primary,
+                        selectedForegroundColor: Colors.white,
+                        foregroundColor: C.wine,
+                        side: const BorderSide(color: C.outline),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(R.control)),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
