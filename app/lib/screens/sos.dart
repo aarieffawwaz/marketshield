@@ -31,7 +31,7 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: ListView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 28), children: [
+        child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 8, R.gutter, 28), children: [
           Row(children: [
             IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close, color: Colors.white)),
             const Spacer(),

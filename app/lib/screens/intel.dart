@@ -13,8 +13,25 @@ class IntelScreen extends StatefulWidget {
   State<IntelScreen> createState() => _IntelScreenState();
 }
 
+/// Selected Intel sub-tab (0 fact check, 1 price caps); deep links can preselect it.
+final intelTab = ValueNotifier<int>(0);
+
 class _IntelScreenState extends State<IntelScreen> {
-  int _tab = 0;
+  int get _tab => intelTab.value;
+
+  @override
+  void initState() {
+    super.initState();
+    intelTab.addListener(_sync);
+  }
+
+  @override
+  void dispose() {
+    intelTab.removeListener(_sync);
+    super.dispose();
+  }
+
+  void _sync() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +41,7 @@ class _IntelScreenState extends State<IntelScreen> {
         child: Column(children: [
           const AppHeader(),
           Container(
-            margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            margin: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 8),
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(color: C.surfaceMid, borderRadius: BorderRadius.circular(R.control + 2)),
             child: Row(children: [
@@ -34,7 +51,7 @@ class _IntelScreenState extends State<IntelScreen> {
               ])
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => setState(() => _tab = i),
+                    onTap: () => intelTab.value = i,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       height: 44,
@@ -59,7 +76,7 @@ class _IntelScreenState extends State<IntelScreen> {
 
 // ------------------------------------------------------------------ fact check
 
-const _sampleHoax =
+const sampleHoax =
     'INFO DARURAT LUMAJANG: Jembatan Gladak Perak ambruk lagi kena lahar dingin Semeru sore ini, Pronojiwo terisolir total cepat sebarkan ke grup RT!';
 
 class FactResult {
@@ -102,7 +119,7 @@ class _FactCheckTabState extends State<_FactCheckTab> {
   }
 
   Future<void> _check() async {
-    final text = _ctl.text.trim().isEmpty ? _sampleHoax : _ctl.text.trim();
+    final text = _ctl.text.trim().isEmpty ? sampleHoax : _ctl.text.trim();
     setState(() => _busy = true);
     // Server classifier first (POST /signals/check); on-device rules when offline.
     final (remote, _) = await (
@@ -127,7 +144,7 @@ class _FactCheckTabState extends State<_FactCheckTab> {
             _filter == 0 ||
             (_filter == 1 ? (f.v == Verdict.hoax || f.v == Verdict.panic) : f.v == Verdict.official))
         .toList();
-    return ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
+    return ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 24), children: [
       MsCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
@@ -163,7 +180,7 @@ class _FactCheckTabState extends State<_FactCheckTab> {
                     onPressed: () async {
                       final clip = await Clipboard.getData('text/plain');
                       final txt = (clip?.text ?? '').trim();
-                      _ctl.text = txt.isEmpty ? _sampleHoax : txt;
+                      _ctl.text = txt.isEmpty ? sampleHoax : txt;
                     },
                     style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: C.outline),
@@ -345,7 +362,7 @@ class FactResultScreen extends StatelessWidget {
         child: Column(children: [
           SubHeader(context.t('Verifikasi Berita', 'News Verification')),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               Row(children: [
                 const Icon(Icons.arrow_back, size: 15, color: C.primary),
                 const SizedBox(width: 4),
@@ -412,21 +429,34 @@ class FactResultScreen extends StatelessWidget {
               const SizedBox(height: 14),
               MsCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Icon(Icons.satellite_alt_rounded, color: C.sat),
                     const SizedBox(width: 8),
                     Expanded(child: Text(context.t('Cek Silang Citra Satelit', 'Satellite Cross-check'), style: outfit(18, w: FontWeight.w600))),
-                    const SatChip('Sentinel-1 SAR'),
                   ]),
+                  const SizedBox(height: 8),
+                  // Chip on its own line so it never collides with the title on narrow screens.
+                  const Align(alignment: Alignment.centerLeft, child: SatChip('Sentinel-1 SAR')),
                   const SizedBox(height: 12),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(R.control),
                     child: Stack(children: [
+                      // Archive photo of the 2021 eruption (not a live satellite image).
                       Image.asset('assets/img/bridge.jpg', height: 160, width: double.infinity, fit: BoxFit.cover),
                       Positioned(
-                        right: 8,
+                        left: 8,
                         top: 8,
-                        child: Pill(context.t('Jembatan utuh', 'Bridge intact'), icon: Icons.check_circle, bg: C.l1, fg: Colors.white, size: 10.5),
+                        child: Pill(context.t('Arsip 2021: permukiman tertimbun abu', 'Archive 2021: homes buried in ash'),
+                            icon: Icons.photo_library_outlined, bg: Colors.black54, fg: Colors.white, size: 10.5),
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          color: Colors.black45,
+                          child: Text('Foto: Antara TV • CC BY 3.0', style: inter(9, c: Colors.white)),
+                        ),
                       ),
                     ]),
                   ),
@@ -512,7 +542,7 @@ class _HetTab extends StatelessWidget {
         : d <= 10
             ? (context.t('HARGA NAIK (SEDIKIT DI ATAS HET)', 'RISING (JUST ABOVE CAP)'), C.l2, Icons.trending_up)
             : (context.t('DI ATAS HET • LAPORKAN', 'ABOVE CAP • REPORT IT'), C.crimson, Icons.warning_amber_rounded);
-    return ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
+    return ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 24), children: [
       MsCard(
         color: C.surfaceLow,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -623,7 +653,7 @@ class _HetTab extends StatelessWidget {
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(R.sheet))),
       builder: (sheet) => Padding(
-        padding: EdgeInsets.fromLTRB(20, 12, 20, 20 + MediaQuery.of(sheet).viewInsets.bottom),
+        padding: EdgeInsets.fromLTRB(R.gutter, 12, R.gutter, 20 + MediaQuery.of(sheet).viewInsets.bottom),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Center(child: Container(width: 36, height: 4, decoration: BoxDecoration(color: C.handle, borderRadius: BorderRadius.circular(9)))),
           const SizedBox(height: 16),
@@ -679,7 +709,7 @@ class KitScreen extends StatelessWidget {
           SubHeader(context.t('Kit Siaga Bencana', 'Disaster Ready Kit'),
               trailing: Pill('Level ${levelRoman[app.level - 1]} ${context.l(levelName[app.level - 1])}', bg: C.pink, size: 10.5)),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               MsCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

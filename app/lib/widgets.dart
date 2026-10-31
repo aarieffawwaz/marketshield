@@ -30,7 +30,7 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(R.gutter, 8, R.gutter, 8),
       child: Row(children: [
         logo(32),
         const SizedBox(width: 10),
@@ -41,14 +41,8 @@ class AppHeader extends StatelessWidget {
               const SizedBox(width: 3),
               Text('Candipuro, Lumajang', style: outfit(15.5, w: FontWeight.w600)),
             ]),
-            Row(children: [
-              const _Pulse(),
-              const SizedBox(width: 6),
-              Text(context.t('PEMANTAUAN AKTIF', 'LIVE MONITORING'),
-                  style: inter(10.5, w: FontWeight.w700, c: C.primary, ls: .6)),
-              const SizedBox(width: 6),
-              Flexible(child: Freshness(context.repo.volcano, compact: true)),
-            ]),
+            const SizedBox(height: 2),
+            const ModeBadge(),
           ]),
         ),
         IconButton(
@@ -94,6 +88,43 @@ class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
       );
 }
 
+/// Always-visible data-mode badge for the header: "DEMO" (ember) or "LIVE" (green) plus freshness.
+class ModeBadge extends StatelessWidget {
+  const ModeBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final live = context.app.isLive;
+    final c = live ? C.l1 : C.l3;
+    return Row(children: [
+      const _Pulse(),
+      const SizedBox(width: 6),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+        decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(5)),
+        child: Text(live ? 'LIVE' : 'DEMO', style: inter(9.5, w: FontWeight.w800, c: Colors.white, ls: .8)),
+      ),
+      const SizedBox(width: 6),
+      Flexible(
+        child: live
+            ? Freshness(context.repo.volcano, compact: true)
+            : Text(context.t('Data contoh • simulasi', 'Sample data • simulation'),
+                maxLines: 1, overflow: TextOverflow.ellipsis, style: inter(10.5, w: FontWeight.w600, c: C.textMuted)),
+      ),
+    ]);
+  }
+}
+
+/// Standalone DEMO / LIVE pill (Profil, Peta).
+class ModeBadgePill extends StatelessWidget {
+  const ModeBadgePill({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final live = context.app.isLive;
+    return Pill(live ? 'LIVE' : 'DEMO', icon: Icons.circle, bg: (live ? C.l1 : C.l3).withValues(alpha: .14), fg: live ? C.l1 : C.l3, size: 10);
+  }
+}
+
 /// Data provenance for one API feed: "Live · 14.05", "Offline · data tersimpan 14.05" or bundled data.
 /// Tapping it retries the network.
 class Freshness extends StatelessWidget {
@@ -104,12 +135,14 @@ class Freshness extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final repo = context.repo; // subscribe to updates
+    final demo = !context.app.isLive;
     final at = feed.at == null ? '' : context.l(clock(feed.at!));
     final (dot, label) = switch (feed.origin) {
-      Origin.live => (C.l1, compact ? 'Live $at' : 'Live · $at'),
-      Origin.cache => (C.l2, compact ? 'Offline' : context.t('Offline · data tersimpan $at', 'Offline · saved data $at')),
+      _ when demo => (C.l3, compact ? 'Demo' : context.t('Demo · data contoh', 'Demo · sample data')),
+      Origin.live => (C.l1, compact ? context.t('Diperbarui $at', 'Updated $at') : 'Live · $at'),
+      Origin.cache => (C.l2, context.t('Offline · data tersimpan $at', 'Offline · saved data $at')),
       Origin.bundled when feed.syncing => (C.navInactive, context.t('Menyinkronkan…', 'Syncing…')),
-      Origin.bundled => (C.navInactive, compact ? 'Offline' : context.t('Offline · data bawaan', 'Offline · built-in data')),
+      Origin.bundled => (C.navInactive, context.t('Offline · data bawaan', 'Offline · built-in data')),
     };
     final Widget body = compact
         // Single text run so it ellipsizes cleanly in tight headers.
@@ -140,7 +173,7 @@ class Freshness extends StatelessWidget {
       label: label,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: feed.syncing ? null : repo.refresh,
+        onTap: feed.syncing || demo ? null : repo.refresh,
         child: body,
       ),
     );
@@ -156,7 +189,7 @@ class SubHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 6, 16, 6),
+      padding: const EdgeInsets.fromLTRB(4, 6, R.gutter, 6),
       child: Row(children: [
         IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: C.wine)),
         logo(28),

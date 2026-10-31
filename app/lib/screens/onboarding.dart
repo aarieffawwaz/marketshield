@@ -52,7 +52,7 @@ class SplashScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: ListView(padding: const EdgeInsets.fromLTRB(20, 28, 20, 20), children: [
+        child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 28, R.gutter, 20), children: [
           Center(
             child: Container(
               width: 112,
@@ -194,7 +194,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onPageChanged: (i) => setState(() => _i = i),
               itemBuilder: (_, i) {
                 final p = pages[i];
-                return ListView(padding: const EdgeInsets.symmetric(horizontal: 20), children: [
+                return ListView(padding: const EdgeInsets.symmetric(horizontal: R.gutter), children: [
                   _Illustration(icon: p.$1, caption: p.$5),
                   const SizedBox(height: 22),
                   Text(p.$2, style: outfit(28, w: FontWeight.w700, h: 1.15)),
@@ -229,7 +229,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+            padding: const EdgeInsets.fromLTRB(R.gutter, 8, R.gutter, 16),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 for (var k = 0; k < pages.length; k++)
@@ -361,9 +361,9 @@ class PersonaScreen extends StatelessWidget {
               const Icon(Icons.shield_outlined, color: C.wine),
             ]),
           ),
-          const Padding(padding: EdgeInsets.fromLTRB(20, 10, 20, 0), child: Bar(1, height: 5)),
+          const Padding(padding: EdgeInsets.fromLTRB(R.gutter, 10, R.gutter, 0), child: Bar(1, height: 5)),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(20, 18, 20, 20), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 18, R.gutter, 20), children: [
               Align(
                 alignment: Alignment.centerLeft,
                 child: Pill(context.t('Kecamatan Candipuro, Lumajang', 'Candipuro District, Lumajang'),
@@ -411,10 +411,17 @@ class PersonaScreen extends StatelessWidget {
                     ]),
                   ),
                 ),
+              const SizedBox(height: 10),
+              Text(context.t('Sumber data', 'Data source'), style: outfit(20, w: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(context.t('Bisa diganti kapan saja di Profil.', 'You can change this any time in Profile.'),
+                  style: inter(13, c: C.textMuted)),
+              const SizedBox(height: 12),
+              const DataModePicker(),
             ]),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+            padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 16),
             child: Btn(context.t('Simpan & Mulai Pemantauan', 'Save & Start Monitoring'),
                 icon: Icons.arrow_forward,
                 trailingIcon: true,
@@ -424,5 +431,52 @@ class PersonaScreen extends StatelessWidget {
         ]),
       ),
     );
+  }
+}
+
+/// Demo vs Live choice, shared by onboarding and Profil. Saved via the data repository.
+class DataModePicker extends StatelessWidget {
+  const DataModePicker({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final app = context.app;
+    Widget option(DataMode m, IconData icon, Color c, String title, String sub) {
+      final on = app.mode == m;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: MsCard(
+          color: on ? C.surfaceLow : C.surface,
+          border: on ? c : null,
+          padding: const EdgeInsets.all(14),
+          onTap: () => app.setMode(m),
+          child: Row(children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(color: on ? c : C.surfaceMid, borderRadius: BorderRadius.circular(11)),
+              child: Icon(icon, color: on ? Colors.white : C.wine, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: inter(14.5, w: FontWeight.w700, c: C.wine)),
+                const SizedBox(height: 2),
+                Text(sub, style: inter(12.5, c: C.textMuted, h: 1.35)),
+              ]),
+            ),
+            Icon(on ? Icons.radio_button_checked : Icons.radio_button_off, color: on ? c : C.outlineStrong),
+          ]),
+        ),
+      );
+    }
+
+    return Column(children: [
+      option(DataMode.demo, Icons.science_outlined, C.l3, context.t('Mode demo', 'Demo mode'),
+          context.t('Data contoh, level bisa disimulasikan.', 'Sample data; the alert level can be simulated.')),
+      option(DataMode.live, Icons.cloud_sync_outlined, C.l1, context.t('Data live', 'Live data'),
+          context.t('Langsung dari server MarketShield; level mengikuti PVMBG. Tetap jalan offline dengan data tersimpan.',
+              'Straight from the MarketShield server; level follows PVMBG. Works offline with saved data.')),
+    ]);
   }
 }

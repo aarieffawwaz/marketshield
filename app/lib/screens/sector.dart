@@ -56,7 +56,7 @@ class _SectorScreenState extends State<SectorScreen> {
           SubHeader(context.t('Peringatan Sektor', 'Sector Alerts')),
           SizedBox(
             height: 44,
-            child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 16), children: [
+            child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: R.gutter), children: [
               for (final p in Persona.values)
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
@@ -76,7 +76,7 @@ class _SectorScreenState extends State<SectorScreen> {
             ]),
           ),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 10, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 10, R.gutter, 28), children: [
               MsCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [

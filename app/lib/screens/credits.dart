@@ -18,7 +18,7 @@ class CreditsScreen extends StatelessWidget {
         child: Column(children: [
           SubHeader(context.t('Sumber Data & Kredit Foto', 'Data Sources & Photo Credits')),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               Text(
                   context.t(
                       'Foto berlisensi CC BY / CC BY-SA dipakai sesuai ketentuan lisensinya; perubahan yang kami lakukan hanya pemotongan dan kompresi. Ketuk tautan untuk membuka sumber asli.',

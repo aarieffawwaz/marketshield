@@ -14,29 +14,47 @@ class L {
   const L(this.id, this.en);
 }
 
+/// Demo = bundled sample data, no network, level can be simulated.
+/// Live = MarketShield API (cache → bundled fallback), level follows PVMBG.
+enum DataMode { demo, live }
+
 class AppState extends ChangeNotifier {
   Lang lang = Lang.id;
-  int level = 2; // PVMBG status I–IV, driven by Demo Mode or the live PVMBG feed
-  bool _levelPinned = false; // true once the user (or a deep link) picks a level
+  int level = 2; // PVMBG status I–IV: simulated in Demo, from the PVMBG feed in Live
+  int _demoLevel = 2;
+  int? _liveLevel;
+  DataMode mode = DataMode.live;
   Persona persona = Persona.petani;
   final Set<int> kitDone = {0, 1, 2, 4, 5};
   final Set<int> protocolDone = {};
+
+  bool get isLive => mode == DataMode.live;
 
   void setLang(Lang v) {
     lang = v;
     notifyListeners();
   }
 
+  /// Simulated level (Demo Mode, deep links). In Live mode the next PVMBG update wins again.
   void setLevel(int v) {
-    _levelPinned = true;
+    level = v;
+    if (!isLive) _demoLevel = v;
+    notifyListeners();
+  }
+
+  /// Official level from the live API; only shown while in Live mode.
+  void applyLiveLevel(int v) {
+    if (v < 1 || v > 4) return;
+    _liveLevel = v;
+    if (!isLive || v == level) return;
     level = v;
     notifyListeners();
   }
 
-  /// Applies the official level from the live API unless the user is driving Demo Mode.
-  void applyLiveLevel(int v) {
-    if (_levelPinned || v < 1 || v > 4 || v == level) return;
-    level = v;
+  void setMode(DataMode m) {
+    if (m == mode) return;
+    mode = m;
+    level = m == DataMode.live ? (_liveLevel ?? level) : _demoLevel;
     notifyListeners();
   }
 

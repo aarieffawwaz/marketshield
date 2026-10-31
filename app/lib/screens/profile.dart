@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(children: [
           const AppHeader(),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               Row(children: [
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -84,6 +84,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 14),
               MsCard(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    const Icon(Icons.storage_outlined, color: C.wine, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(context.t('Sumber Data Aplikasi', 'App Data Source'), style: outfit(18, w: FontWeight.w700))),
+                    const ModeBadgePill(),
+                  ]),
+                  const SizedBox(height: 4),
+                  Text(
+                      context.t('Mode demo untuk presentasi konsep; Data live untuk sistem yang berjalan.',
+                          'Demo mode to present the concept; Live data for the running system.'),
+                      style: inter(12.5, c: C.textMuted, h: 1.4)),
+                  const SizedBox(height: 12),
+                  const DataModePicker(),
+                ]),
+              ),
+              const SizedBox(height: 14),
+              MsCard(
                 border: C.outlineStrong,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
@@ -108,7 +126,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(context.t('Status Simulasi Aktif', 'Active simulation'), style: inter(11, c: C.textMuted)),
+                          Text(
+                              app.isLive
+                                  ? context.t('Status resmi PVMBG (live)', 'Official PVMBG status (live)')
+                                  : context.t('Status Simulasi Aktif', 'Active simulation'),
+                              style: inter(11, c: C.textMuted)),
                           Text('Level ${levelRoman[lvl - 1]} • ${context.l(levelName[lvl - 1])}', style: inter(14, w: FontWeight.w700, c: C.wine)),
                         ]),
                       ),
@@ -119,6 +141,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ]),
                   ),
                   const SizedBox(height: 14),
+                  if (app.isLive)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: C.surfaceLow, borderRadius: BorderRadius.circular(R.control)),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(
+                            context.t('Simulasi level hanya tersedia di Mode demo. Saat ini level Semeru mengikuti status resmi PVMBG.',
+                                "Level simulation is only available in Demo mode. Semeru's level now follows the official PVMBG status."),
+                            style: inter(12.5, c: C.text, h: 1.45)),
+                        const SizedBox(height: 10),
+                        Btn(context.t('Pakai Mode Demo untuk Simulasi', 'Switch to Demo Mode to Simulate'),
+                            icon: Icons.science_outlined, height: 44, outlined: true, onTap: () => app.setMode(DataMode.demo)),
+                      ]),
+                    )
+                  else ...[
                   Row(children: [
                     Expanded(child: Text(context.t('Tingkat Bahaya Gunung Semeru', 'Semeru hazard level'), style: inter(13, w: FontWeight.w600, c: C.wine))),
                     Text(context.t('Klik level untuk simulasi', 'Tap a level'), style: inter(11, c: C.textMuted)),
@@ -157,6 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                   ]),
+                  ],
                   const SizedBox(height: 16),
                   Text(context.t('Ganti Persona Juri', 'Switch persona'), style: inter(13, w: FontWeight.w600, c: C.wine)),
                   const SizedBox(height: 8),

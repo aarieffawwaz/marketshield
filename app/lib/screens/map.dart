@@ -8,6 +8,7 @@ import '../core.dart';
 import '../geo_map.dart';
 import '../theme.dart';
 import '../widgets.dart';
+import 'map3d.dart';
 import 'shell.dart';
 import 'sos.dart';
 
@@ -40,7 +41,7 @@ class _MapScreenState extends State<MapScreen> {
         child: Column(children: [
           const AppHeader(),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: R.gutter),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(color: C.surfaceLow, borderRadius: BorderRadius.circular(R.control)),
             child: Row(children: [
@@ -52,11 +53,11 @@ class _MapScreenState extends State<MapScreen> {
                     style: inter(12, w: FontWeight.w600, c: C.wine),
                     overflow: TextOverflow.ellipsis),
               ),
-              const Pill('Live', icon: Icons.circle, bg: Colors.white, size: 10),
+              const ModeBadgePill(),
             ]),
           ),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 24), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 12, R.gutter, 24), children: [
               SizedBox(
                 height: 44,
                 child: ListView.separated(
@@ -93,25 +94,33 @@ class _MapScreenState extends State<MapScreen> {
                         showAsh: _layer == 0 || _layer == 2,
                         showLahar: _layer == 0 || _layer == 3,
                         onVolcano: () => push(context, const VolcanoScreen()),
+                        actions: [MapPill(Icons.view_in_ar_outlined, '3D', onTap: () => show3dOptions(context))],
+                      ),
+                    ),
+                    // Wind pill stops short of the control column on the right.
+                    Positioned(
+                      left: mapInset,
+                      top: mapInset,
+                      right: mapInset + 48 + 8,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99), boxShadow: shadow1),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            const Icon(Icons.air, size: 15, color: C.primary),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text('${context.t('Angin GFS', 'GFS wind')}: ${context.t('Barat Daya', 'SW')} (240°) • 12 knot',
+                                  overflow: TextOverflow.ellipsis, style: inter(11, w: FontWeight.w600, c: C.wine)),
+                            ),
+                          ]),
+                        ),
                       ),
                     ),
                     Positioned(
-                      left: 10,
-                      top: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99), boxShadow: shadow1),
-                        child: Row(children: [
-                          const Icon(Icons.air, size: 15, color: C.primary),
-                          const SizedBox(width: 6),
-                          Text('${context.t('Angin GFS', 'GFS wind')}: ${context.t('Barat Daya', 'SW')} (240°) • 12 knot',
-                              style: inter(11, w: FontWeight.w600, c: C.wine)),
-                        ]),
-                      ),
-                    ),
-                    Positioned(
-                      right: 10,
-                      top: 56,
+                      right: mapInset,
+                      top: mapInset,
                       child: Container(
                         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: shadow1),
                         child: Column(children: [
@@ -127,7 +136,7 @@ class _MapScreenState extends State<MapScreen> {
                         ]),
                       ),
                     ),
-                    const Positioned(left: 10, bottom: 10, child: SatChip('Sentinel-1 • NOAA-20 VIIRS • GPM')),
+                    const Positioned(left: mapInset, bottom: attributionHeight + 8, child: SatChip('Sentinel-1 • NOAA-20 VIIRS • GPM')),
                   ]),
                 ),
               ),
@@ -216,7 +225,7 @@ class VolcanoScreen extends StatelessWidget {
         child: Column(children: [
           SubHeader(context.t('Detail Gunung Api', 'Volcano Detail')),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(R.card),
                 child: SizedBox(
@@ -453,7 +462,7 @@ class _EvacScreenState extends State<EvacScreen> {
         child: Column(children: [
           SubHeader(context.t('Panduan Evakuasi', 'Evacuation Guide')),
           Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+            child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               MsCard(
                 color: C.pink,
                 border: const Color(0xFFF5C9C9),
@@ -497,10 +506,11 @@ class _EvacScreenState extends State<EvacScreen> {
                   height: 300,
                   child: LayoutBuilder(builder: (context, c) {
                     return Stack(children: [
-                      Positioned.fill(child: GeoMap(mode: GeoMode.route, krbKm: s.krbRadiusKm, navigating: _nav, showAsh: false)),
+                      Positioned.fill(
+                          child: GeoMap(mode: GeoMode.route, krbKm: s.krbRadiusKm, navigating: _nav, showAsh: false, bottomInset: 34)),
                       Positioned(
-                          left: 10,
-                          top: 10,
+                          left: mapInset,
+                          top: mapInset,
                           child: Pill('${s.krbRadiusKm.toInt()} KM ${context.t('ZONA KRITIS', 'CRITICAL ZONE')}',
                               icon: Icons.circle, bg: Colors.white, fg: C.crimson, size: 10.5)),
                       Positioned(
@@ -508,8 +518,9 @@ class _EvacScreenState extends State<EvacScreen> {
                         right: 0,
                         bottom: 0,
                         child: Container(
+                          height: 34,
                           color: Colors.white.withValues(alpha: .92),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: mapInset),
                           child: Row(children: [
                             const Icon(Icons.satellite_alt_rounded, size: 14, color: C.sat),
                             const SizedBox(width: 6),
