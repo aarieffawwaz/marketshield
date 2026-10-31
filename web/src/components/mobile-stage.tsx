@@ -66,7 +66,10 @@ export function MobileStage() {
   const [active, setActive] = useState<string | null>(null);
   // Start the heavy Flutter downloads alongside the page itself
   preload("/mobile-app/main.dart.js", { as: "script" });
-  preload("/mobile-app/canvaskit/chromium/canvaskit.wasm", { as: "fetch", crossOrigin: "anonymous" });
+  // Flutter picks the Chromium CanvasKit build only on Chromium browsers; preloading it elsewhere (Safari, iOS) wastes ~2 MB
+  if (typeof navigator !== "undefined" && "userAgentData" in navigator && !/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    preload("/mobile-app/canvaskit/chromium/canvaskit.wasm", { as: "fetch", crossOrigin: "anonymous" });
+  }
   const jump = (screen: string) => {
     setActive(screen);
     frameRef.current?.contentWindow?.postMessage(`ms:${screen}`, window.location.origin);
