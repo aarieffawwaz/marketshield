@@ -1,0 +1,26 @@
+# OS / editors
+.DS_Store
+.idea/
+*.iml
+.vscode/
+
+# AI assistant helper files (never pushed)
+AGENTS.md
+CLAUDE.md
+.claude/
+.cursor/
+*.prompt.md
+
+# Secrets
+.env*
+!.env.example
+key.properties
+*.jks
+*.keystore
+
+# Build output produced by CI
+web/public/mobile-app/
+web/public/downloads/
+web/public/vendor/
+app/build/
+app/.dart_tool/
