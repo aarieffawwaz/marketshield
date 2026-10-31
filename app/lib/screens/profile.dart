@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core.dart';
 import '../theme.dart';
 import '../widgets.dart';
+import 'credits.dart';
 import 'onboarding.dart';
 import 'shell.dart';
 
@@ -223,6 +224,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const SplashScreen()), (_) => false),
                   ),
+                  ListTile(
+                    leading: const Icon(Icons.photo_library_outlined, color: C.wine),
+                    title: Text(context.t('Sumber data & kredit foto', 'Data sources & photo credits'), style: inter(14, w: FontWeight.w600, c: C.wine)),
+                    subtitle: Text(context.t('Lisensi foto, dataset satelit & peta', 'Photo licenses, satellite datasets & maps'), style: inter(12, c: C.textMuted)),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => push(context, const CreditsScreen()),
+                  ),
                 ]),
               ),
               const SizedBox(height: 14),
@@ -246,6 +254,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Expanded(child: Text(d, style: inter(11.5, c: C.textMuted))),
                       ]),
                     ),
+                  const SizedBox(height: 4),
+                  InkWell(
+                    onTap: () => push(context, const CreditsScreen()),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Text('${context.t('Sumber data & kredit foto', 'Data sources & photo credits')} →',
+                          style: inter(12.5, w: FontWeight.w600, c: C.primary)),
+                    ),
+                  ),
                   const Divider(height: 20, color: C.outline),
                   Text('MarketShield v1.0 • BRAIN – Ayam Jago • INCEPTION 2026',
                       style: inter(11, c: C.textMuted)),

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'core.dart';
 import 'data/repository.dart';
 import 'deeplink.dart';
+import 'screens/credits.dart';
 import 'screens/intel.dart';
 import 'screens/map.dart';
 import 'screens/onboarding.dart';
@@ -15,7 +16,7 @@ import 'theme.dart';
 
 final navKey = GlobalKey<NavigatorState>();
 
-const _tabs = {'home': 0, 'map': 1, 'intel': 2, 'posko': 3, 'profile': 4};
+const _tabs = {'home': 0, 'map': 1, 'intel': 2, 'posko': 3, 'profile': 4, 'credits': 4};
 
 /// Jumps straight to a screen, skipping onboarding (used by the website's "Try this" links).
 void openScreen(AppState state, String screen) {
@@ -28,6 +29,7 @@ void openScreen(AppState state, String screen) {
     'sos' => const SosScreen() as Widget,
     'evac' => const EvacScreen(),
     'kit' => const KitScreen(),
+    'credits' => const CreditsScreen(),
     _ => null,
   };
   if (extra != null) nav.push(MaterialPageRoute(builder: (_) => extra));
