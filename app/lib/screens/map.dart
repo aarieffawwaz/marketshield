@@ -204,7 +204,7 @@ class _MapScreenState extends State<MapScreen> {
           child: SizedBox(
             height: 110,
             child: Stack(fit: StackFit.expand, children: [
-              Image.asset(img, fit: BoxFit.cover),
+              AssetPhoto(img),
               const DecoratedBox(
                 decoration: BoxDecoration(
                     gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black54])),
@@ -236,7 +236,7 @@ class VolcanoScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 210,
                   child: Stack(fit: StackFit.expand, children: [
-                    Image.asset('assets/img/mahameru.webp', fit: BoxFit.cover),
+                    const AssetPhoto('assets/img/mahameru.webp'),
                     const DecoratedBox(
                       decoration: BoxDecoration(
                           gradient: LinearGradient(

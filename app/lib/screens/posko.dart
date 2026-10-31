@@ -367,7 +367,7 @@ class _AidPriorityScreenState extends State<AidPriorityScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(R.card),
                 child: Stack(children: [
-                  Image.asset('assets/img/posko_scene.webp', height: 140, width: double.infinity, fit: BoxFit.cover),
+                  const AssetPhoto('assets/img/posko_scene.webp', height: 140, width: double.infinity),
                   Positioned(
                     left: 12,
                     bottom: 10,

@@ -21,6 +21,13 @@ class Shell extends StatefulWidget {
 
 class _ShellState extends State<Shell> {
   int? _lastLevel;
+  final _opened = <int>{};
+  static const _screens = [HomeScreen(), MapScreen(), IntelScreen(), PoskoScreen(), ProfileScreen()];
+
+  Widget _tab(int k, int current) {
+    if (k == current) _opened.add(k);
+    return _opened.contains(k) ? _screens[k] : const SizedBox.shrink();
+  }
 
   @override
   void didChangeDependencies() {
@@ -53,12 +60,10 @@ class _ShellState extends State<Shell> {
       builder: (context, i, _) => Scaffold(
         // SOS lives on the outer Scaffold so the floating toast and the bottom bar push it up instead of covering it.
         floatingActionButton: i == 0 && context.app.level >= 3 ? const SosFab() : null,
-        body: IndexedStack(index: i, children: const [
-          HomeScreen(),
-          MapScreen(),
-          IntelScreen(),
-          PoskoScreen(),
-          ProfileScreen(),
+        // Tabs are built the first time they are opened (then kept alive), so the first frame
+        // only lays out one screen and the Peta/Posko map tiles load on demand.
+        body: IndexedStack(index: i, children: [
+          for (var k = 0; k < _screens.length; k++) _tab(k, i),
         ]),
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
@@ -564,7 +569,7 @@ class _Photo extends StatelessWidget {
           height: height,
           width: double.infinity,
           child: Stack(fit: StackFit.expand, children: [
-            Image.asset(asset, fit: BoxFit.cover),
+            AssetPhoto(asset),
             Positioned(
               left: 10,
               bottom: 10,
