@@ -30,6 +30,8 @@ class C {
 }
 
 class R {
+  /// Horizontal page padding (screen edge → content) on every screen.
+  static const gutter = 22.0;
   static const card = 16.0;
   static const control = 12.0;
   static const sheet = 28.0;

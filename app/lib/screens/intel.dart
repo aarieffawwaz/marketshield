@@ -13,8 +13,25 @@ class IntelScreen extends StatefulWidget {
   State<IntelScreen> createState() => _IntelScreenState();
 }
 
+/// Selected Intel sub-tab (0 fact check, 1 price caps); deep links can preselect it.
+final intelTab = ValueNotifier<int>(0);
+
 class _IntelScreenState extends State<IntelScreen> {
-  int _tab = 0;
+  int get _tab => intelTab.value;
+
+  @override
+  void initState() {
+    super.initState();
+    intelTab.addListener(_sync);
+  }
+
+  @override
+  void dispose() {
+    intelTab.removeListener(_sync);
+    super.dispose();
+  }
+
+  void _sync() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +51,7 @@ class _IntelScreenState extends State<IntelScreen> {
               ])
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => setState(() => _tab = i),
+                    onTap: () => intelTab.value = i,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       height: 44,
@@ -59,7 +76,7 @@ class _IntelScreenState extends State<IntelScreen> {
 
 // ------------------------------------------------------------------ fact check
 
-const _sampleHoax =
+const sampleHoax =
     'INFO DARURAT LUMAJANG: Jembatan Gladak Perak ambruk lagi kena lahar dingin Semeru sore ini, Pronojiwo terisolir total cepat sebarkan ke grup RT!';
 
 class FactResult {
@@ -102,7 +119,7 @@ class _FactCheckTabState extends State<_FactCheckTab> {
   }
 
   Future<void> _check() async {
-    final text = _ctl.text.trim().isEmpty ? _sampleHoax : _ctl.text.trim();
+    final text = _ctl.text.trim().isEmpty ? sampleHoax : _ctl.text.trim();
     setState(() => _busy = true);
     // Server classifier first (POST /signals/check); on-device rules when offline.
     final (remote, _) = await (
@@ -163,7 +180,7 @@ class _FactCheckTabState extends State<_FactCheckTab> {
                     onPressed: () async {
                       final clip = await Clipboard.getData('text/plain');
                       final txt = (clip?.text ?? '').trim();
-                      _ctl.text = txt.isEmpty ? _sampleHoax : txt;
+                      _ctl.text = txt.isEmpty ? sampleHoax : txt;
                     },
                     style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: C.outline),

@@ -15,12 +15,19 @@ enum Origin { bundled, cache, live }
 class Live<T> {
   final String path;
   final T Function(Map<String, dynamic>) _parse;
+  final T bundled;
   T value;
   Origin origin = Origin.bundled;
   DateTime? at; // when the shown data was fetched from the network (live or cached copy)
   bool syncing = false;
 
-  Live(this.path, this.value, this._parse);
+  Live(this.path, this.bundled, this._parse) : value = bundled;
+
+  void _reset() {
+    value = bundled;
+    origin = Origin.bundled;
+    at = null;
+  }
 
   String get _key => 'ms.api.v1:$path';
 
@@ -46,22 +53,34 @@ class Live<T> {
     }
   }
 
-  Future<void> _fetch(MsApi api, SharedPreferences? prefs) async {
-    final raw = await api.getRaw(path);
-    final now = DateTime.now();
-    _apply(raw, Origin.live, now);
-    await prefs?.setString(_key, jsonEncode({'at': now.toIso8601String(), 'body': raw}));
-  }
+  Future<void> _store(SharedPreferences? prefs, String raw, DateTime now) async =>
+      prefs?.setString(_key, jsonEncode({'at': now.toIso8601String(), 'body': raw}));
 }
 
 /// Live data with offline fallback: network → last good cached JSON → bundled static data.
+/// In [DataMode.demo] it serves bundled sample data only and never touches the network.
 class DataRepo extends ChangeNotifier {
-  DataRepo({MsApi? api}) : _api = api ?? MsApi();
+  DataRepo({MsApi? api, SharedPreferences? prefs})
+      : _api = api ?? MsApi(),
+        _prefs = prefs;
+
+  static const _modeKey = 'ms.dataMode';
 
   final MsApi _api;
-  SharedPreferences? _prefs;
+  final SharedPreferences? _prefs;
   Timer? _timer;
   AppLifecycleListener? _lifecycle;
+  DataMode _mode = DataMode.demo;
+  int _generation = 0; // bumps on every mode switch so stale responses are dropped
+
+  DataMode get mode => _mode;
+
+  /// Saved choice from onboarding/Profil, or null on first run.
+  static DataMode? savedMode(SharedPreferences? prefs) => switch (prefs?.getString(_modeKey)) {
+        'demo' => DataMode.demo,
+        'live' => DataMode.live,
+        _ => null,
+      };
 
   final volcano = Live<VolcanoStatus?>('/volcanoes', null, parseSemeru);
   final posko = Live<List<Posko>>('/posko?volcano=semeru', poskoList, parsePosko);
@@ -72,42 +91,64 @@ class DataRepo extends ChangeNotifier {
 
   List<Live<Object?>> get _all => [volcano, posko, prices, intel, alerts, priority];
 
-  /// Loads cached copies, then refreshes from the network in the background. Call after `runApp`.
-  Future<void> start() async {
-    try {
-      _prefs = await SharedPreferences.getInstance();
-    } catch (e) {
-      debugPrint('shared_preferences unavailable: $e');
-    }
-    var any = false;
+  /// Switches data source. Live: cached copies first, then a background refresh. Demo: bundled only.
+  /// [persist] saves the choice (onboarding / Profil); deep-link overrides pass false.
+  Future<void> setMode(DataMode m, {bool persist = true}) async {
+    if (persist) await _prefs?.setString(_modeKey, m.name);
+    if (m == _mode && (_timer != null || m == DataMode.demo)) return;
+    _mode = m;
+    _generation++;
+    _timer?.cancel();
+    _timer = null;
+    _lifecycle?.dispose();
+    _lifecycle = null;
     for (final e in _all) {
-      any = e._restore(_prefs) || any;
+      e._reset();
+      e.syncing = false;
     }
-    if (any) notifyListeners();
+    if (m == DataMode.demo) {
+      notifyListeners();
+      return;
+    }
+    for (final e in _all) {
+      e._restore(_prefs);
+    }
+    notifyListeners();
     _timer = Timer.periodic(const Duration(minutes: 5), (_) => refresh());
     _lifecycle = AppLifecycleListener(onResume: refresh);
     await refresh();
   }
 
-  Future<void> refresh() => Future.wait([for (final e in _all) _refreshOne(e)]);
+  Future<void> refresh() async {
+    if (_mode != DataMode.live) return;
+    await Future.wait([for (final e in _all) _refreshOne(e)]);
+  }
 
   Future<void> _refreshOne(Live<Object?> e) async {
     if (e.syncing) return;
+    final gen = _generation;
     e.syncing = true;
     notifyListeners();
     try {
-      await e._fetch(_api, _prefs);
+      final raw = await _api.getRaw(e.path);
+      if (gen != _generation) return; // mode changed while waiting
+      final now = DateTime.now();
+      e._apply(raw, Origin.live, now);
+      await e._store(_prefs, raw, now);
     } catch (err) {
       debugPrint('GET ${e.path} failed: $err');
-      if (e.origin == Origin.live) e.origin = Origin.cache; // still showing the last good copy
+      if (gen == _generation && e.origin == Origin.live) e.origin = Origin.cache; // still showing the last good copy
     } finally {
-      e.syncing = false;
-      notifyListeners();
+      if (gen == _generation) {
+        e.syncing = false;
+        notifyListeners();
+      }
     }
   }
 
-  /// Hoax/panic check via `POST /signals/check`; null when offline or the API fails.
+  /// Hoax/panic check via `POST /signals/check`; null in Demo mode, offline or when the API fails.
   Future<SignalCheck?> checkSignal(String text, Lang lang) async {
+    if (_mode != DataMode.live) return null;
     try {
       final j = await _api.post('/signals/check', {'text': text, 'lang': lang == Lang.en ? 'en' : 'id'});
       return parseSignalCheck(j);

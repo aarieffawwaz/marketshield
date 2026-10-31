@@ -52,7 +52,7 @@ class _MapScreenState extends State<MapScreen> {
                     style: inter(12, w: FontWeight.w600, c: C.wine),
                     overflow: TextOverflow.ellipsis),
               ),
-              const Pill('Live', icon: Icons.circle, bg: Colors.white, size: 10),
+              const ModeBadgePill(),
             ]),
           ),
           Expanded(
