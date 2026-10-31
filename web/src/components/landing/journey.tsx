@@ -5,6 +5,7 @@ import { motion, useScroll, useSpring } from "motion/react";
 import { Check, Satellite, Siren, Truck } from "lucide-react";
 import { useT } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { EvacMap } from "./evac-map";
 
 /* Mini interface mockups shown inside each journey card */
 
@@ -110,31 +111,11 @@ function MiniEvac() {
         <span className="font-semibold text-wine">{t("Rute evakuasi aman", "Safe evacuation route")}</span>
         <span className="rounded-full bg-[#e6f2e7] px-2 py-0.5 text-[10px] font-semibold text-[#2e7d32]">{t("Bebas lahar", "Lahar-free")}</span>
       </div>
-      <svg viewBox="0 0 320 150" className="mt-1 w-full" role="img" aria-label={t("Peta rute evakuasi", "Evacuation route map")}>
-        <defs>
-          <pattern id="haz" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#fbe3dc" /><line x1="0" y1="0" x2="0" y2="8" stroke="#e8a99a" strokeWidth="3" /></pattern>
-        </defs>
-        <rect width="320" height="150" fill="#f6efe8" />
-        {[30, 55, 80].map((r) => <circle key={r} cx="40" cy="10" r={r} fill="none" stroke="#d8c3b4" strokeWidth="0.8" />)}
-        <path d="M0 0 H120 C 105 40, 70 60, 0 70 Z" fill="url(#haz)" />
-        <text x="8" y="16" fontSize="9" fontWeight="700" fill="#b51a14">KRB III</text>
-        <path d="M100 0 C 120 40, 150 80, 165 150" fill="none" stroke="#a0522d" strokeWidth="11" opacity="0.35" strokeLinecap="round" />
-        <path d="M100 0 C 120 40, 150 80, 165 150" fill="none" stroke="#7a3b16" strokeWidth="2.5" strokeDasharray="5 4" />
-        <text x="172" y="140" fontSize="9" fontWeight="600" fill="#7a3b16">{t("Alur lahar · hindari", "Lahar channel · avoid")}</text>
-        <path d="M38 118 C 80 112, 110 100, 138 96 S 190 84, 230 70 S 275 52, 292 40" fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round" />
-        <motion.path d="M38 118 C 80 112, 110 100, 138 96 S 190 84, 230 70 S 275 52, 292 40" fill="none" stroke="#2e7d32" strokeWidth="4.5" strokeLinecap="round" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }} transition={{ duration: 1.6, ease: "easeInOut" }} />
-        <rect x="136" y="86" width="22" height="9" rx="2" fill="#5a4a47" />
-        <text x="128" y="81" fontSize="8.5" fill="#5a4a47">{t("Jembatan aman", "Safe bridge")}</text>
-        <circle cx="38" cy="118" r="7" fill="#2f5d8a" stroke="#fff" strokeWidth="2.5" />
-        <text x="18" y="140" fontSize="9.5" fontWeight="700" fill="#2f5d8a">{t("Anda · Sumberwuluh", "You · Sumberwuluh")}</text>
-        <rect x="282" y="28" width="22" height="22" rx="5" fill="#2e7d32" stroke="#fff" strokeWidth="2" />
-        <path d="M287 39 h12 M293 33 v12" stroke="#fff" strokeWidth="2.5" />
-        <text x="214" y="22" fontSize="9.5" fontWeight="700" fill="#2e7d32">{t("Balai Desa Sumbermujur", "Sumbermujur village hall")}</text>
-      </svg>
-      <div className="grid grid-cols-3 border-t border-line text-center text-[11px]">
+      <EvacMap className="mt-2.5 h-[220px] border-y border-line sm:h-[240px]" />
+      <div className="grid grid-cols-3 text-center text-[11px]">
         <div className="py-2"><p className="font-display text-[15px] font-semibold text-wine">18 mnt</p><p className="text-muted">ETA · 4,2 km</p></div>
         <div className="border-x border-line py-2"><p className="font-display text-[15px] font-semibold text-wine">268/420</p><p className="text-muted">{t("terisi shelter", "shelter filled")}</p></div>
-        <div className="flex items-center justify-center py-2"><span className="inline-flex items-center gap-1 rounded-full bg-crimson px-2.5 py-1 font-semibold text-white"><Siren className="h-3 w-3" /> {t("Tahan SOS", "Hold SOS")}</span></div>
+        <div className="flex items-center justify-center px-1 py-2"><span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-crimson px-2 py-1 text-[10.5px] font-semibold text-white sm:px-2.5 sm:text-[11px]"><Siren className="hidden h-3 w-3 min-[400px]:block sm:block" /> {t("Tahan SOS", "Hold SOS")}</span></div>
       </div>
     </div>
   );

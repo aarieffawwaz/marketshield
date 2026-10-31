@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, ArrowUpRight, Check, ChevronDown } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Building2, Check, ChevronDown, Pill, Sprout, User } from "lucide-react";
 import { Reveal } from "./reveal";
 import { FluidTabs } from "@/components/ui/interactions";
+import { PhoneShot } from "@/components/ui/phone";
 import { POSTS } from "@/lib/blog";
 import { Rolling, Stagger, staggerItem } from "@/components/ui/rolling";
 import { StoreBadges } from "@/components/ui/store-badges";
@@ -50,21 +51,23 @@ export function Numbers() {
 export function UseCases() {
   const { t } = useT();
   const cases = [
-    { key: "warga", stats: [["1", t("langkah berikutnya, selalu jelas", "clear next step")], ["2 dtk", t("cek pesan berantai", "to check a message")], ["0", t("biaya untuk warga", "cost for residents")]] as [string, string][], label: t("Warga", "Residents"), who: "Bu Sari, Candipuro", q: t("“Saya bahaya tidak, beli apa, ke mana, pesan itu benar tidak?”", "“Am I in danger, what do I buy, where do I go, is that message true?”"), pts: [t("Beranda menunjukkan satu langkah berikutnya", "Home shows one next step"), t("Cek pesan WhatsApp dalam 2 detik", "Check a WhatsApp message in 2 seconds"), t("Rute bebas lahar ke shelter yang masih muat", "Lahar-free route to a shelter with room")], shot: "05_home3a" },
-    { key: "petani", stats: [["72 j", t("prakiraan arah abu", "ash forecast")], ["Rp", t("estimasi aset terpapar", "exposed assets")], ["3", t("protokol per level", "protocols per level")]] as [string, string][], label: t("Petani", "Farmers"), who: "Pak Darto, Cangkringan", q: t("“Panen lebih awal? Pindahkan sapi? Tutup palung?”", "“Harvest early? Move the cows? Cover troughs?”"), pts: [t("Arah abu dari angin GFS untuk 72 jam", "Ash direction from GFS wind for 72 h"), t("Estimasi aset terpapar dalam Rupiah", "Exposed assets in Rupiah"), t("Checklist dengan tenggat sesuai jendela aksi", "Checklist with action-window deadlines")], shot: "17_sector" },
-    { key: "apotek", stats: [["HET", t("patokan harga resmi", "official price cap")], ["4", t("outlet stok terverifikasi", "verified outlets")], ["5", t("desa prioritas", "priority villages")]] as [string, string][], label: t("Apotek", "Pharmacies"), who: t("Apotek di Pasirian", "A pharmacy in Pasirian"), q: t("“Buktikan harga saya wajar, kirim bantuan ke yang butuh.”", "“Prove my prices are fair, send aid where it's needed.”"), pts: [t("Lencana harga wajar sesuai HET", "Fair-price badge against the cap"), t("Stok terlihat warga, antrean lebih tenang", "Stock visible to residents, calmer queues"), t("Lima desa prioritas dan kebutuhannya", "Top five priority villages and needs")], shot: "13_het" },
-    { key: "bpbd", stats: [["3D", t("peta satelit & simulasi", "satellite map & sim")], ["6 j", t("siklus data satelit", "satellite data cycle")], ["⌘K", t("perintah cepat", "quick commands")]] as [string, string][], label: "BPBD", who: t("Pusdalops kabupaten", "District ops centre"), q: t("“Verifikasi laporan, perbarui posko, lihat desa prioritas.”", "“Verify reports, update posts, see priority villages.”"), pts: [t("Peta 3D dengan lapisan satelit", "3D map with satellite layers"), t("Catat kiriman, peringkat ikut bergeser", "Log deliveries, ranking shifts"), t("Siaran bertahap tanpa memicu panic buying", "Staggered broadcasts without panic buying")], shot: "16_aid_a" },
+    { key: "warga", icon: User, stats: [["1", t("langkah berikutnya, selalu jelas", "clear next step")], ["2 dtk", t("cek pesan berantai", "to check a message")], ["0", t("biaya untuk warga", "cost for residents")]] as [string, string][], label: t("Warga", "Residents"), who: "Bu Sari, Candipuro", q: t("“Saya bahaya tidak, beli apa, ke mana, pesan itu benar tidak?”", "“Am I in danger, what do I buy, where do I go, is that message true?”"), pts: [t("Beranda menunjukkan satu langkah berikutnya", "Home shows one next step"), t("Cek pesan WhatsApp dalam 2 detik", "Check a WhatsApp message in 2 seconds"), t("Rute bebas lahar ke shelter yang masih muat", "Lahar-free route to a shelter with room")], shot: "05_home3a" },
+    { key: "petani", icon: Sprout, stats: [["72 j", t("prakiraan arah abu", "ash forecast")], ["Rp", t("estimasi aset terpapar", "exposed assets")], ["3", t("protokol per level", "protocols per level")]] as [string, string][], label: t("Petani", "Farmers"), who: "Pak Darto, Cangkringan", q: t("“Panen lebih awal? Pindahkan sapi? Tutup palung?”", "“Harvest early? Move the cows? Cover troughs?”"), pts: [t("Arah abu dari angin GFS untuk 72 jam", "Ash direction from GFS wind for 72 h"), t("Estimasi aset terpapar dalam Rupiah", "Exposed assets in Rupiah"), t("Checklist dengan tenggat sesuai jendela aksi", "Checklist with action-window deadlines")], shot: "17_sector" },
+    { key: "apotek", icon: Pill, stats: [["HET", t("patokan harga resmi", "official price cap")], ["4", t("outlet stok terverifikasi", "verified outlets")], ["5", t("desa prioritas", "priority villages")]] as [string, string][], label: t("Apotek", "Pharmacies"), who: t("Apotek di Pasirian", "A pharmacy in Pasirian"), q: t("“Buktikan harga saya wajar, kirim bantuan ke yang butuh.”", "“Prove my prices are fair, send aid where it's needed.”"), pts: [t("Lencana harga wajar sesuai HET", "Fair-price badge against the cap"), t("Stok terlihat warga, antrean lebih tenang", "Stock visible to residents, calmer queues"), t("Lima desa prioritas dan kebutuhannya", "Top five priority villages and needs")], shot: "13_het" },
+    { key: "bpbd", icon: Building2, stats: [["3D", t("peta satelit & simulasi", "satellite map & sim")], ["6 j", t("siklus data satelit", "satellite data cycle")], ["⌘K", t("perintah cepat", "quick commands")]] as [string, string][], label: "BPBD", who: t("Pusdalops kabupaten", "District ops centre"), q: t("“Verifikasi laporan, perbarui posko, lihat desa prioritas.”", "“Verify reports, update posts, see priority villages.”"), pts: [t("Peta 3D dengan lapisan satelit", "3D map with satellite layers"), t("Catat kiriman, peringkat ikut bergeser", "Log deliveries, ranking shifts"), t("Siaran bertahap tanpa memicu panic buying", "Staggered broadcasts without panic buying")], shot: "16_aid_a" },
   ];
   const [k, setK] = useState("warga");
   const c = cases.find((x) => x.key === k)!;
   return (
     <section className="tex-topo-b tex-glow bg-cream py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Reveal>
+        <Reveal className="flex flex-col items-center text-center">
           <Kicker n="—">{t("Untuk siapa", "Who it's for")}</Kicker>
           <h2 className="mt-6 max-w-3xl font-display text-[clamp(1.9rem,4.2vw,3.4rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-wine">{t("Satu sumber kebenaran, langkah berbeda untuk tiap peran.", "One source of truth, different steps for every role.")}</h2>
         </Reveal>
-        <FluidTabs label={t("Peran", "Role")} value={k} onChange={setK} className="mt-8 w-fit flex-wrap gap-1 rounded-full bg-sand-2 p-1" itemClassName="rounded-full px-4 py-2 text-[13.5px] font-medium" options={cases.map((x) => ({ value: x.key, label: x.label }))} />
+        <div className="mt-8 flex justify-center">
+          <FluidTabs label={t("Peran", "Role")} value={k} onChange={setK} className="max-w-full flex-wrap justify-center gap-0.5 rounded-[1.6rem] bg-sand-2 p-1 sm:gap-1 sm:rounded-full" itemClassName="rounded-full px-2.5 py-2 text-[13px] font-medium sm:px-4 sm:text-[13.5px]" options={cases.map((x) => ({ value: x.key, label: <span className="flex items-center gap-1.5"><x.icon className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" strokeWidth={2} aria-hidden />{x.label}</span> }))} />
+        </div>
         <AnimatePresence mode="wait">
           <motion.div key={k} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.28 }} className="card mt-6 grid overflow-hidden md:grid-cols-[1.15fr_0.85fr]">
             <div className="flex flex-col justify-center p-6 sm:p-10">
@@ -86,11 +89,7 @@ export function UseCases() {
               <Link href="/fitur" className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-medium text-maroon">{t("Lihat semua fitur", "See all features")} <ArrowRight className="h-4 w-4" /></Link>
             </div>
             <div className="tex-topo relative hidden items-center justify-center bg-gradient-to-br from-peach/70 to-sand px-8 py-10 md:flex">
-              <div className="w-[240px] rounded-[2.3rem] bg-[#141012] p-[9px] shadow-2xl ring-1 ring-black/10">
-                <div className="relative aspect-[1080/2424] overflow-hidden rounded-[1.8rem] bg-[#fff8f3]">
-                  <Image src={`/screens/${c.shot}.webp`} alt="" fill sizes="240px" className="object-cover object-top" />
-                </div>
-              </div>
+              <PhoneShot src={c.shot} sizes="250px" className="w-[250px]" />
             </div>
           </motion.div>
         </AnimatePresence>

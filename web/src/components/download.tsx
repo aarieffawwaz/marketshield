@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { BadgeCheck, ChevronDown, Cpu, Download, Languages, MonitorSmartphone, ShieldCheck, Smartphone, WifiOff } from "lucide-react";
 import { PageShell } from "@/components/site/page";
 import { CopyButton } from "@/components/ui/interactions";
+import { PhoneShot } from "@/components/ui/phone";
 import { APK } from "@/lib/data";
 import { useLatestRelease } from "@/lib/release";
 import { useT } from "@/lib/store";
@@ -21,16 +22,6 @@ const SHOTS = [
   { s: "13_het", id: "Harga HET", en: "Price cap" },
   { s: "16_aid_a", id: "Prioritas bantuan", en: "Aid priority" },
 ];
-
-function PhoneShot({ src, className }: { src: string; className?: string }) {
-  return (
-    <div className={cn("rounded-[2.2rem] bg-[#141012] p-[9px] shadow-2xl ring-1 ring-white/10", className)}>
-      <div className="relative aspect-[1080/2424] overflow-hidden rounded-[1.7rem] bg-[#fff8f3]">
-        <Image src={`/screens/${src}.webp`} alt="" fill sizes="280px" className="object-cover object-top" />
-      </div>
-    </div>
-  );
-}
 
 export function DownloadPage() {
   const { t, tx } = useT();
