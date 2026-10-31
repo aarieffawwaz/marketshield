@@ -46,18 +46,33 @@ curl https://marketshield-inception.vercel.app/api/v1/volcanoes/semeru/risk
 
 ```json
 {
-  "model": { "probability_7d": 0.75, "window_days": 5, "top_drivers": ["Tren SO2", "Hujan 72 Jam", "Backscatter S1"], "name": null, "updated_at": "2026-10-31T15:49:17.278Z" },
+  "model": {
+    "probability_7d": 0.9685,
+    "window_days": 7,
+    "top_drivers": ["Titik panas 3 minggu lalu", "Titik panas minggu ini", "Backscatter S1"],
+    "name": "xgboost-thermal-v1",
+    "updated_at": "2026-10-31T18:58:04.696Z"
+  },
   "volcano": "semeru",
   "official_level": { "value": 3, "name": "Siaga", "source": "PVMBG" },
   "escalation_probability_7d": 0.71,
-  "action_window": { "id": "…", "en": "…" },
-  "drivers": ["…"],
-  "indicators": [{ "key": "so2", "dataset": "COPERNICUS/S5P/NRTI/L3_SO2", "value": "…", "trend": "up", "acquired": "…" }],
-  "history": [{ "day": "…", "probability": "…" }]
+  "action_window": { "id": "± 36 jam jendela aksi", "en": "≈ 36-hour action window" },
+  "drivers": ["SO₂ up 3 days in a row", "Radar change in the Besuk Kobokan channel", "Crater temperature anomaly +8 °C"],
+  "indicators": [
+    { "key": "s1", "dataset": "COPERNICUS/S1_GRD", "value": "−3,1 dB • 12 km²", "trend": "up", "acquired": "2 days ago" },
+    { "key": "firms", "dataset": "FIRMS", "value": "7 titik • 34 MW", "trend": "up", "acquired": "6 h ago" },
+    { "key": "so2", "dataset": "COPERNICUS/S5P/NRTI/L3_SO2", "value": "2,8 DU", "trend": "up", "acquired": "1 day ago" }
+  ],
+  "history": [
+    { "day": "30/10", "probability": 0.61 },
+    { "day": "31/10", "probability": 0.72 }
+  ]
 }
 ```
 
-`model` is the latest forecast written by the risk-engine notebook to `volcanoes/{id}.forecast`; it is `null` when none exists. `escalation_probability_7d` is the scenario value for the requested level.
+Fetched from production on 1 November 2026; `indicators` (7 in total) and `history` (16 days) are shortened here.
+
+`model` is the latest XGBoost forecast (`xgboost-thermal-v1`) that `web/scripts/publish-forecast.ts` writes from `ml/results/risk_latest.json` to `volcanoes/{id}.forecast`; it is `null` when none exists. `probability_7d` is the chance of NASA FIRMS thermal activity within 5 km of the summit in the next 7 days, a satellite proxy and not the PVMBG level; `top_drivers` are the three largest SHAP contributions. `escalation_probability_7d`, `action_window`, `indicators` and `history` are scenario values that change with the requested level; `drivers` is fixed scenario text. The `model` block does not depend on `level`.
 
 ## GET /villages/priority
 
