@@ -1,0 +1,52 @@
+{
+  "target": "any FIRMS thermal hotspot within 5 km of the summit in the next 7 days (proxy, not the PVMBG level)",
+  "data": {
+    "volcanoes": 25,
+    "weeks": 407,
+    "rows": 10067,
+    "train_rows": 6416,
+    "test_rows": 3651,
+    "train_period": "2019-2023",
+    "test_period": "2024-2026",
+    "positive_rate_train": 0.1459,
+    "positive_rate_test": 0.1501
+  },
+  "xgboost_test": {
+    "n": 3651,
+    "positives": 548,
+    "roc_auc": 0.8989,
+    "pr_auc": 0.6735,
+    "precision": 0.5544,
+    "recall": 0.781,
+    "f1": 0.6485
+  },
+  "persistence_baseline_test": {
+    "n": 3651,
+    "positives": 548,
+    "roc_auc": 0.7835,
+    "pr_auc": 0.4554,
+    "precision": 0.6337,
+    "recall": 0.6314,
+    "f1": 0.6325
+  },
+  "onset_weeks_test": {
+    "xgboost": {
+      "n": 3105,
+      "positives": 202,
+      "roc_auc": 0.8085,
+      "pr_auc": 0.2984,
+      "precision": 0.3527,
+      "recall": 0.4505,
+      "f1": 0.3957
+    },
+    "persistence": "always predicts no activity on these weeks"
+  },
+  "shap_mean_abs": {
+    "firms_prev3w": 1.516,
+    "firms_now": 0.6305,
+    "so2_now": 0.4614,
+    "rain_7d_mm": 0.3073,
+    "s1_change_db": 0.2804,
+    "so2_ratio": 0.2039
+  }
+}

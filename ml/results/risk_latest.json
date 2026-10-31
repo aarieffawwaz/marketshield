@@ -1,0 +1,252 @@
+[
+  {
+    "volcano": "Agung",
+    "week": "2026-10-12",
+    "p": 0.2305,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Hujan 7 hari",
+      "SO2 minggu ini"
+    ]
+  },
+  {
+    "volcano": "Rinjani",
+    "week": "2026-10-12",
+    "p": 0.46,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "SO2 minggu ini",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Marapi",
+    "week": "2026-10-19",
+    "p": 0.0232,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "SO2 minggu ini",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Dukono",
+    "week": "2026-10-19",
+    "p": 0.0927,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Tren SO2",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Ibu",
+    "week": "2026-10-19",
+    "p": 0.9889,
+    "top": [
+      "Titik panas minggu ini",
+      "Titik panas 3 minggu lalu",
+      "SO2 minggu ini"
+    ]
+  },
+  {
+    "volcano": "Ruang",
+    "week": "2026-10-19",
+    "p": 0.4321,
+    "top": [
+      "Hujan 7 hari",
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Karangetang",
+    "week": "2026-10-19",
+    "p": 0.9681,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Hujan 7 hari"
+    ]
+  },
+  {
+    "volcano": "Soputan",
+    "week": "2026-10-19",
+    "p": 0.2054,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Backscatter S1"
+    ]
+  },
+  {
+    "volcano": "Lokon",
+    "week": "2026-10-19",
+    "p": 0.9309,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "SO2 minggu ini"
+    ]
+  },
+  {
+    "volcano": "Dempo",
+    "week": "2026-10-19",
+    "p": 0.0707,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "SO2 minggu ini",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Kerinci",
+    "week": "2026-10-19",
+    "p": 0.0531,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "SO2 minggu ini",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Sinabung",
+    "week": "2026-10-19",
+    "p": 0.0959,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Hujan 7 hari",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Ijen",
+    "week": "2026-10-19",
+    "p": 0.9724,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Tren SO2"
+    ]
+  },
+  {
+    "volcano": "Lewotobi",
+    "week": "2026-10-19",
+    "p": 0.8532,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Hujan 7 hari"
+    ]
+  },
+  {
+    "volcano": "Tambora",
+    "week": "2026-10-19",
+    "p": 0.4068,
+    "top": [
+      "SO2 minggu ini",
+      "Tren SO2",
+      "Titik panas 3 minggu lalu"
+    ]
+  },
+  {
+    "volcano": "Batur",
+    "week": "2026-10-19",
+    "p": 0.1118,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "SO2 minggu ini",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Slamet",
+    "week": "2026-10-19",
+    "p": 0.0487,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "SO2 minggu ini",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Raung",
+    "week": "2026-10-19",
+    "p": 0.8232,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Hujan 7 hari"
+    ]
+  },
+  {
+    "volcano": "Kelud",
+    "week": "2026-10-19",
+    "p": 0.103,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Tren SO2"
+    ]
+  },
+  {
+    "volcano": "Bromo",
+    "week": "2026-10-19",
+    "p": 0.8127,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Hujan 7 hari"
+    ]
+  },
+  {
+    "volcano": "Merapi",
+    "week": "2026-10-19",
+    "p": 0.1019,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Backscatter S1"
+    ]
+  },
+  {
+    "volcano": "Semeru",
+    "week": "2026-10-19",
+    "p": 0.9685,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Titik panas minggu ini",
+      "Backscatter S1"
+    ]
+  },
+  {
+    "volcano": "Gamalama",
+    "week": "2026-10-19",
+    "p": 0.0345,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Backscatter S1",
+      "Titik panas minggu ini"
+    ]
+  },
+  {
+    "volcano": "Anak Krakatau",
+    "week": "2026-10-19",
+    "p": 0.984,
+    "top": [
+      "Titik panas minggu ini",
+      "Titik panas 3 minggu lalu",
+      "SO2 minggu ini"
+    ]
+  },
+  {
+    "volcano": "Banda Api",
+    "week": "2026-10-19",
+    "p": 0.112,
+    "top": [
+      "Titik panas 3 minggu lalu",
+      "Tren SO2",
+      "Hujan 7 hari"
+    ]
+  }
+]
