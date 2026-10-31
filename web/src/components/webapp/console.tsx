@@ -11,7 +11,8 @@ import {
 import { Logo, Mark } from "@/components/ui/brand";
 import { LangToggle, ThemeToggle } from "@/components/ui/lang-toggle";
 import { FluidTabs } from "@/components/ui/interactions";
-import { ALERTS, LEVELS, VOLCANO, type Level } from "@/lib/data";
+import { LEVELS, VOLCANO, type Level } from "@/lib/data";
+import { useAlerts } from "@/lib/live";
 import { PEOPLE, useApp, useT, type Role } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LevelChip } from "./ui";
@@ -120,7 +121,7 @@ export function Console() {
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="lg:hidden"><Mark /></Link>
             <div className="min-w-0">
-              <p className="hidden text-[11.5px] text-muted sm:block">{session.org} · {VOLCANO.name}</p>
+              <p className="hidden items-center gap-2 text-[11.5px] text-muted sm:flex">{session.org} · {VOLCANO.name} {session.uid ? <span className="inline-flex items-center gap-1 rounded-full bg-leaf/12 px-1.5 py-px text-[10.5px] font-medium text-leaf"><span className="h-1.5 w-1.5 rounded-full bg-current" /> Live</span> : <span className="rounded-full bg-sand px-1.5 py-px text-[10.5px] font-medium text-muted">{t("Mode demo", "Demo mode")}</span>}</p>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.h1 key={current} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} transition={{ duration: 0.18 }} className="truncate font-display text-[17px] font-semibold text-wine">{label}</motion.h1>
               </AnimatePresence>
@@ -374,6 +375,7 @@ function UserMenu({ onSwitched }: { onSwitched: (name: string) => void }) {
                   <button
                     onClick={() => {
                       signOut();
+                      import("@/lib/auth").then((m) => m.operatorSignOut());
                       router.replace("/app/login");
                     }}
                     className={item}
@@ -398,6 +400,7 @@ function Notifications() {
   const [open, setOpen] = useState(false);
   const [read, setRead] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const alerts = useAlerts(5).data;
   useEffect(() => {
     if (!open) return;
     const close = (e: PointerEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
@@ -418,7 +421,7 @@ function Notifications() {
               <button onClick={() => setRead(true)} className="text-[12px] font-medium text-maroon">{t("Tandai dibaca", "Mark as read")}</button>
             </div>
             <div className={cn("max-h-[360px] overflow-y-auto transition", read && "opacity-60")}>
-              <AlertList items={ALERTS.slice(0, 5)} />
+              <AlertList items={alerts.slice(0, 5)} />
             </div>
           </motion.div>
         )}
@@ -444,7 +447,7 @@ function CommandPalette({ items, go, close }: { items: { key: Tab; icon: typeof 
       ...([1, 2, 3, 4] as Level[]).map((l) => ({ id: `lv${l}`, icon: Bell, label: t(`Set status ke Level ${LEVELS[l].roman}`, `Set status to Level ${LEVELS[l].roman}`), hint: "PVMBG", run: () => setLevel(l) })),
       { id: "lang", icon: ArrowLeftRight, label: lang === "id" ? "Switch to English" : "Ganti ke Bahasa Indonesia", hint: t("Bahasa", "Language"), run: () => setLang(lang === "id" ? "en" : "id") },
       { id: "mobile", icon: Smartphone, label: t("Buka aplikasi warga", "Open resident app"), hint: "/mobile", run: () => router.push("/mobile") },
-      { id: "out", icon: LogOut, label: t("Keluar", "Sign out"), hint: "", run: () => { signOut(); router.replace("/app/login"); } },
+      { id: "out", icon: LogOut, label: t("Keluar", "Sign out"), hint: "", run: () => { signOut(); import("@/lib/auth").then((m) => m.operatorSignOut()); router.replace("/app/login"); } },
     ],
     [items, t, go, setLevel, lang, setLang, router, signOut],
   );
