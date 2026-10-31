@@ -165,7 +165,10 @@ class _GeoMapState extends State<GeoMap> {
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99), boxShadow: shadow1),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             if (icon != null) ...[Icon(icon, size: 12, color: color), const SizedBox(width: 3)],
-            Text(label, style: inter(big ? 11.5 : 10.5, w: FontWeight.w700, c: C.wine)),
+            // Live posko names can be long ("Balai Desa Sumbermujur"); ellipsize instead of overflowing the marker.
+            Flexible(
+                child: Text(label,
+                    maxLines: 1, overflow: TextOverflow.ellipsis, style: inter(big ? 11.5 : 10.5, w: FontWeight.w700, c: C.wine))),
           ]),
         ),
         const SizedBox(height: 3),
@@ -240,7 +243,7 @@ class _GeoMapState extends State<GeoMap> {
             if (m == GeoMode.hazard || m == GeoMode.risk)
               for (final (n, p, _) in mapVillages.where((v) => m == GeoMode.risk || !const {'Penanggal', 'Sumbermujur'}.contains(v.$1))) Marker(point: p, width: 110, height: 44, alignment: Alignment.topCenter, child: _pin(n, C.textMuted)),
             if (m != GeoMode.risk)
-              for (final (n, p, c) in mapPosts) Marker(point: p, width: 150, height: 44, alignment: Alignment.topCenter, child: _pin(n, c, icon: Icons.home_work_outlined)),
+              for (final (n, p, c) in mapPosts) Marker(point: p, width: 180, height: 44, alignment: Alignment.topCenter, child: _pin(n, c, icon: Icons.home_work_outlined)),
             if (m != GeoMode.posts)
               Marker(
                 point: userPos,
