@@ -1,0 +1,65 @@
+rules_version = '2';
+
+// Clients (web console, Flutter app) read public data directly.
+// All writes from the public API, pipelines and notebooks go through the Admin SDK,
+// which bypasses these rules. Operators sign in with Firebase Auth; their role is a
+// custom claim set by an admin (see web/scripts/set-role.ts).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function role() {
+      return request.auth != null ? request.auth.token.get('role', '') : '';
+    }
+    function isAdmin() { return role() == 'admin'; }
+    function isOperator() { return role() in ['admin', 'bpbd', 'posko']; }
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    // Public reference data
+    match /volcanoes/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /villages/{id} {
+      allow read: if true;
+      allow write: if isAdmin() || role() == 'bpbd';
+    }
+    match /prices/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /alerts/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || role() == 'bpbd';
+      allow update, delete: if isAdmin();
+    }
+    match /intel/{id} {
+      allow read: if true;
+      allow write: if isAdmin() || role() == 'bpbd';
+    }
+
+    // Aid posts: operators may update live status fields only
+    match /posko/{id} {
+      allow read: if true;
+      allow create, delete: if isAdmin() || role() == 'bpbd';
+      allow update: if isAdmin() || role() == 'bpbd'
+        || (role() == 'posko' && onlyChanges(['status', 'filled', 'has', 'needs', 'updatedAt', 'updatedLabel']));
+    }
+
+    // Operational data: server writes only, operators read
+    match /signals/{id} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+    match /reports/{id} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+
+    // Operator profiles
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}
