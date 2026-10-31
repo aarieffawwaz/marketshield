@@ -12,7 +12,7 @@ import { Logo, Mark } from "@/components/ui/brand";
 import { LangToggle, ThemeToggle } from "@/components/ui/lang-toggle";
 import { FluidTabs } from "@/components/ui/interactions";
 import { LEVELS, VOLCANO, type Level } from "@/lib/data";
-import { useAlerts, useDataMode, useOfficialLevel } from "@/lib/live";
+import { useAlerts, useDataMode, useForecast, useOfficialLevel } from "@/lib/live";
 import { PEOPLE, useApp, useT, type Role } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LevelChip } from "./ui";
@@ -213,6 +213,9 @@ function Sidebar({ groups, allowed, tab, go, openPalette }: { groups: NavGroups;
   const session = useApp((s) => s.session)!;
   const level = useApp((s) => s.level);
   const L = LEVELS[level];
+  // same source as the overview KPI: the live model forecast when it covers the current level
+  const fc = useForecast();
+  const prob = fc && level === 3 ? fc.p : L.prob;
   return (
     <aside className={cn("fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/5 bg-night text-bone transition-[width] duration-300 lg:flex", collapsed ? "w-[76px]" : "w-[264px]")}>
       <div className="flex h-16 items-center justify-between px-4">
@@ -236,9 +239,9 @@ function Sidebar({ groups, allowed, tab, go, openPalette }: { groups: NavGroups;
           <div data-tour="status" className="rounded-xl p-3 ring-1 ring-white/10" style={{ background: `linear-gradient(135deg, ${L.color}33, transparent)` }}>
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-semibold" style={{ color: L.color === "#E0A100" ? "#f5c84a" : L.color === "#2E7D32" ? "#6fcf73" : "#ff9a6b" }}>Level {L.roman} · {tx(L.name)}</span>
-              <span className="font-mono text-[11px] tabular text-bone/70">{Math.round(L.prob * 100)}%</span>
+              <span className="font-mono text-[11px] tabular text-bone/70">{Math.round(prob * 100)}%</span>
             </div>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10"><motion.div animate={{ width: `${L.prob * 100}%` }} transition={{ duration: 0.6 }} className="h-full rounded-full" style={{ background: L.color }} /></div>
+            <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10"><motion.div animate={{ width: `${prob * 100}%` }} transition={{ duration: 0.6 }} className="h-full rounded-full" style={{ background: L.color }} /></div>
             <p className="mt-2 text-[11px] text-bone/45">{t("Lintasan berikutnya: Sentinel-1 · 14.20 WIB", "Next pass: Sentinel-1 · 14:20 WIB")}</p>
           </div>
           <button onClick={openPalette} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] text-bone/50 ring-1 ring-white/10 transition hover:text-bone">
