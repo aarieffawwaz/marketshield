@@ -7,7 +7,6 @@ import { ArrowRight, ArrowUp, Check, Mail, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/brand";
 import { BrandIcon } from "@/components/ui/brand-icons";
 import { StoreBadges } from "@/components/ui/store-badges";
-import { LangToggle } from "@/components/ui/lang-toggle";
 import { SOCIALS } from "@/lib/site";
 import { useT } from "@/lib/store";
 
@@ -113,11 +112,11 @@ export function SiteFooter() {
           <StoreBadges dark />
         </div>
       </div>
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_2.4fr]">
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:py-24">
+        <div className="grid gap-16 lg:grid-cols-[1fr_2.2fr] lg:gap-24">
           <div>
             <Logo dark />
-            <p className="mt-4 max-w-sm text-[14px] leading-relaxed text-bone/55">
+            <p className="mt-5 max-w-sm text-[14px] leading-relaxed text-bone/55">
               {t("Peringatan dini erupsi berbasis satelit untuk warga, pasar dan posko di sekitar gunung api aktif Indonesia.", "Satellite-based eruption early warning for residents, markets and aid posts around Indonesia's active volcanoes.")}
             </p>
             <form
@@ -125,7 +124,7 @@ export function SiteFooter() {
                 e.preventDefault();
                 if (/\S+@\S+\.\S+/.test(email)) setSent(true);
               }}
-              className="mt-6 max-w-sm"
+              className="mt-9 max-w-sm"
             >
               <p className="text-[13px] font-medium">{t("Buletin bulanan", "Monthly bulletin")}</p>
               <p className="mt-1 text-[12.5px] text-bone/50">{t("Ringkasan aktivitas gunung api dan pembaruan produk.", "Volcano activity digest and product updates.")}</p>
@@ -143,7 +142,7 @@ export function SiteFooter() {
                 )}
               </AnimatePresence>
             </form>
-            <div className="mt-7">
+            <div className="mt-10">
               <p className="text-[13px] font-medium">{t("Ikuti kami", "Follow us")}</p>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {SOCIALS.map((so) => (
@@ -162,11 +161,11 @@ export function SiteFooter() {
               </ul>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-x-10 gap-y-12 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-12">
             {cols.map((c) => (
               <div key={c.h}>
                 <p className="label text-bone/40">{c.h}</p>
-                <ul className="mt-4 space-y-2.5 text-[13.5px] text-bone/70">
+                <ul className="mt-5 space-y-3.5 text-[13.5px] text-bone/70">
                   {c.links.map(([href, label]) => (
                     <li key={href + label}><Link href={href} className="transition hover:text-bone">{label}</Link></li>
                   ))}
@@ -175,7 +174,7 @@ export function SiteFooter() {
             ))}
           </div>
         </div>
-        <div className="mt-12 flex flex-wrap items-center gap-2 border-t border-white/10 pt-6">
+        <div className="mt-20 flex flex-wrap items-center gap-2.5 border-t border-white/10 pt-8">
           <Link href="/status" className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-[12px] text-bone/70 ring-1 ring-white/10 transition hover:text-bone">
             <span className={`h-2 w-2 rounded-full ${status === "ok" ? "bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/70" : status === "down" ? "bg-ember" : "animate-pulse bg-bone/40"}`} />
             {status === "ok" ? t("API berjalan normal", "API operational") : status === "down" ? t("Gangguan terdeteksi", "Issue detected") : t("Memeriksa status…", "Checking status…")}
@@ -185,9 +184,8 @@ export function SiteFooter() {
               <ShieldCheck className="h-3.5 w-3.5 text-ember" /> {b}
             </Link>
           ))}
-          <div className="ml-auto"><LangToggle dark /></div>
         </div>
-        <div className="mt-6 grid gap-4 text-[12px] text-bone/40 lg:grid-cols-[1fr_auto]">
+        <div className="mt-8 grid gap-6 text-[12px] leading-relaxed text-bone/40 lg:grid-cols-[1fr_auto] lg:gap-16">
           <div className="space-y-1.5">
             <p>© 2026 MarketShield · BRAIN – Ayam Jago · BINUS University · INCEPTION 2026</p>
             <p>
@@ -200,7 +198,7 @@ export function SiteFooter() {
 
       {/* live strip + oversized wordmark */}
       <div className="relative overflow-hidden border-t border-white/10">
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 pt-6 text-[12px] text-bone/55 sm:px-6">
+        <div className="relative z-10 mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 pt-6 text-[12px] text-bone/55 sm:px-6 sm:pt-8">
           <span className="inline-flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inset-0 animate-ping rounded-full opacity-60" style={{ background: level ? LEVEL_COLOR[level] : "#888" }} />
@@ -216,7 +214,7 @@ export function SiteFooter() {
         </div>
         <div aria-hidden className="tex-topo pointer-events-none absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_40%)]" />
         <div aria-hidden className="pointer-events-none absolute -bottom-40 left-1/2 h-80 w-[70%] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(234,106,31,0.45),transparent)] blur-2xl" />
-        <p aria-hidden className="relative select-none whitespace-nowrap px-2 pt-4 text-center font-display text-[14.6vw] font-semibold leading-[0.78] tracking-[-0.06em] text-transparent [background-clip:text] [-webkit-background-clip:text] [background-image:linear-gradient(180deg,rgba(244,237,228,0.22)_0%,rgba(244,237,228,0.06)_70%,transparent_100%)] [margin-bottom:-2.6vw]">
+        <p aria-hidden className="relative select-none whitespace-nowrap px-2 pt-10 text-center font-display text-[14.6vw] font-semibold leading-[0.78] tracking-[-0.06em] text-transparent [background-clip:text] [-webkit-background-clip:text] [background-image:linear-gradient(180deg,rgba(244,237,228,0.22)_0%,rgba(244,237,228,0.06)_70%,transparent_100%)] [margin-bottom:-2.6vw]">
           MarketShield
         </p>
       </div>
