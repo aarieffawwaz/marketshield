@@ -561,9 +561,9 @@ export function RealMap({ start = "indonesia", className, autoSim }: { start?: "
       <AnimatePresence>{sim && frame && <SimPanel t={simT} setT={(v) => { setPlaying(false); setSimT(v); }} playing={playing} setPlaying={setPlaying} scenario={scenario} setScenario={setScenario} wind={wind} setWind={setWind} early={early} setEarly={setEarly} speed={speed} setSpeed={setSpeed} frame={frame} close={stopSim} view={view} goView={goView} impacts={impacts} />}</AnimatePresence>
       <AnimatePresence>
         {focus && !sim && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute bottom-10 left-3 w-[250px] rounded-2xl bg-night/80 p-4 text-bone ring-1 ring-white/10 backdrop-blur-md">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] rounded-2xl bg-night/80 p-4 text-bone ring-1 ring-white/10 backdrop-blur-md max-sm:p-3 sm:inset-x-auto sm:bottom-10 sm:left-3 sm:w-[250px]">
             <p className="label !text-[9.5px] text-ember">{t("Gunung api", "Volcano")}</p>
-            <p className="mt-1 font-display text-[20px] font-semibold">{focus}</p>
+            <p className="mt-1 font-display text-[20px] font-semibold max-sm:mt-0.5 max-sm:text-[18px]">{focus}</p>
             {focus === "Semeru" ? (
               <>
                 <p className="text-[12px] text-bone/60">3.676 mdpl · Lumajang</p>
@@ -573,7 +573,7 @@ export function RealMap({ start = "indonesia", className, autoSim }: { start?: "
                 </div>
                 <div className="mt-3 border-t border-white/10 pt-3">
                   <p className="mb-1.5 flex items-center gap-1 text-[11px] text-bone/50"><Layers className="h-3 w-3" /> {t("Lapisan", "Layers")}</p>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex gap-1 max-sm:-mx-3 max-sm:overflow-x-auto max-sm:px-3 max-sm:[scrollbar-width:none] sm:flex-wrap">
                     {([
                       ["krb", "KRB"],
                       ["ash", t("Abu", "Ash")],
@@ -581,16 +581,16 @@ export function RealMap({ start = "indonesia", className, autoSim }: { start?: "
                       ["hex", t("Heksagon 3D", "3D hexagons")],
                       ["places", t("Desa & posko", "Villages & posts")],
                     ] as const).map(([k, l]) => (
-                      <button key={k} onClick={() => setOverlays((o) => ({ ...o, [k]: !o[k] }))} className={cn("rounded-md px-2 py-1 text-[11px] ring-1 transition", overlays[k] ? "bg-white/15 text-bone ring-white/20" : "text-bone/45 ring-white/10")}>{l}</button>
+                      <button key={k} onClick={() => setOverlays((o) => ({ ...o, [k]: !o[k] }))} className={cn("rounded-md px-2 py-1 text-[11px] ring-1 transition max-sm:h-10 max-sm:shrink-0 max-sm:whitespace-nowrap max-sm:px-3 max-sm:text-[12px]", overlays[k] ? "bg-white/15 text-bone ring-white/20" : "text-bone/45 ring-white/10")}>{l}</button>
                     ))}
                   </div>
                 </div>
-                <button onClick={startSim} className="btn-shine shine-crimson mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-crimson py-2 text-[12px] font-semibold text-white"><Play className="h-3.5 w-3.5" /> {t("Simulasikan erupsi", "Simulate an eruption")}</button>
+                <button onClick={startSim} className="btn-shine shine-crimson mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-crimson py-2 text-[12px] font-semibold text-white max-sm:h-10 max-sm:text-[13px]"><Play className="h-3.5 w-3.5" /> {t("Simulasikan erupsi", "Simulate an eruption")}</button>
               </>
             ) : (
               <>
                 <p className="text-[12px] text-bone/60">{t("Dipantau lewat satelit. Zona & heksagon di sini adalah model umum; data desa & posko dibuka per kabupaten.", "Monitored by satellite. Zones & hexagons here are a generic model; village & post data opens per district.")}</p>
-                <button onClick={startSim} className="btn-shine shine-crimson mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-crimson py-2 text-[12px] font-semibold text-white"><Play className="h-3.5 w-3.5" /> {t("Simulasikan erupsi", "Simulate an eruption")}</button>
+                <button onClick={startSim} className="btn-shine shine-crimson mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-crimson py-2 text-[12px] font-semibold text-white max-sm:h-10 max-sm:text-[13px]"><Play className="h-3.5 w-3.5" /> {t("Simulasikan erupsi", "Simulate an eruption")}</button>
               </>
             )}
           </motion.div>
