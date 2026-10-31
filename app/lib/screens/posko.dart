@@ -38,7 +38,13 @@ class _PoskoScreenState extends State<PoskoScreen> {
       if (_seg == 1 && p.isShelter) return false;
       if (_filters.contains(0) && (p.km ?? double.infinity) > 3) return false;
       if (_filters.contains(1) && !p.open24) return false;
-      if (_q.isNotEmpty && !p.name.toLowerCase().contains(_q.toLowerCase())) return false;
+      if (_filters.contains(2) && p.capacityPct < 70) return false;
+      // The hint promises item search too, so match stock and urgent needs in both languages.
+      if (_q.isNotEmpty) {
+        final q = _q.toLowerCase();
+        final hay = [p.name, for (final l in [...p.available, ...p.needed]) ...[l.id, l.en]];
+        if (!hay.any((t) => t.toLowerCase().contains(q))) return false;
+      }
       return true;
     }).toList();
     return Scaffold(
@@ -112,7 +118,6 @@ class _PoskoScreenState extends State<PoskoScreen> {
                 onChanged: (v) => setState(() => _q = v),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search, color: C.wine),
-                  suffixIcon: const Icon(Icons.tune, color: C.wine),
                   hintText: context.t('Cari nama posko, balai desa, atau komoditas', 'Search post, village hall or item'),
                   hintStyle: inter(13.5, c: C.navInactive),
                   filled: true,
@@ -262,7 +267,7 @@ class _PoskoCard extends StatelessWidget {
         ]),
         const SizedBox(height: 12),
         Row(children: [
-          Expanded(child: Btn(context.t('Rute Navigasi', 'Navigate'), icon: Icons.directions, height: 46, onTap: () => push(context, const EvacScreen()))),
+          Expanded(child: Btn(context.t('Rute', 'Route'), icon: Icons.directions, height: 46, onTap: () => push(context, const EvacScreen()))),
           const SizedBox(width: 10),
           Expanded(
               child: Btn(context.t('Hubungi', 'Call'),
