@@ -27,15 +27,24 @@ export function LoginScreen() {
       router.replace(role === "donor" ? "/app?tab=aid" : role === "posko" ? "/app?tab=posko" : "/app");
     }, 650);
   };
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!/\S+@\S+\.\S+/.test(email) || pw.length < 6) {
       setErr(t("Masukkan email kerja dan kata sandi minimal 6 karakter.", "Enter your work email and a password of at least 6 characters."));
       return;
     }
     setErr("");
-    const role: Role = email.includes("desa") || email.includes("posko") ? "posko" : email.includes("go.id") ? "bpbd" : "donor";
-    enter(role, "form");
+    setBusy("form");
+    try {
+      const { operatorSignIn } = await import("@/lib/auth");
+      const session = await operatorSignIn(email, pw);
+      signIn(session);
+      router.replace(session.role === "donor" ? "/app?tab=aid" : session.role === "posko" ? "/app?tab=posko" : "/app");
+    } catch (e) {
+      const { authErrorText } = await import("@/lib/auth");
+      setErr(authErrorText((e as { code?: string }).code ?? "", t));
+      setBusy(null);
+    }
   };
 
   const roles: { role: Role; icon: typeof Building2; label: string }[] = [
@@ -80,7 +89,7 @@ export function LoginScreen() {
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mx-auto my-auto w-full max-w-[400px] py-10">
           <div className="lg:hidden"><Logo /></div>
           <h2 className="mt-6 font-display text-[28px] font-semibold tracking-tight text-wine lg:mt-0">{t("Masuk ke console", "Sign in to the console")}</h2>
-          <p className="mt-1.5 text-[14px] text-muted">{t("Gunakan akun instansi Anda.", "Use your organisation account.")}</p>
+          <p className="mt-1.5 text-[14px] text-muted">{t("Gunakan akun operator dari admin MarketShield.", "Use the operator account issued by a MarketShield admin.")}</p>
 
           <form onSubmit={submit} className="mt-7 space-y-3.5">
             <label className="block">
@@ -95,12 +104,9 @@ export function LoginScreen() {
             <button disabled={!!busy} className="btn-shine shine-maroon flex w-full items-center justify-center gap-2 rounded-xl bg-maroon py-3 text-[14px] font-medium text-white disabled:opacity-70">
               {busy === "form" ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t("Masuk", "Sign in")} <ArrowRight className="h-4 w-4" /></>}
             </button>
-            <button type="button" onClick={() => enter("bpbd", "sso")} disabled={!!busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-surface py-3 text-[14px] font-medium text-wine ring-1 ring-line transition hover:bg-sand">
-              {busy === "sso" ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />} {t("Masuk dengan SSO instansi", "Sign in with organisation SSO")}
-            </button>
           </form>
 
-          <div className="my-7 flex items-center gap-3 text-[12px] text-muted"><span className="h-px flex-1 bg-line" />{t("atau masuk cepat sebagai", "or jump in as")}<span className="h-px flex-1 bg-line" /></div>
+          <div className="my-7 flex items-center gap-3 text-[12px] text-muted"><span className="h-px flex-1 bg-line" />{t("atau coba mode demo sebagai", "or try demo mode as")}<span className="h-px flex-1 bg-line" /></div>
           <div className="space-y-2">
             {roles.map((r) => {
               const p = PEOPLE[r.role];
@@ -117,6 +123,7 @@ export function LoginScreen() {
               );
             })}
           </div>
+          <p className="mt-3 flex items-start gap-1.5 text-[12px] text-muted"><KeyRound className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {t("Mode demo memakai data asli, tapi perubahan Anda tidak disimpan ke database.", "Demo mode shows real data, but your changes are not saved to the database.")}</p>
           <p className="mt-8 text-center text-[12px] text-muted">{t("Dengan masuk, Anda menyetujui", "By signing in you agree to the")} <Link href="/syarat" className="underline">{t("Syarat", "Terms")}</Link> {t("dan", "and")} <Link href="/privasi" className="underline">{t("Kebijakan Privasi", "Privacy Policy")}</Link>.</p>
         </motion.div>
       </main>
