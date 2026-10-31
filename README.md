@@ -191,33 +191,15 @@ Open **[marketshield-inception.vercel.app](https://marketshield-inception.vercel
 | Download | `/download` | Latest APK, size and SHA-256 from GitHub Releases |
 | API | `/api/v1/*` | [API reference](docs/API.md) |
 
-## Models
-
-| Model | Data | Held-out result |
-|:-|:-|:-|
-| **Satellite risk engine** (XGBoost + SHAP) | Google Earth Engine, 25 volcanoes × 407 weeks (2019–2026) | ROC-AUC **0.899** vs 0.784 persistence baseline; recall 78 % vs 63 % (test 2024–2026) |
-| **IndoBERT hoax filter** | 12,136 Indonesian texts, de-duplicated before an 80/10/10 split | Accuracy **98.4 %** vs 96.9 % TF-IDF; **90 %** on 40 short WhatsApp-style messages |
-
-<p align="center">
-  <img src="ml/results/risk_results.png" alt="Risk engine: ROC and precision-recall curves on 2024–2026 and SHAP importance" width="100%" />
-  <img src="ml/results/hoax_results.png" alt="IndoBERT: confusion matrix, macro-F1 against the baseline and training curve" width="100%" />
-</p>
-
-How we trained, the runs we discarded and why, and how to reproduce: [ml/README.md](ml/README.md).
-
-## Demo or real
-
-<p align="center">
-  <img src="docs/readme/data-modes.png" alt="Three modes: demo, live view-only, live operator" width="100%" />
-</p>
-
-Judges can explore the concept in **Demo** without changing anything, then switch to **Live** to see the same screens running on the real database. Live never goes blank: the app falls back to the last cached data, then to bundled data, and says so in the header (*Offline · data tersimpan 14.05*).
-
 ## Architecture
 
 <p align="center">
   <img src="docs/readme/architecture-detailed.png" alt="MarketShield architecture: people, Flutter app, Next.js site, console, API, map and 3D, Firestore, Auth, ML pipelines, external sources and delivery" width="100%" />
 </p>
+
+Source of the diagram: [docs/diagrams/architecture-detailed.html](docs/diagrams/architecture-detailed.html).
+
+Three surfaces (resident app, console, public API) share one Firestore project in `asia-southeast2` (Jakarta). The website, console and API run on Vercel; the Flutter web build is served from the same domain under `/mobile-app`. The models run offline in Python and their output is published to Firestore with a script, following the contract in [firebase/ML-CONTRACT.md](firebase/ML-CONTRACT.md).
 
 <details>
 <summary>Text version (Mermaid)</summary>
@@ -227,7 +209,7 @@ flowchart LR
   subgraph People
     R[Residents<br/>Flutter app]
     O[Operators<br/>BPBD · posko · donors]
-    J[Judges and public]
+    P[Public and partners]
   end
   subgraph Vercel["Vercel · marketshield-inception.vercel.app"]
     S[Next.js 16 site]
@@ -235,7 +217,7 @@ flowchart LR
     A[Public API /api/v1]
     M[3D map /embed/peta<br/>Flutter web /mobile-app]
   end
-  subgraph Firebase["Firebase · marketshield-brain · asia-southeast2"]
+  subgraph Firebase["Firebase · asia-southeast2"]
     F[(Cloud Firestore)]
     U[Firebase Auth<br/>role claims]
   end
@@ -247,13 +229,13 @@ flowchart LR
   R --> A
   R --> M
   O --> C
-  J --> C
-  J --> A
+  P --> C
+  P --> A
   C <-->|realtime listeners| F
   C --> U
   A -->|Admin SDK| F
-  G --> X --> F
-  B --> F
+  G --> X -->|publish-forecast| F
+  B -.->|trained, not yet served| A
 ```
 
 </details>
@@ -262,20 +244,139 @@ flowchart LR
 
 - **Satellites instead of sensors.** Nothing to install, steal or maintain on an active volcano; every input is a public catalogue or an official source.
 - **Firestore for a small team.** Realtime listeners give instant aid-post updates without a socket server, and security rules enforce roles in the database, so a UI bug cannot grant write access.
-- **One Flutter codebase for Android and web.** Residents install a 20 MB APK; judges and partners open the same app in a browser.
-- **Fallback everywhere.** The API, the console and the app all ship bundled data and say when they use it. A disaster app that goes blank when the network drops is worse than none.
+- **One Flutter codebase for Android and web.** Residents install a 20 MB APK; partners open the same app in a browser.
+- **Fallback everywhere.** The API, the console and the app all ship bundled data and say when they use it. A disaster app that goes blank when the network drops does more harm than good.
+- **Message text is never stored.** Only the label, confidence, trigger words, language and length are logged (UU PDP 27/2022 data minimisation).
 
 ## Technology stack
 
 | Layer | Technology | Why |
 |:-|:-|:-|
-| Resident app | Flutter 3.41, Dart 3.11, flutter_map, http, shared_preferences, webview_flutter | One codebase for Android and web; offline cache; small APK |
-| Website and console | Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS 4, Motion, Zustand, Recharts, Driver.js | Static marketing pages, client console, Indonesian/English, dark mode |
+| Resident app | Flutter 3.41, Dart 3.11, flutter_map, http, shared_preferences, url_launcher, webview_flutter, google_fonts | One codebase for Android and web; offline cache; small APK |
+| Website and console | Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS 4, Motion, Zustand, Recharts, Driver.js, lucide-react | Static marketing pages, client console, Indonesian/English, dark mode |
 | Maps and 3D | MapLibre GL 6.16, three.js 0.186 | Globe projection, terrain, custom WebGL layer for the eruption |
 | Backend | Next.js route handlers on Vercel, Firebase Admin SDK | Public API next to the site, no separate server to run |
-| Database and auth | Cloud Firestore (Jakarta), Firebase Auth (email, Google), security rules | Realtime, role claims, data close to users |
-| Data and models | Google Earth Engine (10 datasets), XGBoost, IndoBERT (`indobenchmark/indobert-base-p1`), Google Colab | Public satellite data; tabular risk model; Indonesian language model |
+| Database and auth | Cloud Firestore (Jakarta), Firebase Auth (email/password, Google), security rules with custom claims | Realtime, role claims, data close to users |
+| Satellite data | Google Earth Engine (10 datasets, Python `earthengine-api`) | Public catalogues, national coverage |
+| Machine learning | XGBoost, SHAP, scikit-learn, pandas; PyTorch, Hugging Face Transformers and Datasets, IndoBERT (`indobenchmark/indobert-base-p1`); Google Colab | Tabular risk model with explanations; Indonesian language model |
 | Delivery | GitHub Actions, Vercel CLI, GitHub Releases | Build check per PR, production on merge, signed APKs per tag |
+| Testing | `flutter test`, `flutter analyze`, ESLint, TypeScript strict, Playwright (browser checks) | See [Testing](#testing) |
+
+## Models
+
+Both models are trained and evaluated in [`ml/`](ml/README.md). Every number below comes from the JSON files in [`ml/results/`](ml/results).
+
+### Satellite risk engine (XGBoost + SHAP)
+
+**Target.** Whether NASA FIRMS records at least one thermal hotspot within 5 km of the summit in the next 7 days. PVMBG's alert-level history is not available in machine-readable form, so the model predicts this satellite proxy for eruptive activity. **It is not the PVMBG level**, and the app always shows the official level separately.
+
+**Data.** Weekly Google Earth Engine features for 25 volcanoes, January 2019 to October 2026: 407 weeks, 10,067 volcano-weeks. Features: FIRMS hotspot fraction (this week and the previous 3 weeks), Sentinel-5P SO₂ and its trend, Sentinel-1 VV backscatter change, GPM IMERG rainfall.
+
+**Method.** XGBoost (300 trees, depth 4, class-weighted). Time split: train 2019–2023 (6,416 rows), test 2024–2026 (3,651 rows). Baseline: persistence ("next week looks like this week").
+
+| Metric (test 2024–2026) | XGBoost | Persistence baseline |
+|:-|:-:|:-:|
+| ROC-AUC | **0.899** | 0.784 |
+| PR-AUC | **0.674** | 0.455 |
+| Recall | **78 %** | 63 % |
+| Precision | 55 % | 63 % |
+| F1 | **0.649** | 0.633 |
+| Onset weeks (no hotspot this week): ROC-AUC / recall | **0.81 / 45 %** | cannot predict onsets |
+
+SHAP ranking: hotspots in the previous 3 weeks, hotspots this week, SO₂, rainfall, Sentinel-1 backscatter, SO₂ trend. The newest forecast per volcano is written to `volcanoes/{id}.forecast` by `web/scripts/publish-forecast.ts`; the console and `/api/v1/volcanoes/{id}/risk` read it.
+
+### IndoBERT hoax filter
+
+**Data.** [`mzuama/IndonesianHoaxdetection`](https://huggingface.co/datasets/mzuama/IndonesianHoaxdetection): 12,150 texts, 12,136 after removing empty rows and duplicates **before** splitting. Stratified 80/10/10 split (9,708 / 1,214 / 1,214). Fine-tuned `indobenchmark/indobert-base-p1` for 2 epochs with short-crop augmentation and 60 team-written short disaster messages (training only).
+
+| Evaluation set | n | TF-IDF + LogReg | IndoBERT |
+|:-|:-:|:-:|:-:|
+| Test (article-length texts) | 1,214 | 96.9 % | **98.4 %** (macro-F1 0.984) |
+| Test, short crops (first 8–30 words) | 1,208 | 94.8 % | **96.6 %** |
+| Test, disaster-related subset | 70 | 98.6 % | **100 %** |
+| Probe: short WhatsApp-style disaster messages | 40 | 87.5 % | **90.0 %** |
+
+The first run scored 98.3 % on the test split but only 50 % on the 40-message probe set, because it labelled every short message as a hoax. Short-crop augmentation and the team-written messages brought the probe to 90 %. The probe set was written by the team, so treat it as a sanity check, not a benchmark.
+
+**In the product.** A 500 MB model does not fit a serverless function, so `/api/v1/signals/check` still uses the rule-based classifier in `web/src/lib/classify.ts` (`rules-v1`). Serving IndoBERT behind the same response contract is the next step.
+
+<p align="center">
+  <img src="ml/results/risk_results.png" alt="Risk engine: ROC and precision-recall curves on 2024–2026 and SHAP importance" width="100%" />
+  <img src="ml/results/hoax_results.png" alt="IndoBERT: confusion matrix, macro-F1 against the baseline and training curve" width="100%" />
+</p>
+
+Training details, discarded runs and reproduction commands: [ml/README.md](ml/README.md).
+
+## Data sources and licences
+
+| Source | Used for | Licence / terms |
+|:-|:-|:-|
+| Google Earth Engine: NASA FIRMS, Sentinel-5P SO₂ and aerosol (`COPERNICUS/S5P`), Sentinel-1 GRD | Risk engine features, hazard layers | Copernicus open licence, NASA open data, Earth Engine terms (project registered for non-commercial use) |
+| Google Earth Engine: GPM IMERG, NOAA GFS | Rainfall (rain-lahar risk), wind (ash drift) | NASA / NOAA open data |
+| Google Earth Engine: Sentinel-2, MODIS, Landsat 9, Copernicus DEM GLO-30 | Vegetation change, land-surface temperature, terrain | Copernicus open licence, NASA / USGS open data |
+| Google Earth Engine: WorldPop, ESA WorldCover | Exposed population, land cover | CC BY 4.0 |
+| PVMBG / MAGMA Indonesia | Official volcano levels | Public government information |
+| Government price caps (HET) | Price watch reference | Public regulations |
+| `mzuama/IndonesianHoaxdetection` (Hugging Face) | IndoBERT training and evaluation | Licence not stated by the author |
+| Sentinel-2 cloudless 2023 by EOX | Map imagery | CC BY-NC-SA 4.0 (**non-commercial**) |
+| AWS Terrain Tiles (Terrarium) | 3D terrain | Open data |
+| Esri basemaps | Map basemap | Esri terms of use |
+| OpenStreetMap | Map data | ODbL |
+| Natural Earth | Land outline for the globe | Public domain |
+
+The full list, including photos, 3D models, fonts and libraries, is in [docs/AI_USE_AND_THIRD_PARTY.md](docs/AI_USE_AND_THIRD_PARTY.md).
+
+## API reference
+
+Base URL: `https://marketshield-inception.vercel.app/api/v1`. JSON over HTTPS, no authentication, CORS open (`Access-Control-Allow-Origin: *`). Every response includes `source`: `"firestore"` when served from the live database, `"static"` when the bundled dataset was used.
+
+| Method | Path | Returns |
+|:-|:-|:-|
+| GET | `/volcanoes` | 25 mapped volcanoes with the official PVMBG level |
+| GET | `/volcanoes/{id}/risk` | Official level, scenario escalation probability, action window, satellite indicators and the latest model forecast (`model`) |
+| GET | `/villages/priority?level=&volcano=` | Aid Priority Index ranking |
+| GET | `/prices` | Emergency goods: HET, market average, deviation, `flagged` above 0.3 |
+| GET | `/posko?volcano=` | Aid posts and shelters: status, capacity, stock, needs |
+| GET | `/alerts` | Latest alerts from BPBD and satellites (newest 20) |
+| GET | `/intel` | Verified claims: hoax, panic, verified, official |
+| POST | `/signals/check` | Classify a chain message (`{ "text": "...", "lang": "id" }`) and cross-check it; the text is never stored |
+
+```bash
+curl https://marketshield-inception.vercel.app/api/v1/volcanoes/semeru/risk
+
+curl -X POST https://marketshield-inception.vercel.app/api/v1/signals/check \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Katanya lahar sudah masuk Pronojiwo, segera tinggalkan rumah! Sebarkan!"}'
+```
+
+Parameters, sample responses and error codes: [docs/API.md](docs/API.md).
+
+## Repository structure
+
+```
+marketshield/
+├── app/                        Flutter resident app (Android + web)
+│   ├── lib/
+│   │   ├── main.dart, core.dart    entry point; bundled models and demo data
+│   │   ├── data/                   api.dart, repository.dart (cache → fallback), mappers.dart, credits.dart
+│   │   ├── screens/                shell, map, map3d, intel, posko, sector, sos, profile, onboarding, credits
+│   │   └── geo_map.dart            flutter_map hazard map (KRB rings, ash, lahar, routes, posts)
+│   ├── android/                Gradle; release signing from key.properties (CI only)
+│   └── test/                   data_test.dart, widget_test.dart
+├── web/                        Next.js 16 site, console and public API
+│   ├── src/app/                routes: /, /app, /mobile, /embed/peta, /download, product, trust and legal pages
+│   │   └── api/v1/             route handlers for the public API
+│   ├── src/components/         landing, map (MapLibre + three.js), webapp (console), pages, site, ui
+│   ├── src/lib/                data.ts, classify.ts, live.ts, auth.ts, store.ts, release.ts, server/ (Admin SDK)
+│   ├── scripts/                seed.ts, set-role.ts, publish-forecast.ts
+│   └── .env.example
+├── ml/                         Models: risk_engine.py, train_hoax.py, hoax_classifier.ipynb, data/, results/
+├── firebase/                   firestore.rules, firestore.indexes.json, SCHEMA.md, ML-CONTRACT.md
+├── docs/                       technical docs, API, security, evidence, diagrams, README images
+├── .github/workflows/          deploy.yml, release-apk.yml
+├── firebase.json
+└── CHANGELOG.md
+```
 
 ## Getting started
 
