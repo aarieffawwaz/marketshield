@@ -121,7 +121,7 @@ export function Console() {
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="lg:hidden"><Mark /></Link>
             <div className="min-w-0">
-              <p className="hidden items-center gap-2 text-[11.5px] text-muted sm:flex">{session.org} · {VOLCANO.name} <ModeBadge /></p>
+              <p className="flex items-center gap-2 text-[11.5px] text-muted"><span className="hidden sm:inline">{session.org} · {VOLCANO.name}</span> <ModeBadge /></p>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.h1 key={current} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} transition={{ duration: 0.18 }} className="truncate font-display text-[17px] font-semibold text-wine">{label}</motion.h1>
               </AnimatePresence>
