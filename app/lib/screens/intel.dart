@@ -364,9 +364,18 @@ class FactResultScreen extends StatelessWidget {
           Expanded(
             child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [
               Row(children: [
-                const Icon(Icons.arrow_back, size: 15, color: C.primary),
-                const SizedBox(width: 4),
-                Text(context.t('Cek Pesan', 'Check message'), style: inter(13, w: FontWeight.w600, c: C.primary)),
+                InkWell(
+                  onTap: () => Navigator.of(context).maybePop(),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.arrow_back, size: 15, color: C.primary),
+                      const SizedBox(width: 4),
+                      Text(context.t('Cek Pesan', 'Check message'), style: inter(13, w: FontWeight.w600, c: C.primary)),
+                    ]),
+                  ),
+                ),
                 const Spacer(),
                 Pill('${context.t('Laporan', 'Report')} #MS-88219', icon: Icons.check_circle_outline, bg: C.surfaceMid, size: 10.5),
               ]),
@@ -587,7 +596,7 @@ class _HetTab extends StatelessWidget {
                     sub: d <= 0
                         ? '${context.t('Hemat', 'Save')} ${rp(n95.het - n95.avg)} (${d.toStringAsFixed(0)}%)'
                         : '+${rp(n95.avg - n95.het)} (+${d.toStringAsFixed(0)}%) ${context.t('di atas HET', 'above cap')}',
-                    valueColor: C.crimson)),
+                    valueColor: pillColor)),
           ]),
           const SizedBox(height: 10),
           Container(
@@ -626,6 +635,7 @@ class _HetTab extends StatelessWidget {
                   Text('${context.l(h.unit)} • HET ${rp(h.het)} • ${h.stores} ${context.t('toko', 'stores')}', style: inter(11.5, c: C.textMuted)),
                 ]),
               ),
+              const SizedBox(width: 8),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Text(rp(h.avg), style: outfit(16, w: FontWeight.w700)),
                 _status(context, h),
@@ -706,7 +716,7 @@ class KitScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(children: [
-          SubHeader(context.t('Kit Siaga Bencana', 'Disaster Ready Kit'),
+          SubHeader(context.t('Kit Siaga', 'Ready Kit'),
               trailing: Pill('Level ${levelRoman[app.level - 1]} ${context.l(levelName[app.level - 1])}', bg: C.pink, size: 10.5)),
           Expanded(
             child: ListView(padding: const EdgeInsets.fromLTRB(R.gutter, 4, R.gutter, 28), children: [

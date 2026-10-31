@@ -33,7 +33,8 @@ class _ShellState extends State<Shell> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final lvl = context.app.level;
-    if (_lastLevel != null && _lastLevel != lvl) {
+    // The first PVMBG sync replaces the placeholder level on launch; only real changes get a toast.
+    if (_lastLevel != null && _lastLevel != lvl && !context.app.levelFromFirstSync) {
       final up = lvl > _lastLevel!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -319,6 +320,7 @@ class HomeScreen extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text('Gunung Semeru', maxLines: 1, style: outfit(22, w: FontWeight.w700)))),
+            const SizedBox(width: 8),
             const LevelChip(3, solid: true),
           ]),
           const SizedBox(height: 10),
@@ -479,7 +481,7 @@ class HomeScreen extends StatelessWidget {
                   side: const BorderSide(color: Color(0x66FFFFFF)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(R.control))),
               icon: const Icon(Icons.near_me_outlined, color: Colors.white, size: 18),
-              label: Text(context.t('Cari Posko Terdekat & Jalur Aman', 'Find Nearest Post & Safe Route'),
+              label: Text(context.t('Cari Posko & Jalur Aman', 'Find Post & Safe Route'),
                   style: inter(14, w: FontWeight.w600, c: Colors.white)),
             ),
           ),
@@ -490,8 +492,8 @@ class HomeScreen extends StatelessWidget {
           icon: Icons.verified_user_outlined,
           trailing: Text(context.t('1 mnt lalu', '1 min ago'), style: inter(11, c: C.textMuted))),
       for (final (name, km, note, cap) in [
-        ('GOR Candipuro', 2.6, context.t('Koridor AB • Aman', 'Corridor AB • Safe'), 60),
         ('Balai Desa Penanggal', 1.4, context.t('Jalur desa • Aman', 'Village road • Safe'), 80),
+        ('GOR Candipuro', 2.6, context.t('Koridor AB • Aman', 'Corridor AB • Safe'), 60),
       ])
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
@@ -546,7 +548,7 @@ class _CriticalBanner extends StatelessWidget {
           const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
           const SizedBox(width: 8),
           Expanded(
-              child: Text(context.t('STATUS KRITIS: LEVEL IV AWAS • SEMERU', 'CRITICAL: LEVEL IV WARNING • SEMERU'),
+              child: Text(context.t('LEVEL IV AWAS • SEMERU', 'LEVEL IV WARNING • SEMERU'),
                   style: inter(12, w: FontWeight.w700, c: Colors.white, ls: .4), overflow: TextOverflow.ellipsis)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),

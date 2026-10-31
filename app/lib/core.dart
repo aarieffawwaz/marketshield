@@ -30,6 +30,9 @@ class AppState extends ChangeNotifier {
 
   bool get isLive => mode == DataMode.live;
 
+  /// True when the last level change was the first PVMBG sync after launch (not news worth a toast).
+  bool levelFromFirstSync = false;
+
   void setLang(Lang v) {
     lang = v;
     notifyListeners();
@@ -37,6 +40,7 @@ class AppState extends ChangeNotifier {
 
   /// Simulated level (Demo Mode, deep links). In Live mode the next PVMBG update wins again.
   void setLevel(int v) {
+    levelFromFirstSync = false;
     level = v;
     if (!isLive) _demoLevel = v;
     notifyListeners();
@@ -45,8 +49,10 @@ class AppState extends ChangeNotifier {
   /// Official level from the live API; only shown while in Live mode.
   void applyLiveLevel(int v) {
     if (v < 1 || v > 4) return;
+    final first = _liveLevel == null;
     _liveLevel = v;
     if (!isLive || v == level) return;
+    levelFromFirstSync = first;
     level = v;
     notifyListeners();
   }
@@ -54,6 +60,7 @@ class AppState extends ChangeNotifier {
   void setMode(DataMode m) {
     if (m == mode) return;
     mode = m;
+    levelFromFirstSync = false;
     level = m == DataMode.live ? (_liveLevel ?? level) : _demoLevel;
     notifyListeners();
   }
