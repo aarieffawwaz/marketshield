@@ -37,7 +37,7 @@ Satellite-based eruption early warning for residents, markets and aid posts arou
 
 ## Contents
 
-[Overview](#overview) · [Key capabilities](#key-capabilities) · [Product tour](#product-tour) · [How it works](#how-it-works) · [Demo or real](#demo-or-real) · [Architecture](#architecture) · [Technology stack](#technology-stack) · [Getting started](#getting-started) · [Delivery](#delivery) · [Security overview](#security-overview) · [Testing and evidence](#testing-and-evidence) · [AI Use and Third-Party Declaration](#ai-use-and-third-party-declaration) · [Documentation](#documentation) · [Known limitations](#known-limitations) · [Next steps](#next-steps) · [Team](#team)
+[Overview](#overview) · [Key capabilities](#key-capabilities) · [Product tour](#product-tour) · [How it works](#how-it-works) · [Models](#models) · [Demo or real](#demo-or-real) · [Architecture](#architecture) · [Technology stack](#technology-stack) · [Getting started](#getting-started) · [Delivery](#delivery) · [Security overview](#security-overview) · [Testing and evidence](#testing-and-evidence) · [AI Use and Third-Party Declaration](#ai-use-and-third-party-declaration) · [Documentation](#documentation) · [Known limitations](#known-limitations) · [Next steps](#next-steps) · [Team](#team)
 
 ---
 
@@ -60,8 +60,8 @@ Satellite-based eruption early warning for residents, markets and aid posts arou
 | Area | What is implemented | Details |
 |:-|:-|:-|
 | Adaptive resident app | Flutter app (Android + web); home, primary action and highlighted features follow PVMBG levels I–IV; demo/live data modes; offline cache | [Technical §4](docs/TECHNICAL_DOCUMENTATION.md#4-resident-app-flutter) |
-| Satellite forecast | 7-day escalation probability, action window and top drivers written by the risk-engine notebook; shown in the console and served by the API | [Technical §7](docs/TECHNICAL_DOCUMENTATION.md#7-data-and-models) |
-| Hoax filter | Message check with trigger words, satellite cross-check and nearest official fact; stores outcomes only, never message text | [Technical §7.3](docs/TECHNICAL_DOCUMENTATION.md#73-hoax-filter) |
+| Satellite risk engine | XGBoost on 10,067 volcano-weeks of Earth Engine features (FIRMS, Sentinel-5P SO₂, Sentinel-1, GPM IMERG): **ROC-AUC 0.90** vs 0.78 baseline on 2024–2026, with SHAP drivers; forecast published to Firestore, shown in the console and the risk API | [ML report](ml/README.md#2-satellite-risk-engine) |
+| Hoax filter | Fine-tuned IndoBERT: **98.4 %** test accuracy (TF-IDF baseline 96.9 %), **90 %** on short WhatsApp-style messages; API and app use a rule-based classifier with trigger words and a satellite cross-check; outcomes stored, never message text | [ML report](ml/README.md#1-indobert-hoax-filter) |
 | Live database | Cloud Firestore in Jakarta with security rules; realtime listeners in the console | [Technical §6](docs/TECHNICAL_DOCUMENTATION.md#6-backend-database-and-auth) |
 | Operator console | Overview, hazard map, Aid Priority Index, posts and shelters, broadcasts, signal filter, price watch, guided tour; Firebase Auth (email or Google) with role claims | [Technical §5](docs/TECHNICAL_DOCUMENTATION.md#5-web-console) |
 | Demo and live modes | Sample-data demo for exploring, live view-only for proof, operator mode for writes; a badge always shows which | [Demo or real](#demo-or-real) |
@@ -92,7 +92,7 @@ Open **[marketshield-inception.vercel.app](https://marketshield-inception.vercel
 
 <div align="center">
 <img src="docs/readme/console-overview.png" alt="Web console overview in live mode" width="860" />
-<br/><sub>Console overview in <b>Live</b> mode. The 75% escalation odds and the 5-day window come from the risk-engine notebook through Firestore; the alerts list is the live <code>alerts</code> collection.</sub>
+<br/><sub>Console overview in <b>Live</b> mode. The escalation odds come from the XGBoost risk engine through Firestore; the alerts list is the live <code>alerts</code> collection.</sub>
 <br/><br/>
 <img src="docs/readme/eruption-sim.png" alt="3D eruption simulation on Semeru" width="860" />
 <br/><sub>Eruption simulation on Semeru terrain: ash column, distance rings, villages and aid posts in the flow path, and an event log comparing the timeline with and without MarketShield.</sub>
@@ -116,11 +116,25 @@ Open **[marketshield-inception.vercel.app](https://marketshield-inception.vercel
 | Responsibility | Model | Official source or deterministic code |
 |:-|:-|:-|
 | Volcano alert level | – | PVMBG status, stored as `volcanoes/{id}.level` |
-| 7-day escalation probability | XGBoost risk engine (team notebook) | Shown next to the official level, never replacing it |
-| Message check | IndoBERT classifier (team notebook, fine-tuning in progress) | Trigger words, satellite cross-check, nearest official fact; rule-based classifier in the API and app |
+| 7-day activity probability | XGBoost risk engine on Earth Engine features ([report](ml/README.md#2-satellite-risk-engine)) | Shown next to the official level, never replacing it |
+| Message check | IndoBERT fine-tuned on 12k Indonesian texts ([report](ml/README.md#1-indobert-hoax-filter)) | Trigger words, satellite cross-check, nearest official fact; rule-based classifier serves the API and app today |
 | Aid priority | – | exposure × hazard × vulnerability ÷ (aid received + 1) |
 | Price watch | – | (market − HET) ÷ HET, flagged above 30% |
 | Broadcasts | – | Signed-in BPBD operators only, staggered by cohort |
+
+## Models
+
+| Model | Data | Held-out result |
+|:-|:-|:-|
+| **Satellite risk engine** (XGBoost + SHAP) | Google Earth Engine, 25 volcanoes × 407 weeks (2019–2026) | ROC-AUC **0.899** vs 0.784 persistence baseline; recall 78 % vs 63 % (test 2024–2026) |
+| **IndoBERT hoax filter** | 12,136 Indonesian texts, de-duplicated before an 80/10/10 split | Accuracy **98.4 %** vs 96.9 % TF-IDF; **90 %** on 40 short WhatsApp-style messages |
+
+<p align="center">
+  <img src="ml/results/risk_results.png" alt="Risk engine: ROC and precision-recall curves on 2024–2026 and SHAP importance" width="100%" />
+  <img src="ml/results/hoax_results.png" alt="IndoBERT: confusion matrix, macro-F1 against the baseline and training curve" width="100%" />
+</p>
+
+How we trained, the runs we discarded and why, and how to reproduce: [ml/README.md](ml/README.md).
 
 ## Demo or real
 
@@ -133,7 +147,7 @@ Judges can explore the concept in **Demo** without changing anything, then switc
 ## Architecture
 
 <p align="center">
-  <img src="docs/readme/architecture.png" alt="MarketShield architecture" width="100%" />
+  <img src="docs/readme/architecture-detailed.png" alt="MarketShield architecture: people, Flutter app, Next.js site, console, API, map and 3D, Firestore, Auth, ML pipelines, external sources and delivery" width="100%" />
 </p>
 
 <details>
@@ -268,8 +282,8 @@ Required by the competition rules. Full list with licences: [AI_USE_AND_THIRD_PA
 
 | Component | Model | Status |
 |:-|:-|:-|
-| Risk engine | XGBoost on PVMBG status history and Earth Engine features, built by the team in a Colab notebook | Writes `volcanoes/semeru.forecast`; shown in the console and the risk API |
-| Hoax filter | IndoBERT (`indobenchmark/indobert-base-p1`), fine-tuned by the team on a self-curated corpus of Indonesian disaster messages | Fine-tuning in progress; the API and the app use a rule-based classifier meanwhile |
+| Risk engine | XGBoost + SHAP, trained by the team on Google Earth Engine features for 25 volcanoes (2019–2026); target = NASA FIRMS thermal activity in the next 7 days (a satellite proxy, not the PVMBG level) | ROC-AUC 0.90 vs 0.78 baseline on 2024–2026; forecast in `volcanoes/{id}.forecast` |
+| Hoax filter | IndoBERT (`indobenchmark/indobert-base-p1`) fine-tuned by the team on the public `mzuama/IndonesianHoaxdetection` dataset plus 60 team-written short disaster messages | 98.4 % test accuracy, 90 % on a 40-message probe set; served by the API next (rule-based classifier meanwhile) |
 
 **AI used to build the product**
 
@@ -302,7 +316,7 @@ Required by the competition rules. Full list with licences: [AI_USE_AND_THIRD_PA
 ## Known limitations
 
 - **Seeded operational data.** Villages, aid posts, prices, alerts and intel are realistic demo records in Firestore, not yet fed by BPBD or market surveys.
-- **Models run in notebooks.** The XGBoost forecast and IndoBERT labels are written to Firestore from Colab; the 6-hourly Earth Engine pipeline is not scheduled yet, and the API's message check uses the rule-based classifier.
+- **Models are trained offline.** The risk engine and IndoBERT are trained and evaluated in `ml/` and the forecast is published to Firestore with a script; the 6-hourly schedule and serving IndoBERT behind the API are next. The risk target is a satellite proxy for eruptive activity, not the PVMBG alert level.
 - **One volcano in depth.** Semeru has full detail (villages, posts, risk); the other 24 mapped volcanoes have hazard rings only.
 - **No push notifications yet.** Broadcasts appear in the console and in the app feed; FCM delivery is next.
 - **Android only for the native app.** iOS and the Play Store are planned. v1.0.0 is signed with a debug key; later releases use the release key.

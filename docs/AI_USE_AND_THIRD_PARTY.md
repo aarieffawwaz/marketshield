@@ -6,9 +6,9 @@ Required by the competition rules ("README lengkap termasuk AI Use and Third-Par
 
 | Component | Model / method | Data | What it decides | Status |
 |:-|:-|:-|:-|:-|
-| Risk engine | XGBoost classifier with SHAP explanations | PVMBG status history and Earth Engine features, compiled by the team | 7-day escalation probability, action window, top drivers. Never the official level. | Built in a team Colab notebook; writes `volcanoes/semeru.forecast` |
-| Hoax filter | IndoBERT `indobenchmark/indobert-base-p1` (MIT), fine-tuned by the team | Self-curated corpus of Indonesian disaster chain messages and social posts (hoax / fact) | A label and confidence for a pasted message | Fine-tuning in progress; until it is served, the API and app use the rule-based classifier `rules-v1` |
-| Rule-based classifier | Trigger phrases + satellite cross-check (`web/src/lib/classify.ts`) | Written by the team | Fallback label for message checks | In production |
+| Risk engine | XGBoost classifier with SHAP explanations | Google Earth Engine features (FIRMS, Sentinel-5P, Sentinel-1, GPM IMERG) for 25 volcanoes, 2019–2026 | Probability of thermal activity in the next 7 days and its top drivers. Never the official level. | Trained and evaluated in `ml/risk_engine.py` (ROC-AUC 0.90 on 2024–2026); forecast published to Firestore |
+| Hoax filter | IndoBERT `indobenchmark/indobert-base-p1` (MIT), fine-tuned by the team | Public `mzuama/IndonesianHoaxdetection` (Hugging Face) + 60 team-written short disaster messages | A label and confidence for a pasted message | Trained in `ml/train_hoax.py` (98.4 % test accuracy); not yet served — the API and app use `rules-v1` meanwhile |
+| Rule-based classifier | Trigger phrases + satellite cross-check (`web/src/lib/classify.ts`) | Written by the team | Label for message checks | In production |
 
 Safety-relevant decisions (official level, evacuation, broadcasts) are never made by a model.
 
@@ -29,7 +29,7 @@ No AI-generated photographs are used to depict real events; the volcano and disa
 | Google Earth Engine catalogue: Sentinel-1/2/5P (Copernicus), NASA FIRMS, MODIS, Landsat 9, GPM IMERG, NOAA GFS, Copernicus DEM GLO-30, WorldPop, ESA WorldCover | Each dataset's own terms (Copernicus open licence, NASA/NOAA open data, WorldPop CC BY 4.0, ESA WorldCover CC BY 4.0); Earth Engine terms of service | Risk features, hazard layers, exposed population |
 | PVMBG / MAGMA Indonesia | Public government information | Official volcano levels |
 | Government price caps (HET) | Public regulations | Price watch reference |
-| PVMBG status history 2006–2026 | Public records, compiled by the team | Risk-engine training labels |
+| `mzuama/IndonesianHoaxdetection` | Hugging Face dataset (licence not stated by the author) | IndoBERT training and evaluation |
 | Natural Earth | Public domain | Land outline for the globe |
 
 ## 4. Maps and services
