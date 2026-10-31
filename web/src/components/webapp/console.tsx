@@ -184,7 +184,7 @@ export function Console() {
             {current === "prices" && <PricePanel toast={toast} />}
             {current === "signal" && <SignalPanel />}
             {current === "posko" && <PoskoPanel toast={toast} />}
-            {current === "alerts" && <AlertsPanel />}
+            {current === "alerts" && <AlertsPanel toast={toast} />}
           </motion.div>
         </AnimatePresence>
       </main>

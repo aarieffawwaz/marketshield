@@ -605,13 +605,14 @@ export function AlertList({ items, animate }: { items: Alert[]; animate?: boolea
   );
 }
 
-export function AlertsPanel() {
+export function AlertsPanel({ toast }: { toast: (m: string) => void }) {
   const { t, tx } = useT();
   const level = useApp((s) => s.level);
   const live = useAlerts();
   const session = useApp((s) => s.session);
   const mode = useDataMode();
-  const viewOnly = !session?.uid && mode === "live";
+  // Firestore rules only let BPBD operators (and admins) create alerts; posko accounts can't broadcast live
+  const viewOnly = mode === "live" && (!session?.uid || session.role !== "bpbd");
   const [demo, setDemo] = useState<Alert[]>([]);
   const items = [...demo, ...live.data];
   const [msg, setMsg] = useState("");
@@ -622,7 +623,7 @@ export function AlertsPanel() {
     const hh = `${String(now.getHours()).padStart(2, "0")}.${String(now.getMinutes()).padStart(2, "0")}`;
     const text = `${area}: ${msg}`;
     if (viewOnly) return;
-    if (session?.uid) broadcastAlert(text).catch(() => setDemo((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: text, en: text } }, ...x]));
+    if (session?.uid) broadcastAlert(text).catch(() => toast(t("Gagal menyiarkan: akun Anda tidak berhak mengirim siaran.", "Couldn't broadcast: your account can't send alerts.")));
     else setDemo((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: text, en: text } }, ...x]);
     setMsg("");
   };
@@ -650,7 +651,7 @@ export function AlertsPanel() {
           doneLabel={t("Siaran terkirim", "Broadcast sent")}
         />
         <p className="mt-3 text-[11.5px] text-muted">{tx({ id: "Siaran dijadwalkan bertahap per kohort agar tidak memicu panic buying.", en: "Broadcasts are staggered by cohort to avoid panic buying." })}</p>
-        {viewOnly && <p className="mt-2 rounded-lg bg-sand px-3 py-2 text-[11.5px] text-muted">{t("Mode live hanya-lihat. Masuk dengan akun operator BPBD untuk menyiarkan.", "Live mode is view-only. Sign in as a BPBD operator to broadcast.")}</p>}
+        {viewOnly && <p className="mt-2 rounded-lg bg-sand px-3 py-2 text-[11.5px] text-muted">{session?.uid ? t("Siaran live hanya untuk operator BPBD. Akun posko tetap bisa memperbarui status posko.", "Live broadcasts are for BPBD operators only. Aid post accounts can still update post status.") : t("Mode live hanya-lihat. Masuk dengan akun operator BPBD untuk menyiarkan.", "Live mode is view-only. Sign in as a BPBD operator to broadcast.")}</p>}
       </Card>
     </div>
   );
