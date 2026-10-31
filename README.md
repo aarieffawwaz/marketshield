@@ -68,7 +68,7 @@ MarketShield is a disaster-readiness system for communities around Indonesia's a
 
 ## Contents
 
-[Problem](#problem) · [Solution](#solution-four-pillars) · [Features by role](#features-by-role) · [Product tour](#product-tour) · [Architecture](#architecture) · [Technology stack](#technology-stack) · [Models](#models) · [Data sources and licences](#data-sources-and-licences) · [API](#api-reference) · [Repository structure](#repository-structure) · [Getting started](#getting-started) · [Demo mode and live mode](#demo-mode-and-live-mode) · [CI/CD](#cicd) · [Testing](#testing) · [Security](#security) · [Known limitations](#known-limitations) · [Roadmap](#roadmap) · [Team](#team) · [Credits](#credits-and-third-party-licences) · [License](#license)
+[Problem](#problem) · [Solution](#solution-four-pillars) · [Features by role](#features-by-role) · [Product tour](#product-tour) · [Architecture](#architecture) · [Technology stack](#technology-stack) · [Models](#models) · [Data sources and licences](#data-sources-and-licences) · [API](#api-reference) · [Repository structure](#repository-structure) · [Getting started](#getting-started) · [Demo mode and live mode](#demo-mode-and-live-mode) · [CI/CD](#cicd) · [Testing](#testing) · [Security](#security) · [Known limitations](#known-limitations) · [Roadmap](#roadmap) · [Team](#team) · [Credits](#credits-and-third-party-licences) · [Documentation](#documentation) · [License](#license)
 
 ---
 
@@ -542,32 +542,66 @@ Commands, timestamps, sample responses and a screenshot gallery (Firebase, Earth
 
 Open items include per-post scoping for the `posko` role and a rate limit on `POST /signals/check`. The full self-assessment, including a notebook key that was exposed and disabled during development, is in [docs/SECURITY_SELF_ASSESSMENT.md](docs/SECURITY_SELF_ASSESSMENT.md). Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/aarieffawwaz/marketshield/security/advisories/new).
 
-## AI Use and Third-Party Declaration
+## Known limitations
 
-Required by the competition rules. Full list with licences: [AI_USE_AND_THIRD_PARTY.md](docs/AI_USE_AND_THIRD_PARTY.md).
+- **Seeded operational data.** Villages, aid posts, prices, alerts and intel are realistic demo records in Firestore. They are not yet fed by BPBD or market surveys.
+- **The risk target is a proxy.** The risk engine predicts NASA FIRMS thermal activity within 5 km of the summit in the next 7 days, because PVMBG level history is not machine-readable. It is not the PVMBG alert level, and without seismic data a sudden eruption can be missed. PVMBG stays the official reference.
+- **Models run offline.** The risk engine and IndoBERT are trained and evaluated in `ml/`, and the forecast is published to Firestore with a script. The 6-hourly schedule is not set up yet, and the message check in the API and app still uses the rule-based classifier.
+- **The hoax dataset is news-style.** Real WhatsApp messages are shorter and messier; the 40-message probe set was written by the team and is a sanity check only.
+- **One volcano in depth.** Semeru has full detail (villages, posts, risk); the other 24 mapped volcanoes have hazard rings only.
+- **No push notifications yet.** Broadcasts appear in the console and the app feed; FCM delivery is planned.
+- **The price report form in the app is UI only.** Reports are not sent to the server yet.
+- **Android only for the native app.** iOS and the Play Store are planned. v1.0.0 was signed with a debug key; later releases use the release key, so v1.0.0 testers reinstall once.
+- **Non-commercial imagery.** EOX Sentinel-2 cloudless (CC BY-NC-SA 4.0) and the Earth Engine registration are non-commercial; a paid service needs commercial imagery and an Earth Engine commercial licence.
+- **Self-assessed security.** No third-party audit; open findings are listed in [the self-assessment](docs/SECURITY_SELF_ASSESSMENT.md#4-findings).
+
+## Roadmap
+
+1. Schedule the Earth Engine feature pipeline and the risk model every 6 hours (GitHub Actions and a service account).
+2. Serve the fine-tuned IndoBERT model behind `/api/v1/signals/check`, keeping the same response contract.
+3. FCM push notifications, sent in cohorts so broadcasts do not trigger panic buying.
+4. Pilot with one village on Semeru's slopes and BPBD Lumajang (proposed: Kecamatan Candipuro), with real aid-post and price data; measure a baseline before claiming impact.
+5. Retrain the risk engine on official escalations once machine-readable PVMBG level history is available.
+6. Play Store release (PSE registration under PP 71/2019) and an iOS build, then the next volcanoes.
+7. **SAR-Vault (research idea, not built):** an IoT supply box with a smart lock for distribution without hoarding.
+
+## Team
+
+**BRAIN – Ayam Jago**, BINUS University
+
+| Member | Role | Worked on |
+|:-|:-|:-|
+| Hansel Mitchell T. | Team lead, data and AI engineer | Google Earth Engine pipeline, risk engine, IndoBERT |
+| Aarief Fawwaz S. | Mobile and cloud engineer | Flutter app, Next.js console and API, Firebase, deployment |
+
+## Credits and third-party licences
+
+The full declaration, with licences for every dataset, map service, photo, 3D model, font and library, is in **[docs/AI_USE_AND_THIRD_PARTY.md](docs/AI_USE_AND_THIRD_PARTY.md)**. In short:
 
 **AI inside the product**
 
 | Component | Model | Status |
 |:-|:-|:-|
-| Risk engine | XGBoost + SHAP, trained by the team on Google Earth Engine features for 25 volcanoes (2019–2026); target = NASA FIRMS thermal activity in the next 7 days (a satellite proxy, not the PVMBG level) | ROC-AUC 0.90 vs 0.78 baseline on 2024–2026; forecast in `volcanoes/{id}.forecast` |
-| Hoax filter | IndoBERT (`indobenchmark/indobert-base-p1`) fine-tuned by the team on the public `mzuama/IndonesianHoaxdetection` dataset plus 60 team-written short disaster messages | 98.4 % test accuracy, 90 % on a 40-message probe set; served by the API next (rule-based classifier meanwhile) |
+| Risk engine | XGBoost + SHAP, trained by the team on Earth Engine features for 25 volcanoes (2019–2026); target is NASA FIRMS thermal activity in the next 7 days | ROC-AUC 0.899 vs 0.784 baseline on 2024–2026; forecast in `volcanoes/{id}.forecast` |
+| Hoax filter | IndoBERT (`indobenchmark/indobert-base-p1`, MIT) fine-tuned by the team on `mzuama/IndonesianHoaxdetection` plus 60 team-written short disaster messages | 98.4 % test accuracy, 90 % on a 40-message probe set; not served yet |
+| Rule-based classifier | Trigger phrases and satellite cross-check (`web/src/lib/classify.ts`) | In production |
 
 **AI used to build the product**
 
 | Tool | Used for |
 |:-|:-|
-| Claude Code (Anthropic) | Writing and refactoring code for the website, console, API, Flutter app and CI; debugging; writing this documentation and drawing its diagrams. The team reviewed, tested and merged every change through pull requests. |
+| Claude Code (Anthropic) | Writing and refactoring code for the website, console, API, Flutter app and CI; debugging; automated browser checks; writing documentation and drawing its diagrams. The team reviewed, tested and merged every change through pull requests. |
 
 **Third-party data, services and assets**
 
-- **Satellite and geospatial data:** Google Earth Engine catalogue: Sentinel-1, Sentinel-2, Sentinel-5P, NASA FIRMS, MODIS, Landsat 9, GPM IMERG, NOAA GFS, Copernicus DEM, WorldPop, ESA WorldCover.
+- **Satellite and geospatial data:** Google Earth Engine catalogue (Sentinel-1, Sentinel-2, Sentinel-5P, NASA FIRMS, MODIS, Landsat 9, GPM IMERG, NOAA GFS, Copernicus DEM, WorldPop, ESA WorldCover).
 - **Official information:** PVMBG / MAGMA Indonesia volcano levels; government price caps (HET).
 - **Map tiles:** Sentinel-2 cloudless by EOX (CC BY-NC-SA 4.0, non-commercial), AWS Terrain Tiles, Esri basemaps, © OpenStreetMap contributors (ODbL), Natural Earth.
-- **Photos:** Wikimedia Commons, each with author and licence in [`photo-credits.json`](web/src/lib/photo-credits.json) and on [/kredit](https://marketshield-inception.vercel.app/kredit).
+- **Photos:** Wikimedia Commons and BNPB, each with author and licence in [`web/src/lib/photo-credits.json`](web/src/lib/photo-credits.json) and on [/kredit](https://marketshield-inception.vercel.app/kredit).
 - **3D models:** NVIDIA SimReady Assets (CC BY 4.0).
 - **Logos:** agency and brand marks identify data sources and target users only; no partnership is implied. Brand icons from Simple Icons (CC0).
-- **Open-source libraries:** MIT, Apache-2.0, BSD or ISC licensed; full table in the declaration.
+- **Fonts:** Poppins, Geist, Geist Mono and Google Fonts in the app (SIL Open Font License 1.1).
+- **Open-source libraries:** MIT, Apache-2.0, BSD or ISC licensed, plus GSAP under its own free standard licence.
 
 ## Documentation
 
@@ -575,33 +609,13 @@ Required by the competition rules. Full list with licences: [AI_USE_AND_THIRD_PA
 |:-|:-|
 | [Technical documentation](docs/TECHNICAL_DOCUMENTATION.md) | Architecture and decisions, app, console, backend, data model, models, deployment, operations |
 | [API reference](docs/API.md) | Every endpoint with parameters and sample responses |
+| [ML report](ml/README.md) | Training data, method, results and reproduction for both models |
 | [Security self-assessment](docs/SECURITY_SELF_ASSESSMENT.md) | Threat model, controls, findings and their status |
-| [Execution evidence](docs/EXECUTION_EVIDENCE.md) | What was run, when, and what it returned |
+| [Execution evidence](docs/EXECUTION_EVIDENCE.md) | What was run, when, what it returned, and a screenshot gallery |
 | [AI use and third parties](docs/AI_USE_AND_THIRD_PARTY.md) | Full declaration with licences |
 | [Firestore schema](firebase/SCHEMA.md) · [ML data contract](firebase/ML-CONTRACT.md) | Collections, fields and roles; how notebooks write |
 | [Changelog](CHANGELOG.md) | Release history |
 
-## Known limitations
-
-- **Seeded operational data.** Villages, aid posts, prices, alerts and intel are realistic demo records in Firestore, not yet fed by BPBD or market surveys.
-- **Models are trained offline.** The risk engine and IndoBERT are trained and evaluated in `ml/` and the forecast is published to Firestore with a script; the 6-hourly schedule and serving IndoBERT behind the API are next. The risk target is a satellite proxy for eruptive activity, not the PVMBG alert level.
-- **One volcano in depth.** Semeru has full detail (villages, posts, risk); the other 24 mapped volcanoes have hazard rings only.
-- **No push notifications yet.** Broadcasts appear in the console and in the app feed; FCM delivery is next.
-- **Android only for the native app.** iOS and the Play Store are planned. v1.0.0 is signed with a debug key; later releases use the release key.
-- **Map imagery licence.** EOX Sentinel-2 cloudless is non-commercial; a commercial launch needs another imagery source.
-
-## Next steps
-
-1. Schedule the Earth Engine feature pipeline and the risk model every 6 hours (GitHub Actions + service account).
-2. Serve the fine-tuned IndoBERT model behind `/api/v1/signals/check`.
-3. FCM push notifications with cohort staggering.
-4. Pilot with one village on Semeru's slopes and BPBD Lumajang, with real aid-post and price data.
-5. Play Store release (PSE registration) and an iOS build.
-
-## Team
-
-**BRAIN – Ayam Jago**, BINUS University: product and design, data and geospatial, machine learning, mobile and web.
-
 ## License
 
-Source code: all rights reserved by the team until a licence is chosen. Third-party data, photos and models keep their own licences (see the declaration above).
+Source code: all rights reserved by the team until an open-source licence is chosen. Third-party data, photos, models and libraries keep their own licences (see [Credits and third-party licences](#credits-and-third-party-licences)).
