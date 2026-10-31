@@ -26,11 +26,13 @@ GET /alerts                  200  source=firestore  rows=6
 GET /intel                   200  source=firestore  rows=4
 ```
 
-Risk endpoint, model block (written by the risk-engine notebook):
+Risk endpoint, model block (written by `web/scripts/publish-forecast.ts` from `ml/results/risk_latest.json`), re-checked on 1 Nov 2026:
 
 ```json
 {"official_level": {"value": 3, "name": "Siaga", "source": "PVMBG"},
- "model": {"probability_7d": 0.75, "window_days": 5, "top_drivers": ["Tren SO2", "Hujan 72 Jam", "Backscatter S1"]}}
+ "model": {"probability_7d": 0.9685, "window_days": 7,
+           "top_drivers": ["Titik panas 3 minggu lalu", "Titik panas minggu ini", "Backscatter S1"],
+           "name": "xgboost-thermal-v1", "updated_at": "2026-10-31T18:58:04.696Z"}}
 ```
 
 Message check:
