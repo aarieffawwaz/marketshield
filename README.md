@@ -8,7 +8,7 @@ Satellite-based eruption early warning for residents, markets and aid posts arou
 
 [**Live site**](https://marketshield-inception.vercel.app) · [**Web console**](https://marketshield-inception.vercel.app/app) · [**Resident app**](https://marketshield-inception.vercel.app/mobile) · [**Download APK**](https://github.com/aarieffawwaz/marketshield/releases/latest)
 
-*BRAIN – Ayam Jago · BINUS University · INCEPTION 2026*
+*BRAIN – Ayam Jago · BINUS University*
 
 </div>
 
