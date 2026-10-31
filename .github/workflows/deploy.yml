@@ -1,7 +1,7 @@
 name: Deploy
 
-# Builds the Flutter web app into web/public/mobile-app, then builds and deploys
-# the Next.js site to Vercel. Pull requests get a preview URL; main goes to production.
+# Builds the Flutter web app into web/public/mobile-app, then builds the Next.js site.
+# Pull requests only build (to stay inside Vercel's free upload quota); main deploys to production.
 
 on:
   push:
@@ -25,7 +25,6 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -55,8 +54,7 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Build & deploy
-        id: vercel
+      - name: Build
         working-directory: web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -65,19 +63,12 @@ jobs:
           if [ "$PROD" = "true" ]; then ENV=production; FLAG=--prod; else ENV=preview; FLAG=; fi
           vercel pull --yes --environment=$ENV --token="$VERCEL_TOKEN"
           vercel build $FLAG --token="$VERCEL_TOKEN"
-          url=$(vercel deploy --prebuilt $FLAG --token="$VERCEL_TOKEN")
-          echo "url=$url" >> "$GITHUB_OUTPUT"
-          echo "### Deployed: $url" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Comment preview URL on the PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const url = '${{ steps.vercel.outputs.url }}';
-            const marker = '<!-- vercel-preview -->';
-            const body = `${marker}\n**Preview:** ${url}\n\nCommit: ${context.payload.pull_request.head.sha.slice(0, 7)}`;
-            const { data: comments } = await github.rest.issues.listComments({ ...context.repo, issue_number: context.issue.number });
-            const old = comments.find((c) => c.body?.includes(marker));
-            if (old) await github.rest.issues.updateComment({ ...context.repo, comment_id: old.id, body });
-            else await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
+      - name: Deploy to production
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        working-directory: web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "### Deployed: $url" >> "$GITHUB_STEP_SUMMARY"
