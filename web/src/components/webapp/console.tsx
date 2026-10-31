@@ -418,7 +418,7 @@ function Notifications() {
       </button>
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity: 0, y: -6, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.97 }} transition={{ duration: 0.16 }} className="absolute right-0 top-12 z-50 w-[340px] origin-top-right rounded-3xl bg-surface p-2 shadow-2xl ring-1 ring-black/5">
+          <motion.div initial={{ opacity: 0, y: -6, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.97 }} transition={{ duration: 0.16 }} className="absolute right-0 top-12 z-50 w-[340px] origin-top-right rounded-3xl bg-surface p-2 shadow-2xl ring-1 ring-black/5 max-sm:fixed max-sm:inset-x-3 max-sm:top-16 max-sm:w-auto">
             <div className="flex items-center justify-between px-3 py-2">
               <p className="font-display text-[15px] font-semibold text-wine">{t("Notifikasi", "Notifications")}</p>
               <button onClick={() => setRead(true)} className="text-[12px] font-medium text-maroon">{t("Tandai dibaca", "Mark as read")}</button>
