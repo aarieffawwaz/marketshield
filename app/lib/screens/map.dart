@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 
 import '../core.dart';
+import '../data/repository.dart';
 import '../geo_map.dart';
 import '../theme.dart';
 import '../widgets.dart';
@@ -157,7 +158,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
               const SizedBox(height: 12),
               Row(children: [
-                Expanded(child: _thumb('assets/img/semeru_cctv.webp', 'CCTV Pos Sawur', () {})),
+                Expanded(child: _thumb('assets/img/semeru_cctv.webp', 'CCTV Pos Sawur', () => push(context, const VolcanoScreen()))),
                 const SizedBox(width: 10),
                 Expanded(child: _thumb('assets/img/sar_lahar.webp', 'Radar Sentinel-1', () => push(context, const VolcanoScreen()))),
               ]),
@@ -225,6 +226,7 @@ class VolcanoScreen extends StatelessWidget {
     final lvl = context.app.level;
     final s = snapshots[lvl]!;
     final radius = s.krbRadiusKm.toInt();
+    final at = context.repo.volcano.value?.updatedAt;
     return Scaffold(
       body: SafeArea(
         child: Column(children: [
@@ -302,7 +304,9 @@ class VolcanoScreen extends StatelessWidget {
                     const Icon(Icons.verified_outlined, size: 15, color: C.l1),
                     const SizedBox(width: 6),
                     Expanded(child: Text('PVMBG Badan Geologi', style: inter(12, c: C.textMuted))),
-                    Text(context.t('Diperbarui 10m lalu', 'Updated 10m ago'), style: inter(12, c: C.textMuted)),
+                    Text(
+                        '${context.t('Diperbarui', 'Updated')} ${context.l(at == null || !context.app.isLive ? const L('10 mnt lalu', '10 min ago') : ago(at))}',
+                        style: inter(12, c: C.textMuted)),
                   ]),
                 ]),
               ),
@@ -571,15 +575,18 @@ class _EvacScreenState extends State<EvacScreen> {
               ]),
               const SizedBox(height: 12),
               Row(children: [
-                Expanded(child: _tile(Icons.schedule, '18 ${context.t('MNT', 'MIN')}', context.t('Via Motor/Mobil', 'By motorbike/car'))),
+                Expanded(child: _tile(Icons.schedule, '32 ${context.t('MNT', 'MIN')}', context.t('Via Motor/Mobil', 'By motorbike/car'))),
                 const SizedBox(width: 8),
-                Expanded(child: _tile(Icons.air, '12 KM/J', context.t('Barat (GFS)', 'West (GFS)'))),
+                Expanded(child: _tile(Icons.air, '12 KNOT', context.t('Barat Daya (GFS)', 'South-West (GFS)'))),
                 const SizedBox(width: 8),
                 Expanded(child: _tile(Icons.masks, 'N95', context.t('Aerosol Pekat', 'Dense aerosol'), hot: true)),
               ]),
               const SizedBox(height: 12),
               MsCard(
-                onTap: () => tabIndex.value = 3,
+                onTap: () {
+                  Navigator.of(context).popUntil((r) => r.isFirst);
+                  tabIndex.value = 3;
+                },
                 child: Row(children: [
                   Container(
                     width: 44,
