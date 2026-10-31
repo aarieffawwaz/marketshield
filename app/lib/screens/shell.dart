@@ -33,7 +33,8 @@ class _ShellState extends State<Shell> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final lvl = context.app.level;
-    if (_lastLevel != null && _lastLevel != lvl) {
+    // The first PVMBG sync replaces the placeholder level on launch; only real changes get a toast.
+    if (_lastLevel != null && _lastLevel != lvl && !context.app.levelFromFirstSync) {
       final up = lvl > _lastLevel!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
