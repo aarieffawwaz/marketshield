@@ -12,7 +12,7 @@ import { Logo, Mark } from "@/components/ui/brand";
 import { LangToggle, ThemeToggle } from "@/components/ui/lang-toggle";
 import { FluidTabs } from "@/components/ui/interactions";
 import { LEVELS, VOLCANO, type Level } from "@/lib/data";
-import { useAlerts, useDataMode, useOfficialLevel } from "@/lib/live";
+import { useAlerts, useDataMode, useForecast, useOfficialLevel } from "@/lib/live";
 import { PEOPLE, useApp, useT, type Role } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { LevelChip } from "./ui";
@@ -121,7 +121,7 @@ export function Console() {
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="lg:hidden"><Mark /></Link>
             <div className="min-w-0">
-              <p className="hidden items-center gap-2 text-[11.5px] text-muted sm:flex">{session.org} · {VOLCANO.name} <ModeBadge /></p>
+              <p className="flex items-center gap-2 text-[11.5px] text-muted"><span className="hidden sm:inline">{session.org} · {VOLCANO.name}</span> <ModeBadge /></p>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.h1 key={current} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} transition={{ duration: 0.18 }} className="truncate font-display text-[17px] font-semibold text-wine">{label}</motion.h1>
               </AnimatePresence>
@@ -184,7 +184,7 @@ export function Console() {
             {current === "prices" && <PricePanel toast={toast} />}
             {current === "signal" && <SignalPanel />}
             {current === "posko" && <PoskoPanel toast={toast} />}
-            {current === "alerts" && <AlertsPanel />}
+            {current === "alerts" && <AlertsPanel toast={toast} />}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -213,6 +213,9 @@ function Sidebar({ groups, allowed, tab, go, openPalette }: { groups: NavGroups;
   const session = useApp((s) => s.session)!;
   const level = useApp((s) => s.level);
   const L = LEVELS[level];
+  // same source as the overview KPI: the live model forecast when it covers the current level
+  const fc = useForecast();
+  const prob = fc && level === 3 ? fc.p : L.prob;
   return (
     <aside className={cn("fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/5 bg-night text-bone transition-[width] duration-300 lg:flex", collapsed ? "w-[76px]" : "w-[264px]")}>
       <div className="flex h-16 items-center justify-between px-4">
@@ -236,9 +239,9 @@ function Sidebar({ groups, allowed, tab, go, openPalette }: { groups: NavGroups;
           <div data-tour="status" className="rounded-xl p-3 ring-1 ring-white/10" style={{ background: `linear-gradient(135deg, ${L.color}33, transparent)` }}>
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-semibold" style={{ color: L.color === "#E0A100" ? "#f5c84a" : L.color === "#2E7D32" ? "#6fcf73" : "#ff9a6b" }}>Level {L.roman} · {tx(L.name)}</span>
-              <span className="font-mono text-[11px] tabular text-bone/70">{Math.round(L.prob * 100)}%</span>
+              <span className="font-mono text-[11px] tabular text-bone/70">{Math.round(prob * 100)}%</span>
             </div>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10"><motion.div animate={{ width: `${L.prob * 100}%` }} transition={{ duration: 0.6 }} className="h-full rounded-full" style={{ background: L.color }} /></div>
+            <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10"><motion.div animate={{ width: `${prob * 100}%` }} transition={{ duration: 0.6 }} className="h-full rounded-full" style={{ background: L.color }} /></div>
             <p className="mt-2 text-[11px] text-bone/45">{t("Lintasan berikutnya: Sentinel-1 · 14.20 WIB", "Next pass: Sentinel-1 · 14:20 WIB")}</p>
           </div>
           <button onClick={openPalette} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] text-bone/50 ring-1 ring-white/10 transition hover:text-bone">
@@ -415,7 +418,7 @@ function Notifications() {
       </button>
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity: 0, y: -6, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.97 }} transition={{ duration: 0.16 }} className="absolute right-0 top-12 z-50 w-[340px] origin-top-right rounded-3xl bg-surface p-2 shadow-2xl ring-1 ring-black/5">
+          <motion.div initial={{ opacity: 0, y: -6, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.97 }} transition={{ duration: 0.16 }} className="absolute right-0 top-12 z-50 w-[340px] origin-top-right rounded-3xl bg-surface p-2 shadow-2xl ring-1 ring-black/5 max-sm:fixed max-sm:inset-x-3 max-sm:top-16 max-sm:w-auto">
             <div className="flex items-center justify-between px-3 py-2">
               <p className="font-display text-[15px] font-semibold text-wine">{t("Notifikasi", "Notifications")}</p>
               <button onClick={() => setRead(true)} className="text-[12px] font-medium text-maroon">{t("Tandai dibaca", "Mark as read")}</button>

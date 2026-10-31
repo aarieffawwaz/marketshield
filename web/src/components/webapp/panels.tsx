@@ -62,7 +62,7 @@ export function Overview({ go, role }: { go: (tab: string) => void; role: Role }
         >
           <div className="h-60">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={series} margin={{ left: -18, right: 8, top: 8 }}>
+              <AreaChart data={series} margin={{ left: -18, right: 18, top: 8 }}>
                 <defs>
                   <linearGradient id="risk" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stopColor={L.color} stopOpacity={0.35} />
@@ -132,7 +132,7 @@ function NextActions({ go, role }: { go: (tab: string) => void; role: Role }) {
   if (!items.length) return null;
   return (
     <Card data-tour="actions" title={t("Tindakan disarankan", "Suggested actions")} sub={t("Diurutkan dari dampak terbesar untuk shift ini", "Ordered by impact for this shift")} action={<span className="rounded-full bg-peach px-2.5 py-1 text-[11.5px] font-semibold text-maroon">{items.length}</span>}>
-      <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
         <AnimatePresence initial={false}>
           {items.map((a) => (
             <motion.li layout key={a.id} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: "spring", stiffness: 400, damping: 32 }} className="group flex items-center gap-3 rounded-2xl border border-line bg-sand/50 p-3 transition hover:border-maroon/30 hover:bg-surface">
@@ -605,13 +605,14 @@ export function AlertList({ items, animate }: { items: Alert[]; animate?: boolea
   );
 }
 
-export function AlertsPanel() {
+export function AlertsPanel({ toast }: { toast: (m: string) => void }) {
   const { t, tx } = useT();
   const level = useApp((s) => s.level);
   const live = useAlerts();
   const session = useApp((s) => s.session);
   const mode = useDataMode();
-  const viewOnly = !session?.uid && mode === "live";
+  // Firestore rules only let BPBD operators (and admins) create alerts; posko accounts can't broadcast live
+  const viewOnly = mode === "live" && (!session?.uid || session.role !== "bpbd");
   const [demo, setDemo] = useState<Alert[]>([]);
   const items = [...demo, ...live.data];
   const [msg, setMsg] = useState("");
@@ -622,7 +623,7 @@ export function AlertsPanel() {
     const hh = `${String(now.getHours()).padStart(2, "0")}.${String(now.getMinutes()).padStart(2, "0")}`;
     const text = `${area}: ${msg}`;
     if (viewOnly) return;
-    if (session?.uid) broadcastAlert(text).catch(() => setDemo((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: text, en: text } }, ...x]));
+    if (session?.uid) broadcastAlert(text).catch(() => toast(t("Gagal menyiarkan: akun Anda tidak berhak mengirim siaran.", "Couldn't broadcast: your account can't send alerts.")));
     else setDemo((x) => [{ kind: "level", time: { id: hh, en: hh.replace(".", ":") }, text: { id: text, en: text } }, ...x]);
     setMsg("");
   };
@@ -650,7 +651,7 @@ export function AlertsPanel() {
           doneLabel={t("Siaran terkirim", "Broadcast sent")}
         />
         <p className="mt-3 text-[11.5px] text-muted">{tx({ id: "Siaran dijadwalkan bertahap per kohort agar tidak memicu panic buying.", en: "Broadcasts are staggered by cohort to avoid panic buying." })}</p>
-        {viewOnly && <p className="mt-2 rounded-lg bg-sand px-3 py-2 text-[11.5px] text-muted">{t("Mode live hanya-lihat. Masuk dengan akun operator BPBD untuk menyiarkan.", "Live mode is view-only. Sign in as a BPBD operator to broadcast.")}</p>}
+        {viewOnly && <p className="mt-2 rounded-lg bg-sand px-3 py-2 text-[11.5px] text-muted">{session?.uid ? t("Siaran live hanya untuk operator BPBD. Akun posko tetap bisa memperbarui status posko.", "Live broadcasts are for BPBD operators only. Aid post accounts can still update post status.") : t("Mode live hanya-lihat. Masuk dengan akun operator BPBD untuk menyiarkan.", "Live mode is view-only. Sign in as a BPBD operator to broadcast.")}</p>}
       </Card>
     </div>
   );
