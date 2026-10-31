@@ -8,7 +8,9 @@ import 'screens/sector.dart';
 import 'screens/sos.dart';
 import 'theme.dart';
 
-Widget logo([double s = 34]) => Image.asset('assets/img/logo.webp', width: s, height: s);
+/// MarketShield logo mark (shield + volcano). Square; [s] is its edge in logical pixels.
+Widget logo([double s = 34]) => Image.asset('assets/brand/marketshield-mark.png',
+    width: s, height: s, fit: BoxFit.contain, filterQuality: FilterQuality.medium);
 
 /// Bundled photo decoded at (about) the size it is drawn, fading in once decoded.
 /// Keeps decode time and memory low on phones; images are at most 1080 px wide.
@@ -60,7 +62,7 @@ class AppHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(R.gutter, 8, R.gutter, 8),
       child: Row(children: [
-        logo(32),
+        logo(36),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -220,7 +222,7 @@ class SubHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(4, 6, R.gutter, 6),
       child: Row(children: [
         IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back, color: C.wine)),
-        logo(28),
+        logo(30),
         const SizedBox(width: 10),
         Expanded(child: Text(title, style: outfit(20, w: FontWeight.w700), overflow: TextOverflow.ellipsis)),
         trailing ?? avatar(34),

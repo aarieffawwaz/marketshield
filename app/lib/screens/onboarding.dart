@@ -59,7 +59,7 @@ class SplashScreen extends StatelessWidget {
               height: 112,
               decoration: const BoxDecoration(color: C.pink, shape: BoxShape.circle),
               alignment: Alignment.center,
-              child: logo(84),
+              child: logo(76),
             ),
           ),
           const SizedBox(height: 18),
