@@ -137,7 +137,7 @@ export function PressPage() {
     <>
       <PageHero kicker={t("Pers & media", "Press & media")} title={t("Kit media MarketShield", "MarketShield media kit")} sub={t("Semua yang Anda perlukan untuk menulis tentang kami: deskripsi singkat, fakta, logo, warna dan tangkapan layar.", "Everything you need to write about us: boilerplate, facts, logo, colours and screenshots.")} crumbs={[{ label: t("Pers", "Press") }]}>
         <div className="mt-8 flex flex-wrap gap-3">
-          <a href="/icon.svg" download="marketshield-logo.svg" className="btn-shine shine-bone inline-flex items-center gap-2 rounded-xl bg-bone px-4 py-2.5 text-[13.5px] font-medium text-night"><Download className="h-4 w-4" /> {t("Unduh logo (SVG)", "Download logo (SVG)")}</a>
+          <a href="/brand/marketshield-mark-1024.png" download="marketshield-logo.png" className="btn-shine shine-bone inline-flex items-center gap-2 rounded-xl bg-bone px-4 py-2.5 text-[13.5px] font-medium text-night"><Download className="h-4 w-4" /> {t("Unduh logo (PNG)", "Download logo (PNG)")}</a>
           <Link href="/bantuan#kontak" className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-[13.5px] text-bone ring-1 ring-white/25 hover:bg-white/10"><Megaphone className="h-4 w-4" /> {t("Hubungi tim media", "Contact media team")}</Link>
         </div>
       </PageHero>
@@ -174,8 +174,8 @@ export function PressPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <H2>{t("Logo & warna", "Logo & colours")}</H2>
           <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_1fr_1.4fr]">
-            <div className="card grid h-44 place-items-center"><Mark className="h-16 w-16" /></div>
-            <div className="grid h-44 place-items-center rounded-3xl bg-night"><Mark className="h-16 w-16" /></div>
+            <div className="card grid h-44 place-items-center"><Mark className="h-20 w-20" /></div>
+            <div className="grid h-44 place-items-center rounded-3xl bg-night"><Mark className="h-20 w-20" /></div>
             <div className="grid grid-cols-5 gap-2">
               {PALETTE.map((c) => (
                 <div key={c.hex} className="flex flex-col overflow-hidden rounded-2xl ring-1 ring-line">
