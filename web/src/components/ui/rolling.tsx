@@ -8,21 +8,22 @@ import { cn } from "@/lib/utils";
 export function Rolling({ value, className, delay = 0 }: { value: string; className?: string; delay?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const seen = useInView(ref, { once: true, margin: "-40px" });
-  const chars = value.split("");
   let digitIdx = 0;
   return (
-    <span ref={ref} className={cn("inline-flex overflow-hidden tabular", className)} aria-label={value}>
-      {chars.map((ch, i) => {
-        if (!/\d/.test(ch)) return <span key={i} aria-hidden>{ch}</span>;
+    <span ref={ref} className={cn("inline-flex items-start whitespace-pre leading-none", className)} aria-label={value}>
+      {value.split("").map((ch, i) => {
+        // every glyph sits in the same 1em-tall box so letters, commas and digits share one baseline
+        if (!/\d/.test(ch)) return <span key={i} aria-hidden className="inline-block h-[1em] leading-none">{ch}</span>;
         const d = Number(ch);
         const k = digitIdx++;
         return (
           <span key={i} className="relative inline-block h-[1em] overflow-hidden leading-none" aria-hidden>
-            <span className="invisible">0</span>
+            {/* sized by the final digit so narrow digits like 1 leave no gap */}
+            <span className="invisible">{ch}</span>
             <motion.span
-              className="absolute left-0 top-0 flex flex-col"
+              className="absolute inset-x-0 top-0 flex flex-col items-center"
               initial={{ y: "0%" }}
-              animate={{ y: seen ? `-${(d + 10) * 10 / 2}%` : "0%" }}
+              animate={{ y: seen ? `-${((d + 10) * 100) / 20}%` : "0%" }}
               transition={{ duration: 1.3, delay: delay + k * 0.08, ease: [0.2, 0.8, 0.2, 1] }}
             >
               {Array.from({ length: 20 }, (_, n) => (
