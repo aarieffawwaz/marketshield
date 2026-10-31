@@ -319,6 +319,7 @@ class HomeScreen extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text('Gunung Semeru', maxLines: 1, style: outfit(22, w: FontWeight.w700)))),
+            const SizedBox(width: 8),
             const LevelChip(3, solid: true),
           ]),
           const SizedBox(height: 10),
@@ -490,8 +491,8 @@ class HomeScreen extends StatelessWidget {
           icon: Icons.verified_user_outlined,
           trailing: Text(context.t('1 mnt lalu', '1 min ago'), style: inter(11, c: C.textMuted))),
       for (final (name, km, note, cap) in [
-        ('GOR Candipuro', 2.6, context.t('Koridor AB • Aman', 'Corridor AB • Safe'), 60),
         ('Balai Desa Penanggal', 1.4, context.t('Jalur desa • Aman', 'Village road • Safe'), 80),
+        ('GOR Candipuro', 2.6, context.t('Koridor AB • Aman', 'Corridor AB • Safe'), 60),
       ])
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
@@ -546,7 +547,7 @@ class _CriticalBanner extends StatelessWidget {
           const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
           const SizedBox(width: 8),
           Expanded(
-              child: Text(context.t('STATUS KRITIS: LEVEL IV AWAS • SEMERU', 'CRITICAL: LEVEL IV WARNING • SEMERU'),
+              child: Text(context.t('LEVEL IV AWAS • SEMERU', 'LEVEL IV WARNING • SEMERU'),
                   style: inter(12, w: FontWeight.w700, c: Colors.white, ls: .4), overflow: TextOverflow.ellipsis)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
