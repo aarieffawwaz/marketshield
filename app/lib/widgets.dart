@@ -138,7 +138,7 @@ class Freshness extends StatelessWidget {
     final demo = !context.app.isLive;
     final at = feed.at == null ? '' : context.l(clock(feed.at!));
     final (dot, label) = switch (feed.origin) {
-      _ when demo => (C.l3, context.t('Demo · data contoh', 'Demo · sample data')),
+      _ when demo => (C.l3, compact ? 'Demo' : context.t('Demo · data contoh', 'Demo · sample data')),
       Origin.live => (C.l1, compact ? context.t('Diperbarui $at', 'Updated $at') : 'Live · $at'),
       Origin.cache => (C.l2, context.t('Offline · data tersimpan $at', 'Offline · saved data $at')),
       Origin.bundled when feed.syncing => (C.navInactive, context.t('Menyinkronkan…', 'Syncing…')),

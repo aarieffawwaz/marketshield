@@ -167,7 +167,7 @@ class HomeScreen extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Eyebrow(context.t('Gunung api aktif', 'Active volcano')),
                   const SizedBox(height: 2),
-                  Text('Gunung Semeru', style: outfit(22, w: FontWeight.w700)),
+                  FittedBox(fit: BoxFit.scaleDown, child: Text('Gunung Semeru', maxLines: 1, style: outfit(22, w: FontWeight.w700))),
                   const SizedBox(height: 6),
                   LevelChip(lvl),
                 ]),
@@ -200,8 +200,9 @@ class HomeScreen extends StatelessWidget {
                   Expanded(
                       child: Text(context.t('Prakiraan Satelit MarketShield', 'MarketShield Satellite Forecast'),
                           style: inter(13, w: FontWeight.w700, c: C.wine))),
-                  SatChip('Sentinel-5P • ${context.l(s.updated)}'),
                 ]),
+                const SizedBox(height: 8),
+                SatChip('Sentinel-5P • ${context.l(s.updated)}'),
                 const SizedBox(height: 12),
                 Row(children: [
                   Ring(
@@ -308,7 +309,11 @@ class HomeScreen extends StatelessWidget {
           Row(children: [
             const Icon(Icons.landscape, color: C.wine),
             const SizedBox(width: 8),
-            Expanded(child: Text('Gunung Semeru', style: outfit(22, w: FontWeight.w700))),
+            Expanded(
+                child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text('Gunung Semeru', maxLines: 1, style: outfit(22, w: FontWeight.w700)))),
             const LevelChip(3, solid: true),
           ]),
           const SizedBox(height: 10),
