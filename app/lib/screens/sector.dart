@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core.dart';
+import '../data/repository.dart';
 import '../theme.dart';
 import '../widgets.dart';
 
@@ -19,6 +20,19 @@ const _assets = {
   Persona.warga: (18000000, [L('Rumah & perabot', 'House & furniture'), L('1 sepeda motor', '1 motorbike')]),
 };
 
+(IconData, Color, String, String) _alertRow(BuildContext context, AlertItem a) {
+  final (icon, color, source) = switch (a.kind) {
+    'sat' => (Icons.satellite_alt_rounded, C.sat, const L('Satelit GEE', 'GEE satellite')),
+    'hoax' => (Icons.cancel_outlined, C.crimson, const L('IndoBERT', 'IndoBERT')),
+    'price' => (Icons.price_change_outlined, C.l3, const L('Pantau HET', 'Price Watch')),
+    'posko' => (Icons.night_shelter_outlined, C.primary, const L('Posko', 'Aid posts')),
+    'sector' => (Icons.business_center_outlined, C.l3, const L('Sektor', 'Sector')),
+    _ => (Icons.info_outline, C.wine, const L('MarketShield', 'MarketShield')),
+  };
+  final meta = a.at == null ? context.l(a.meta) : '${context.l(source)} • ${context.l(ago(a.at!))}';
+  return (icon, color, context.l(a.text), meta);
+}
+
 class _SectorScreenState extends State<SectorScreen> {
   late Persona _p = context.appRead.persona;
 
@@ -33,8 +47,8 @@ class _SectorScreenState extends State<SectorScreen> {
     final inbox = [
       (Icons.warning_amber_rounded, C.level(lvl), context.t('Status Semeru: Level ${levelRoman[lvl - 1]} ${context.l(levelName[lvl - 1])}', 'Semeru status: Level ${levelRoman[lvl - 1]} ${context.l(levelName[lvl - 1])}'),
           context.t('PVMBG • 09:15 WIB', 'PVMBG • 09:15 WIB')),
-      (Icons.satellite_alt_rounded, C.sat, context.t('SO₂ naik 3 hari berturut-turut', 'SO₂ up 3 days in a row'), 'Sentinel-5P • 6 ${context.t('jam lalu', 'hrs ago')}'),
-      (Icons.cancel_outlined, C.crimson, context.t('Hoaks jembatan Gladak Perak terbantah', 'Gladak Perak bridge hoax debunked'), 'IndoBERT • 24 ${context.t('mnt lalu', 'min ago')}'),
+      // Live alerts from GET /alerts (bundled fallback); the level line above already covers "level".
+      for (final a in context.repo.alerts.value.where((a) => a.kind != 'level').take(4)) _alertRow(context, a),
     ];
     return Scaffold(
       body: SafeArea(

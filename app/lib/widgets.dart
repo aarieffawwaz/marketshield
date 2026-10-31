@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'core.dart';
+import 'data/repository.dart';
 import 'screens/sector.dart';
 import 'screens/sos.dart';
 import 'theme.dart';
@@ -45,6 +46,8 @@ class AppHeader extends StatelessWidget {
               const SizedBox(width: 6),
               Text(context.t('PEMANTAUAN AKTIF', 'LIVE MONITORING'),
                   style: inter(10.5, w: FontWeight.w700, c: C.primary, ls: .6)),
+              const SizedBox(width: 6),
+              Flexible(child: Freshness(context.repo.volcano, compact: true)),
             ]),
           ]),
         ),
@@ -89,6 +92,59 @@ class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
         opacity: Tween(begin: .35, end: 1.0).animate(_c),
         child: Container(width: 7, height: 7, decoration: const BoxDecoration(color: C.crimson, shape: BoxShape.circle)),
       );
+}
+
+/// Data provenance for one API feed: "Live · 14.05", "Offline · data tersimpan 14.05" or bundled data.
+/// Tapping it retries the network.
+class Freshness extends StatelessWidget {
+  final Live<Object?> feed;
+  final bool compact;
+  const Freshness(this.feed, {super.key, this.compact = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final repo = context.repo; // subscribe to updates
+    final at = feed.at == null ? '' : context.l(clock(feed.at!));
+    final (dot, label) = switch (feed.origin) {
+      Origin.live => (C.l1, compact ? 'Live $at' : 'Live · $at'),
+      Origin.cache => (C.l2, compact ? 'Offline' : context.t('Offline · data tersimpan $at', 'Offline · saved data $at')),
+      Origin.bundled when feed.syncing => (C.navInactive, context.t('Menyinkronkan…', 'Syncing…')),
+      Origin.bundled => (C.navInactive, compact ? 'Offline' : context.t('Offline · data bawaan', 'Offline · built-in data')),
+    };
+    final Widget body = compact
+        // Single text run so it ellipsizes cleanly in tight headers.
+        ? Text.rich(
+            TextSpan(children: [
+              TextSpan(text: '● ', style: TextStyle(color: dot, fontSize: 8)),
+              TextSpan(text: label),
+            ]),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: inter(10.5, w: FontWeight.w600, c: C.textMuted))
+        : Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(color: C.surfaceMid, borderRadius: BorderRadius.circular(999)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (feed.syncing && feed.origin != Origin.bundled)
+                const SizedBox(width: 8, height: 8, child: CircularProgressIndicator(strokeWidth: 1.5, color: C.navInactive))
+              else
+                Container(width: 7, height: 7, decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
+              const SizedBox(width: 5),
+              Flexible(
+                  child: Text(label,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: inter(11, w: FontWeight.w600, c: C.wine))),
+            ]),
+          );
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: feed.syncing ? null : repo.refresh,
+        child: body,
+      ),
+    );
+  }
 }
 
 /// Header for pushed detail screens.

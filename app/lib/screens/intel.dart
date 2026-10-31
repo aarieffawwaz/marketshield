@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../core.dart';
+import '../data/repository.dart';
 import '../theme.dart';
 import '../widgets.dart';
 
@@ -65,7 +66,10 @@ class FactResult {
   final Verdict v;
   final int pct;
   final List<String> flagged;
-  const FactResult(this.v, this.pct, this.flagged);
+  final String? fact; // nearest official fact (API), replaces the canned conclusion
+  final String? satellite; // satellite cross-check note (API)
+  final bool live; // false = offline on-device rules
+  const FactResult(this.v, this.pct, this.flagged, {this.fact, this.satellite, this.live = false});
 }
 
 /// Mock of the IndoBERT multi-task classifier (SIGNAL / HOAX / PANIC) output.
@@ -100,15 +104,29 @@ class _FactCheckTabState extends State<_FactCheckTab> {
   Future<void> _check() async {
     final text = _ctl.text.trim().isEmpty ? _sampleHoax : _ctl.text.trim();
     setState(() => _busy = true);
-    await Future<void>.delayed(const Duration(milliseconds: 1100));
+    // Server classifier first (POST /signals/check); on-device rules when offline.
+    final (remote, _) = await (
+      context.repoRead.checkSignal(text, context.appRead.lang),
+      Future<void>.delayed(const Duration(milliseconds: 600)),
+    ).wait;
     if (!mounted) return;
     setState(() => _busy = false);
-    push(context, FactResultScreen(text: text, result: classify(text)));
+    final result = remote == null
+        ? classify(text)
+        : FactResult(remote.verdict, remote.pct, remote.triggers,
+            fact: remote.fact, satellite: remote.satellite, live: true);
+    push(context, FactResultScreen(text: text, result: result));
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = feed.where((f) => _filter == 0 || (_filter == 1 ? f.v == Verdict.hoax : f.v == Verdict.official)).toList();
+    final intel = context.repo.intel;
+    final all = intel.value;
+    final items = all
+        .where((f) =>
+            _filter == 0 ||
+            (_filter == 1 ? (f.v == Verdict.hoax || f.v == Verdict.panic) : f.v == Verdict.official))
+        .toList();
     return ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
       MsCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -185,7 +203,7 @@ class _FactCheckTabState extends State<_FactCheckTab> {
         height: 38,
         child: ListView(scrollDirection: Axis.horizontal, children: [
           for (final (i, label, dot) in [
-            (0, '${context.t('Semua', 'All')}  18', null),
+            (0, '${context.t('Semua', 'All')}  ${all.length}', null),
             (1, context.t('Hoaks Terbantah', 'Debunked'), C.crimson),
             (2, context.t('Resmi PVMBG', 'Official PVMBG'), C.l1),
           ])
@@ -207,6 +225,11 @@ class _FactCheckTabState extends State<_FactCheckTab> {
         ]),
       ),
       const SizedBox(height: 10),
+      Row(children: [
+        Expanded(child: Text(context.t('Umpan verifikasi', 'Verification feed'), style: inter(11.5, c: C.textMuted))),
+        Freshness(intel),
+      ]),
+      const SizedBox(height: 10),
       for (final f in items) Padding(padding: const EdgeInsets.only(bottom: 12), child: _FeedCard(f)),
     ]);
   }
@@ -218,22 +241,22 @@ class _FeedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hoax = f.v == Verdict.hoax;
-    final c = hoax ? C.crimson : C.l1;
+    final (c, label, icon) = switch (f.v) {
+      Verdict.hoax => (C.crimson, context.t('HOAKS TERBANTAH', 'DEBUNKED'), Icons.cancel),
+      Verdict.panic => (C.l3, context.t('PEMICU PANIK', 'PANIC BAIT'), Icons.campaign_outlined),
+      Verdict.verified => (C.l1, context.t('TERVERIFIKASI', 'VERIFIED'), Icons.check_circle),
+      Verdict.check => (C.l2, context.t('PERLU VERIFIKASI', 'UNVERIFIED'), Icons.help_outline),
+      Verdict.official => (C.l1, context.t('RESMI', 'OFFICIAL'), Icons.verified),
+    };
+    final tappable = hoax || f.v == Verdict.panic;
     return MsCard(
       stripe: c,
-      onTap: hoax ? () => push(context, FactResultScreen(text: _sampleHoax, result: classify(_sampleHoax))) : null,
+      onTap: tappable ? () => _open(context) : null,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Pill(
-              hoax
-                  ? '${context.t('HOAKS TERBANTAH', 'DEBUNKED')} • ${f.pct}%'
-                  : '${context.t('RESMI', 'OFFICIAL')} • ${f.pct}%',
-              icon: hoax ? Icons.cancel : Icons.verified,
-              bg: c.withValues(alpha: .12),
-              fg: c,
-              size: 10.5),
+          Pill('$label • ${f.pct}%', icon: icon, bg: c.withValues(alpha: .12), fg: c, size: 10.5),
           const Spacer(),
-          Text(context.l(f.time), style: inter(11, c: C.textMuted)),
+          Text(context.l(f.when), style: inter(11, c: C.textMuted)),
         ]),
         const SizedBox(height: 10),
         Text(context.l(f.title), style: outfit(17.5, w: FontWeight.w600, h: 1.3)),
@@ -263,6 +286,15 @@ class _FeedCard extends StatelessWidget {
       ]),
     );
   }
+
+  void _open(BuildContext context) {
+    final text = context.l(f.title).replaceAll(RegExp(r'^["“]+|["”]+$'), '');
+    push(
+        context,
+        FactResultScreen(
+            text: text,
+            result: FactResult(f.v, f.pct, classify(text).flagged, fact: context.l(f.body), live: f.at != null)));
+  }
 }
 
 /// S12 — Fact-check verdict with satellite cross-check.
@@ -274,7 +306,7 @@ class FactResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = result;
-    final (color, label, conclusion) = switch (r.v) {
+    final (color, label, canned) = switch (r.v) {
       Verdict.hoax => (
           C.crimson,
           context.t('KEMUNGKINAN BESAR HOAKS', 'MOST LIKELY A HOAX'),
@@ -307,6 +339,7 @@ class FactResultScreen extends StatelessWidget {
               'No official source or satellite evidence yet. Do not forward it for now.')
         ),
     };
+    final conclusion = r.fact ?? canned;
     return Scaffold(
       body: SafeArea(
         child: Column(children: [
@@ -358,7 +391,11 @@ class FactResultScreen extends StatelessWidget {
                     ),
                   ]),
                   const SizedBox(height: 8),
-                  Text(context.t('Tingkat kepastian IndoBERT Multi-Task', 'IndoBERT multi-task confidence'), style: inter(12, c: C.textMuted)),
+                  Text(
+                      r.live
+                          ? context.t('Tingkat kepastian IndoBERT Multi-Task', 'IndoBERT multi-task confidence')
+                          : context.t('Tingkat kepastian • analisis offline di perangkat', 'Confidence • offline on-device analysis'),
+                      style: inter(12, c: C.textMuted)),
                   const SizedBox(height: 6),
                   Bar(r.pct / 100, color: color),
                   const SizedBox(height: 14),
@@ -393,6 +430,14 @@ class FactResultScreen extends StatelessWidget {
                       ),
                     ]),
                   ),
+                  if (r.satellite != null) ...[
+                    const SizedBox(height: 12),
+                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      const Icon(Icons.radar, size: 16, color: C.sat),
+                      const SizedBox(width: 6),
+                      Expanded(child: Text(r.satellite!, style: inter(13, c: C.text, h: 1.45))),
+                    ]),
+                  ],
                   const SizedBox(height: 12),
                   Row(children: [
                     Expanded(child: Stat(context.t('Perubahan backscatter', 'Backscatter change'), '−0,2 dB', sub: context.t('di bawah ambang −3 dB', 'below −3 dB threshold'))),
@@ -458,18 +503,22 @@ class _HetTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final n95 = hetItems.first;
+    final prices = context.repo.prices;
+    final board = prices.value;
+    final n95 = board.featured;
+    final d = n95.diffPct;
+    final (pillText, pillColor, pillIcon) = d <= 0
+        ? (context.t('HARGA STABIL (DI BAWAH HET)', 'STABLE (BELOW CAP)'), C.l1, Icons.check_circle_outline)
+        : d <= 10
+            ? (context.t('HARGA NAIK (SEDIKIT DI ATAS HET)', 'RISING (JUST ABOVE CAP)'), C.l2, Icons.trending_up)
+            : (context.t('DI ATAS HET • LAPORKAN', 'ABOVE CAP • REPORT IT'), C.crimson, Icons.warning_amber_rounded);
     return ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
       MsCard(
         color: C.surfaceLow,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Pill(context.t('SISTEM ANTI-PENIMBUNAN & SPEKULASI', 'ANTI-HOARDING & SPECULATION'), icon: Icons.shield_outlined, bg: C.pink, fg: C.crimson, size: 10.5),
           const SizedBox(height: 8),
-          Row(children: [
-            const Icon(Icons.circle, size: 8, color: C.crimson),
-            const SizedBox(width: 6),
-            Text(context.t('Update: 10 menit lalu', 'Updated: 10 min ago'), style: inter(11.5, c: C.textMuted)),
-          ]),
+          Freshness(prices),
           const SizedBox(height: 10),
           Text(context.t('PANTAU HARGA KEBUTUHAN DARURAT', 'TRACK EMERGENCY SUPPLY PRICES'), style: outfit(22, w: FontWeight.w700, c: C.crimson, h: 1.15)),
           const SizedBox(height: 8),
@@ -487,7 +536,7 @@ class _HetTab extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(color: C.pink, borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.masks_outlined, color: C.crimson),
+              child: Icon(n95.icon, color: C.crimson),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -498,14 +547,17 @@ class _HetTab extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 10),
-          Pill(context.t('HARGA STABIL (DI BAWAH HET)', 'STABLE (BELOW CAP)'), icon: Icons.check_circle_outline, bg: C.l1.withValues(alpha: .12), fg: C.l1, size: 11),
+          Pill(pillText, icon: pillIcon, bg: pillColor.withValues(alpha: .12), fg: pillColor, size: 11),
           const SizedBox(height: 12),
           Row(children: [
             Expanded(child: Stat(context.t('HET Pemerintah', 'Govt. price cap'), rp(n95.het), sub: context.t('Batas tarif legal', 'Legal ceiling'))),
             const SizedBox(width: 10),
             Expanded(
-                child: Stat(context.t('Rata-rata Candipuro', 'Candipuro average'), rp(n95.avg),
-                    sub: '${context.t('Hemat', 'Save')} ${rp(n95.het - n95.avg)} (${n95.diffPct.toStringAsFixed(0)}%)', valueColor: C.crimson)),
+                child: Stat(context.t('Rata-rata ${board.region}', '${board.region} average'), rp(n95.avg),
+                    sub: d <= 0
+                        ? '${context.t('Hemat', 'Save')} ${rp(n95.het - n95.avg)} (${d.toStringAsFixed(0)}%)'
+                        : '+${rp(n95.avg - n95.het)} (+${d.toStringAsFixed(0)}%) ${context.t('di atas HET', 'above cap')}',
+                    valueColor: C.crimson)),
           ]),
           const SizedBox(height: 10),
           Container(
@@ -530,7 +582,7 @@ class _HetTab extends StatelessWidget {
           icon: Icons.report_outlined, color: C.surfaceMid, fg: C.crimson, onTap: () => _report(context)),
       const SizedBox(height: 18),
       SectionTitle(context.t('Kebutuhan Darurat Lainnya', 'Other Emergency Supplies'), icon: Icons.inventory_2_outlined),
-      for (final h in hetItems.skip(1))
+      for (final h in board.others)
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: MsCard(

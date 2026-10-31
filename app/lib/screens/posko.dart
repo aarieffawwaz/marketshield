@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../core.dart';
+import '../data/repository.dart';
 import '../geo_map.dart';
 import '../theme.dart';
 import '../widgets.dart';
@@ -21,10 +22,12 @@ class _PoskoScreenState extends State<PoskoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final list = poskoList.where((p) {
-      final isShelter = p.type.id.startsWith('Shelter');
-      if (_seg == 0 && !isShelter) return false;
-      if (_seg == 1 && isShelter) return false;
+    final feed = context.repo.posko;
+    final all = feed.value;
+    final active = all.where((p) => p.status == 'open').length;
+    final list = all.where((p) {
+      if (_seg == 0 && !p.isShelter) return false;
+      if (_seg == 1 && p.isShelter) return false;
       if (_filters.contains(0) && (p.km ?? double.infinity) > 3) return false;
       if (_filters.contains(1) && !p.open24) return false;
       if (_q.isNotEmpty && !p.name.toLowerCase().contains(_q.toLowerCase())) return false;
@@ -70,7 +73,7 @@ class _PoskoScreenState extends State<PoskoScreen> {
                     Positioned(
                         left: 10,
                         top: 10,
-                        child: Pill('3 ${context.t('Posko Terverifikasi Aktif', 'Verified Active Posts')}',
+                        child: Pill('$active ${context.t('Posko Terverifikasi Aktif', 'Verified Active Posts')}',
                             icon: Icons.circle, bg: Colors.white, fg: C.wine, size: 10.5)),
                     Positioned(
                       left: 0,
@@ -136,7 +139,14 @@ class _PoskoScreenState extends State<PoskoScreen> {
                     ),
                 ]),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
+              Row(children: [
+                Expanded(
+                    child: Text('${list.length} ${context.t('posko ditampilkan', 'posts shown')}',
+                        style: inter(11.5, c: C.textMuted))),
+                Freshness(feed),
+              ]),
+              const SizedBox(height: 10),
               if (list.isEmpty)
                 Padding(
                   padding: const EdgeInsets.all(24),
@@ -182,18 +192,26 @@ class _PoskoCard extends StatelessWidget {
     return MsCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          if (p.open24) ...[
+          if (p.status == 'full') ...[
+            Pill(context.t('PENUH', 'FULL'), bg: C.l3.withValues(alpha: .12), fg: C.l3, size: 10),
+            const SizedBox(width: 8),
+          ] else if (p.status == 'closed') ...[
+            Pill(context.t('TUTUP', 'CLOSED'), bg: C.pink, fg: C.crimson, size: 10),
+            const SizedBox(width: 8),
+          ] else if (p.open24) ...[
             Pill(context.t('BUKA 24 JAM', 'OPEN 24H'), bg: C.l1.withValues(alpha: .12), fg: C.l1, size: 10),
             const SizedBox(width: 8),
           ],
-          const Icon(Icons.near_me_outlined, size: 14, color: C.textMuted),
-          Text(' ${p.km} km ${context.t('dari Anda', 'away')}', style: inter(11.5, c: C.textMuted)),
+          if (p.km != null) ...[
+            const Icon(Icons.near_me_outlined, size: 14, color: C.textMuted),
+            Text(' ${p.km} km ${context.t('dari Anda', 'away')}', style: inter(11.5, c: C.textMuted)),
+          ],
           const Spacer(),
           Container(
             width: 38,
             height: 38,
             decoration: BoxDecoration(color: C.surfaceMid, borderRadius: BorderRadius.circular(10)),
-            child: Icon(p.type.id.startsWith('Shelter') ? Icons.night_shelter_outlined : Icons.warehouse_outlined, color: C.wine, size: 20),
+            child: Icon(p.isShelter ? Icons.night_shelter_outlined : Icons.warehouse_outlined, color: C.wine, size: 20),
           ),
         ]),
         const SizedBox(height: 4),
@@ -207,23 +225,31 @@ class _PoskoCard extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(child: Bar(p.capacityPct / 100, color: p.capacityPct >= 80 ? C.l3 : C.l1, height: 6)),
         ]),
-        const SizedBox(height: 12),
-        Text('${context.t('Tersedia', 'Available')}:', style: inter(12, w: FontWeight.w600, c: C.textMuted)),
-        const SizedBox(height: 6),
-        Wrap(spacing: 6, runSpacing: 6, children: [
-          for (final a in p.available) Pill(context.l(a), icon: Icons.check, bg: C.l1.withValues(alpha: .1), fg: C.l1, size: 10.5),
-        ]),
-        const SizedBox(height: 10),
-        Text('${context.t('Mendesak', 'Urgent')}:', style: inter(12, w: FontWeight.w600, c: C.crimson)),
-        const SizedBox(height: 6),
-        Wrap(spacing: 6, runSpacing: 6, children: [
-          for (final n in p.needed) Pill(context.l(n), icon: Icons.priority_high, bg: C.pink, fg: C.crimson, size: 10.5),
-        ]),
+        if (p.available.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text('${context.t('Tersedia', 'Available')}:', style: inter(12, w: FontWeight.w600, c: C.textMuted)),
+          const SizedBox(height: 6),
+          Wrap(spacing: 6, runSpacing: 6, children: [
+            for (final a in p.available) Pill(context.l(a), icon: Icons.check, bg: C.l1.withValues(alpha: .1), fg: C.l1, size: 10.5),
+          ]),
+        ],
+        if (p.needed.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text('${context.t('Mendesak', 'Urgent')}:', style: inter(12, w: FontWeight.w600, c: C.crimson)),
+          const SizedBox(height: 6),
+          Wrap(spacing: 6, runSpacing: 6, children: [
+            for (final n in p.needed) Pill(context.l(n), icon: Icons.priority_high, bg: C.pink, fg: C.crimson, size: 10.5),
+          ]),
+        ],
         const SizedBox(height: 10),
         Row(children: [
           const Icon(Icons.history, size: 14, color: C.textMuted),
           const SizedBox(width: 4),
-          Text(context.t('Diperbarui relawan 30 mnt lalu', 'Updated by volunteers 30 min ago'), style: inter(11.5, c: C.textMuted)),
+          Text(
+              p.updatedAt == null
+                  ? context.t('Diperbarui relawan 30 mnt lalu', 'Updated by volunteers 30 min ago')
+                  : '${context.t('Diperbarui', 'Updated')} ${context.l(ago(p.updatedAt!))}',
+              style: inter(11.5, c: C.textMuted)),
         ]),
         const SizedBox(height: 12),
         Row(children: [
@@ -253,14 +279,16 @@ class _AidPriorityScreenState extends State<AidPriorityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final feed = context.repo.priority;
+    final villages = feed.value;
     final total = villages.fold(0, (a, v) => a + v.pop);
     final crit = villages.where((v) => v.krb == 'III').length;
-    final gap = villages.fold(0, (a, v) => a + v.unmetPct) ~/ villages.length;
+    final gap = villages.isEmpty ? 0 : villages.fold(0, (a, v) => a + v.unmetPct) ~/ villages.length;
     return Scaffold(
       body: SafeArea(
         child: Column(children: [
           SubHeader(context.t('Logistik Bencana', 'Disaster Logistics'),
-              trailing: Pill(context.t('Sinkron 12m lalu', 'Synced 12m ago'), icon: Icons.sync, bg: C.surfaceMid, size: 10)),
+              trailing: Freshness(feed, compact: true)),
           Expanded(
             child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
               const Wrap(spacing: 6, runSpacing: 6, children: [
@@ -357,13 +385,18 @@ class _AidPriorityScreenState extends State<AidPriorityScreen> {
           Row(children: [
             Pill('#${i + 1} ${context.t('PRIORITAS', 'PRIORITY')}', bg: c, fg: Colors.white, size: 10),
             const SizedBox(width: 8),
-            Pill('KRB ${v.krb}', bg: C.surfaceMid, size: 10),
+            if (v.krb.isNotEmpty) Pill('KRB ${v.krb}', bg: C.surfaceMid, size: 10),
             const Spacer(),
             Text('API ${v.api.toStringAsFixed(2)}', style: outfit(16, w: FontWeight.w700, c: c)),
           ]),
           const SizedBox(height: 8),
           Text('Desa ${v.name}', style: outfit(18, w: FontWeight.w600)),
           Text('Kec. ${v.kec} • ${_fmt(v.pop)} ${context.t('jiwa terpapar', 'people exposed')}', style: inter(12.5, c: C.textMuted)),
+          if (v.needs.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text('${context.t('Butuh', 'Needs')}: ${v.needs.map(context.l).join(', ')}',
+                style: inter(12, w: FontWeight.w500, c: C.wine)),
+          ],
           const SizedBox(height: 10),
           Row(children: [
             Text(context.t('Kebutuhan belum terpenuhi', 'Unmet need'), style: inter(12, c: C.textMuted)),
