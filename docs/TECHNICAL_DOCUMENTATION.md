@@ -292,4 +292,4 @@ Results with dates: [EXECUTION_EVIDENCE.md](EXECUTION_EVIDENCE.md).
 
 ## 13. Limitations and roadmap
 
-See the README sections [Known limitations](../README.md#known-limitations) and [Next steps](../README.md#next-steps).
+See the README sections [Known limitations](../README.en.md#known-limitations) and [Roadmap](../README.en.md#roadmap).

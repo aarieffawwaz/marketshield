@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/readme/banner.png" alt="MarketShield: satellite-based eruption early warning for residents, markets and aid posts" width="100%" />
+  <img src="docs/readme/banner.png" alt="MarketShield: peringatan dini erupsi berbasis satelit untuk warga, pasar, dan posko bantuan" width="100%" />
 </p>
 
 <div align="center">
@@ -8,7 +8,9 @@
 
 **Gunung dibaca dari orbit. Warga bertindak sebelum panik.**
 
-Satellite-based eruption early warning for residents, markets and aid posts around Indonesia's active volcanoes.
+Peringatan dini erupsi berbasis satelit untuk warga, pasar, dan posko bantuan di sekitar gunung api aktif Indonesia.
+
+**Bahasa Indonesia** · [English](README.en.md)
 
 [![Deploy](https://github.com/aarieffawwaz/marketshield/actions/workflows/deploy.yml/badge.svg)](https://github.com/aarieffawwaz/marketshield/actions/workflows/deploy.yml)
 [![Release APK](https://github.com/aarieffawwaz/marketshield/actions/workflows/release-apk.yml/badge.svg)](https://github.com/aarieffawwaz/marketshield/actions/workflows/release-apk.yml)
@@ -29,181 +31,181 @@ Satellite-based eruption early warning for residents, markets and aid posts arou
 
 </div>
 
-MarketShield is a disaster-readiness system for communities around Indonesia's active volcanoes. It reads public satellite data from Google Earth Engine, estimates the chance of thermal activity at a volcano in the next 7 days with an XGBoost model, and turns the official PVMBG alert level into one concrete next step for each resident. Residents use a free Flutter app (Android and web). BPBD officers, aid-post coordinators and donors use a Next.js web console. A public REST API exposes the same data. All three read one Cloud Firestore database in Jakarta, so a change made by an aid-post coordinator shows up on every screen within about a second.
+MarketShield adalah sistem kesiapsiagaan bencana untuk masyarakat di sekitar gunung api aktif Indonesia. Sistem ini membaca data satelit publik dari Google Earth Engine, memperkirakan peluang aktivitas termal di sebuah gunung api dalam 7 hari ke depan dengan model XGBoost, lalu menerjemahkan level status resmi PVMBG menjadi satu langkah konkret untuk setiap warga. Warga memakai aplikasi Flutter gratis (Android dan web). Petugas BPBD, koordinator posko, dan donatur memakai konsol web Next.js. REST API publik menyediakan data yang sama. Ketiganya membaca satu database Cloud Firestore di Jakarta, sehingga perubahan yang dibuat koordinator posko muncul di semua layar dalam waktu sekitar satu detik.
 
-> **Prototype.** Volcano levels follow PVMBG; MarketShield forecasts sit next to the official level and never replace it. Villages, aid posts, prices and alerts in the database are seeded demo records shaped like the real pipeline outputs. See [Known limitations](#known-limitations).
+> **Prototipe.** Level gunung api mengikuti PVMBG. Prakiraan MarketShield ditampilkan di samping level resmi dan tidak pernah menggantikannya. Data desa, posko, harga, dan peringatan di database adalah data demo yang bentuknya mengikuti output pipeline yang sebenarnya. Lihat [Keterbatasan saat ini](#keterbatasan-saat-ini).
 
-## Live links
+## Tautan
 
 | | |
 |:-|:-|
-| **Live site** | <https://marketshield-inception.vercel.app> |
-| **Web console (demo)** | <https://marketshield-inception.vercel.app/app/login>: choose *Data contoh* (sample data) or *Data live*, then pick a role. No account needed |
-| **Resident app in the browser** | <https://marketshield-inception.vercel.app/mobile> (the same Flutter code as the APK) |
-| **Android APK** | [GitHub Releases, latest](https://github.com/aarieffawwaz/marketshield/releases/latest) · [/download](https://marketshield-inception.vercel.app/download) |
-| **3D map and eruption simulation** | <https://marketshield-inception.vercel.app/embed/peta?sim=1> |
-| **Public API** | <https://marketshield-inception.vercel.app/api/v1/volcanoes> · [API reference](docs/API.md) |
-| **System status** | <https://marketshield-inception.vercel.app/status>: live checks from your browser every 30 seconds |
-| **Demo video** | <https://youtu.be/oceCSCnBmjg> |
-| **Pitch deck** | [Google Drive folder](https://drive.google.com/drive/folders/1ypw_RPtIklhbmFj5fhVZ3T04-rk1DNi-?usp=sharing) |
-| **Technical documentation** | [docs/TECHNICAL_DOCUMENTATION.md](docs/TECHNICAL_DOCUMENTATION.md) |
+| **Situs live** | <https://marketshield-inception.vercel.app> |
+| **Konsol web (demo)** | <https://marketshield-inception.vercel.app/app/login>: pilih *Data contoh* atau *Data live*, lalu pilih peran. Tidak perlu akun |
+| **Aplikasi warga di browser** | <https://marketshield-inception.vercel.app/mobile> (kode Flutter yang sama dengan APK) |
+| **APK Android** | [GitHub Releases, versi terbaru](https://github.com/aarieffawwaz/marketshield/releases/latest) · [/download](https://marketshield-inception.vercel.app/download) |
+| **Peta 3D dan simulasi erupsi** | <https://marketshield-inception.vercel.app/embed/peta?sim=1> |
+| **API publik** | <https://marketshield-inception.vercel.app/api/v1/volcanoes> · [Referensi API](docs/API.md) |
+| **Status sistem** | <https://marketshield-inception.vercel.app/status>: pengecekan live dari browser Anda setiap 30 detik |
+| **Video demo** | <https://youtu.be/oceCSCnBmjg> |
+| **Pitch deck** | [Folder Google Drive](https://drive.google.com/drive/folders/1ypw_RPtIklhbmFj5fhVZ3T04-rk1DNi-?usp=sharing) |
+| **Dokumentasi teknis** | [docs/TECHNICAL_DOCUMENTATION.md](docs/TECHNICAL_DOCUMENTATION.md) |
 
-## Preview
+## Pratinjau
 
 <div align="center">
-<img src="docs/readme/console-overview.png" alt="Web console overview in live mode" width="860" />
-<br/><sub>Console overview in <b>Live</b> mode. The escalation odds come from the XGBoost risk engine through Firestore; the alerts list is the live <code>alerts</code> collection.</sub>
+<img src="docs/readme/console-overview.png" alt="Ringkasan konsol web dalam mode live" width="860" />
+<br/><sub>Ringkasan konsol dalam mode <b>Live</b>. Peluang eskalasi berasal dari mesin risiko XGBoost lewat Firestore; daftar peringatan diambil langsung dari koleksi <code>alerts</code>.</sub>
 <br/><br/>
-<img src="docs/readme/eruption-sim.png" alt="3D eruption simulation on Semeru" width="860" />
-<br/><sub>Eruption simulation on Semeru terrain: ash column, distance rings, villages and aid posts in the flow path, and an event log comparing the timeline with and without MarketShield.</sub>
+<img src="docs/readme/eruption-sim.png" alt="Simulasi erupsi 3D di Semeru" width="860" />
+<br/><sub>Simulasi erupsi di terrain Semeru: kolom abu, cincin jarak, desa dan posko di jalur aliran, serta log kejadian yang membandingkan timeline dengan dan tanpa MarketShield.</sub>
 <br/><br/>
-<img src="docs/readme/mobile-host.png" alt="The Flutter resident app running in the browser" width="860" />
-<br/><sub>The resident app is the same Flutter code on Android and on the web.</sub>
+<img src="docs/readme/mobile-host.png" alt="Aplikasi warga Flutter yang berjalan di browser" width="860" />
+<br/><sub>Aplikasi warga memakai kode Flutter yang sama di Android dan di web.</sub>
 </div>
 
 <p align="center">
-  <img src="docs/evidence/site-status.webp" alt="Status page with live checks of the API and map providers" width="49%" />
-  <img src="docs/evidence/api-risk.webp" alt="Risk API serving the model forecast from Firestore" width="49%" />
+  <img src="docs/evidence/site-status.webp" alt="Halaman status dengan pengecekan live untuk API dan penyedia peta" width="49%" />
+  <img src="docs/evidence/api-risk.webp" alt="API risiko yang menyajikan prakiraan model dari Firestore" width="49%" />
 </p>
-<p align="center"><sub>Left: <code>/status</code> checks the API and map providers from the visitor's browser. Right: <code>/api/v1/volcanoes/semeru/risk</code> returns the official level and the model forecast.</sub></p>
+<p align="center"><sub>Kiri: <code>/status</code> mengecek API dan penyedia peta dari browser pengunjung. Kanan: <code>/api/v1/volcanoes/semeru/risk</code> mengembalikan level resmi dan prakiraan model.</sub></p>
 
-## Contents
+## Daftar isi
 
-[Problem](#problem) · [Solution](#solution-four-pillars) · [Features by role](#features-by-role) · [Product tour](#product-tour) · [Architecture](#architecture) · [Technology stack](#technology-stack) · [Models](#models) · [Data sources and licences](#data-sources-and-licences) · [API](#api-reference) · [Repository structure](#repository-structure) · [Getting started](#getting-started) · [Demo mode and live mode](#demo-mode-and-live-mode) · [CI/CD](#cicd) · [Testing](#testing) · [Security](#security) · [Known limitations](#known-limitations) · [Roadmap](#roadmap) · [Team](#team) · [Credits](#credits-and-third-party-licences) · [Documentation](#documentation) · [License](#license)
+[Masalah](#masalah) · [Solusi](#solusi-empat-pilar) · [Fitur per peran](#fitur-per-peran) · [Tur produk](#tur-produk) · [Arsitektur](#arsitektur) · [Stack teknologi](#stack-teknologi) · [Model](#model) · [Sumber data dan lisensi](#sumber-data-dan-lisensi) · [API](#referensi-api) · [Struktur repositori](#struktur-repositori) · [Cara menjalankan](#cara-menjalankan) · [Mode demo dan mode live](#mode-demo-dan-mode-live) · [CI/CD](#cicd) · [Pengujian](#pengujian) · [Keamanan](#keamanan) · [Keterbatasan](#keterbatasan-saat-ini) · [Roadmap](#roadmap) · [Tim](#tim) · [Kredit](#kredit-dan-lisensi-pihak-ketiga) · [Dokumentasi](#dokumentasi) · [Lisensi](#lisensi)
 
 ---
 
-## Problem
+## Masalah
 
-Semeru's eruption on 4 December 2021 sent pyroclastic flows down Besuk Kobokan within an afternoon. PVMBG's alert level is precise, but it reaches residents as a status with no instruction attached, and they still have to guess what to do. Around every escalation three things go wrong at the same time:
+Erupsi Semeru pada 4 Desember 2021 mengirim awan panas guguran ke Besuk Kobokan hanya dalam satu sore. Level status PVMBG sudah tepat, tetapi informasi itu sampai ke warga sebagai status tanpa instruksi, sehingga warga masih harus menebak apa yang perlu dilakukan. Setiap kali level naik, ada tiga masalah yang muncul bersamaan:
 
-1. **Rumours travel faster than corrections.** Chain messages on WhatsApp ("lahar has reached Pronojiwo, leave now!") spread panic before anyone can check them.
-2. **Prices jump and shelves empty.** Residents buy masks and clean water all at once; pharmacies sell out in a day and get accused of price gouging.
-3. **Aid goes to the easiest villages.** Villages closest to the road get supplies first, while the most exposed villages wait.
+1. **Rumor menyebar lebih cepat daripada klarifikasi.** Pesan berantai di WhatsApp ("lahar sudah sampai Pronojiwo, segera pergi!") memicu panik sebelum ada yang sempat mengeceknya.
+2. **Harga melonjak dan stok habis.** Warga membeli masker dan air bersih secara bersamaan; apotek kehabisan stok dalam sehari lalu dituduh menaikkan harga.
+3. **Bantuan menumpuk di desa yang paling mudah dijangkau.** Desa yang paling dekat dengan jalan menerima bantuan lebih dulu, sementara desa yang paling terpapar harus menunggu.
 
-The people involved are residents of the hazard zones (KRB) around the volcano, BPBD operations officers, aid-post and village coordinators, and local pharmacies and distributors. They work in Bahasa Indonesia, often on low-end phones with weak signal.
+Pihak yang terlibat adalah warga kawasan rawan bencana (KRB) di sekitar gunung, petugas operasional BPBD, koordinator posko dan desa, serta apotek dan distributor lokal. Mereka bekerja dalam Bahasa Indonesia, sering dengan ponsel kelas bawah dan sinyal yang lemah.
 
-## Solution: four pillars
-
-<p align="center">
-  <img src="docs/readme/how-it-works.png" alt="Sense, filter, act, fair" width="100%" />
-</p>
-
-| Pillar | What it does | Answers |
-|:-|:-|:-|
-| **1. GeoAI predictive engine** (early action window) | Earth Engine features (NASA FIRMS, Sentinel-5P SO₂, Sentinel-1, GPM IMERG) go into an XGBoost model that gives a 7-day activity probability and its top drivers (SHAP), shown next to the official level | Time to prepare before the level rises |
-| **2. Pre-emptive procurement nudge** | At Level II (Waspada) the app asks residents to build their go-kit in stages, by cohort, at price-cap (HET) prices, so demand is spread over days | Panic buying |
-| **3. Anti-hoax feed** | Paste a chain message: trigger words, a satellite cross-check and the nearest official fact come back in seconds. IndoBERT is trained (98.4 % test accuracy); the API serves a rule-based classifier for now | Rumours and panic |
-| **4. Emergency price tracker** | Market prices compared with the government price cap (HET); deviation above 30 % is flagged | Price speculation |
-
-These reach people through three surfaces: the adaptive resident app, the operator console with the Aid Priority Index, and the public API (8 endpoints under `/api/v1`).
+## Solusi: empat pilar
 
 <p align="center">
-  <img src="docs/readme/levels.png" alt="The resident home screen at PVMBG levels I to IV" width="100%" />
+  <img src="docs/readme/how-it-works.png" alt="Membaca, menyaring, bertindak, adil" width="100%" />
 </p>
 
-The resident home screen follows the PVMBG level and always puts one main action at the top: prepare a go-kit at Level I, shop fairly at Level II, know your route at Level III, evacuate at Level IV.
-
-**Where models are used, and where they are not.** Models appear only where a rule cannot do the job: combining many weak satellite signals into one probability, and reading informal Indonesian chain messages. Safety decisions stay official or deterministic.
-
-| Responsibility | Model | Official source or deterministic code |
+| Pilar | Fungsinya | Masalah yang dijawab |
 |:-|:-|:-|
-| Volcano alert level | – | PVMBG status, stored as `volcanoes/{id}.level` |
-| 7-day activity probability | XGBoost risk engine on Earth Engine features ([report](ml/README.md#2-satellite-risk-engine)) | Shown next to the official level, never replacing it |
-| Message check | IndoBERT fine-tuned on 12k Indonesian texts ([report](ml/README.md#1-indobert-hoax-filter)) | Trigger words, satellite cross-check, nearest official fact; the rule-based classifier serves the API and app today |
-| Aid priority | – | exposure × hazard × vulnerability ÷ (aid received + 1) |
-| Price watch | – | (market − HET) ÷ HET, flagged above 30 % |
-| Broadcasts | – | Signed-in BPBD operators only, staggered by cohort |
+| **1. Mesin prediksi GeoAI** (jendela aksi dini) | Fitur Earth Engine (NASA FIRMS, Sentinel-5P SO₂, Sentinel-1, GPM IMERG) masuk ke model XGBoost yang menghasilkan probabilitas aktivitas 7 hari beserta faktor pendorong utamanya (SHAP), ditampilkan di samping level resmi | Waktu untuk bersiap sebelum level naik |
+| **2. Dorongan belanja lebih awal** | Pada Level II (Waspada) aplikasi mengajak warga menyiapkan tas siaga secara bertahap, per kelompok (cohort), dengan harga sesuai HET, sehingga permintaan tersebar dalam beberapa hari | Panic buying |
+| **3. Feed anti-hoaks** | Tempel pesan berantai, lalu dalam hitungan detik muncul kata pemicu, cek silang satelit, dan fakta resmi terdekat. IndoBERT sudah dilatih (akurasi uji 98,4%); untuk saat ini API memakai classifier berbasis aturan | Rumor dan panik |
+| **4. Pemantau harga darurat** | Harga pasar dibandingkan dengan harga eceran tertinggi (HET) pemerintah; selisih di atas 30% ditandai | Spekulasi harga |
 
-**Design choices for the people using it.** Plain Bahasa Indonesia first, with English everywhere. Works on a low-end phone and offline, from cached or bundled data. Residents need no account. Safety features are free. No field sensor has to be installed or maintained on an active volcano: every input comes from public satellite catalogues and official sources.
+Semua ini sampai ke pengguna lewat tiga tampilan: aplikasi warga yang adaptif, konsol operator dengan Aid Priority Index, dan API publik (8 endpoint di bawah `/api/v1`).
 
-## Features by role
+<p align="center">
+  <img src="docs/readme/levels.png" alt="Beranda aplikasi warga pada level PVMBG I sampai IV" width="100%" />
+</p>
 
-### Residents (warga): Flutter app, Android and web
+Beranda aplikasi warga mengikuti level PVMBG dan selalu menaruh satu aksi utama di bagian atas: siapkan tas siaga di Level I, belanja secukupnya di Level II, kenali jalur evakuasi di Level III, dan evakuasi di Level IV.
 
-- **Adaptive home** (*Beranda*): hero, main button and highlighted features change with PVMBG levels I–IV.
-- **Hazard map** (*Peta*): KRB rings, ash and lahar areas, evacuation route and shelters (flutter_map); a **3D** button opens the eruption simulation in an in-app WebView.
-- **Intel**: paste a chain message to get a label, trigger words, satellite cross-check and nearest official fact; verified intel feed.
-- **Posko**: nearest aid posts and shelters with *Buka* / *Penuh* / *Tutup* status, capacity and needs, updated by coordinators.
-- **Kit Siaga** with HET price anchors, and a price report form (on screen only in this prototype, nothing is sent yet).
-- **Sector protocols**, for example farmers and livestock keepers.
-- **SOS**: hold for 3 seconds.
-- **Profil**: Indonesian/English, demo or live data, level simulation in demo mode, data sources and photo credits.
-- **Offline**: last good data is cached per endpoint; bundled data is used when there is nothing cached. A chip shows *Live*, *Offline · data tersimpan* or *Offline · data bawaan*.
-- No account needed.
+**Di mana model dipakai, dan di mana tidak.** Model hanya dipakai untuk pekerjaan yang tidak bisa diselesaikan dengan aturan: menggabungkan banyak sinyal satelit yang lemah menjadi satu probabilitas, dan membaca pesan berantai berbahasa Indonesia informal. Keputusan keselamatan tetap berasal dari sumber resmi atau logika deterministik.
 
-### Aid-post coordinators (posko): web console
+| Tanggung jawab | Model | Sumber resmi atau kode deterministik |
+|:-|:-|:-|
+| Level status gunung api | – | Status PVMBG, disimpan sebagai `volcanoes/{id}.level` |
+| Probabilitas aktivitas 7 hari | Mesin risiko XGBoost dengan fitur Earth Engine ([laporan](ml/README.md#2-satellite-risk-engine)) | Ditampilkan di samping level resmi dan tidak menggantikannya |
+| Cek pesan | IndoBERT yang di-fine-tune dengan 12 ribu teks berbahasa Indonesia ([laporan](ml/README.md#1-indobert-hoax-filter)) | Kata pemicu, cek silang satelit, fakta resmi terdekat; saat ini API dan aplikasi memakai classifier berbasis aturan |
+| Prioritas bantuan | – | keterpaparan × bahaya × kerentanan ÷ (bantuan yang sudah diterima + 1) |
+| Pantauan harga | – | (harga pasar − HET) ÷ HET, ditandai jika di atas 30% |
+| Siaran | – | Hanya operator BPBD yang sudah login, dikirim bertahap per kelompok |
 
-- Sign in with email or Google; role comes from a Firebase custom claim.
-- Change an aid post's status (*Buka*, *Penuh*, *Tutup*), occupancy, stock and needs. Firestore rules let this role change only those fields.
-- See the overview, hazard map, Aid Priority Index, and alerts and broadcasts.
+**Pilihan desain untuk penggunanya.** Bahasa Indonesia yang sederhana menjadi bahasa utama, dengan versi bahasa Inggris di semua bagian. Bisa dipakai di ponsel kelas bawah dan secara offline, memakai data cache atau data bawaan. Warga tidak perlu akun. Fitur keselamatan gratis. Tidak ada sensor lapangan yang harus dipasang atau dirawat di gunung api aktif: semua input berasal dari katalog satelit publik dan sumber resmi.
 
-### BPBD operators: web console
+## Fitur per peran
 
-- **Overview**: KPIs, next actions, forecast chart from the risk engine, latest alerts.
-- **Hazard map**: satellite 3D, model view and 2D.
-- **Aid Priority Index** per village, and logging a delivery (which moves the next delivery to another village).
-- **Posts and shelters**: status, capacity, stock.
-- **Broadcasts** staggered by cohort so an announcement does not trigger panic buying.
-- **Signal filter**: message check and intel feed.
-- **Price watch**: HET deviation and history.
-- ⌘K command palette, notifications, Indonesian/English, dark mode, guided tour (Driver.js) on the first visit.
+### Warga: aplikasi Flutter, Android dan web
 
-### Donors and distributors: web console
+- **Beranda adaptif** (*Beranda*): hero, tombol utama, dan fitur yang disorot berubah mengikuti level PVMBG I–IV.
+- **Peta bahaya** (*Peta*): cincin KRB, area abu dan lahar, jalur evakuasi, dan tempat pengungsian (flutter_map); tombol **3D** membuka simulasi erupsi di WebView dalam aplikasi.
+- **Intel**: tempel pesan berantai untuk mendapatkan label, kata pemicu, cek silang satelit, dan fakta resmi terdekat; tersedia juga feed intel yang sudah diverifikasi.
+- **Posko**: posko dan tempat pengungsian terdekat dengan status *Buka* / *Penuh* / *Tutup*, kapasitas, dan kebutuhan, yang diperbarui oleh koordinator.
+- **Kit Siaga** dengan acuan harga HET, serta formulir laporan harga (di prototipe ini hanya tampil di layar, belum ada data yang dikirim).
+- **Protokol per sektor**, misalnya untuk petani dan peternak.
+- **SOS**: tahan selama 3 detik.
+- **Profil**: Bahasa Indonesia/Inggris, data demo atau live, simulasi level di mode demo, sumber data, dan kredit foto.
+- **Offline**: data valid terakhir disimpan di cache per endpoint; jika cache kosong, aplikasi memakai data bawaan. Sebuah chip menampilkan *Live*, *Offline · data tersimpan* atau *Offline · data bawaan*.
+- Tidak perlu akun.
 
-- Overview, hazard map, Aid Priority Index and price watch, to see where supplies are needed and prove fair pricing.
+### Koordinator posko: konsol web
 
-### Admins
+- Login dengan email atau Google; peran diambil dari custom claim Firebase.
+- Mengubah status posko (*Buka*, *Penuh*, *Tutup*), jumlah penghuni, stok, dan kebutuhan. Rules Firestore hanya mengizinkan peran ini mengubah field tersebut.
+- Melihat ringkasan, peta bahaya, Aid Priority Index, serta peringatan dan siaran.
 
-- Full write access in Firestore rules, including the official volcano level and price caps.
-- Assign operator roles with `npm run set-role` (writes the custom claim and `users/{uid}`).
-- Load or refresh data with `npm run seed` and publish model forecasts with `npm run publish-forecast`.
-- In the console an admin gets the BPBD view.
+### Operator BPBD: konsol web
 
-| Console tab | BPBD | Posko | Donor |
+- **Ringkasan**: KPI, langkah berikutnya, grafik prakiraan dari mesin risiko, peringatan terbaru.
+- **Peta bahaya**: 3D satelit, tampilan model, dan 2D.
+- **Aid Priority Index** per desa, dan pencatatan pengiriman bantuan (yang memindahkan pengiriman berikutnya ke desa lain).
+- **Posko dan pengungsian**: status, kapasitas, stok.
+- **Siaran** yang dikirim bertahap per kelompok agar pengumuman tidak memicu panic buying.
+- **Filter sinyal**: cek pesan dan feed intel.
+- **Pantauan harga**: selisih terhadap HET dan riwayatnya.
+- Command palette ⌘K, notifikasi, Bahasa Indonesia/Inggris, mode gelap, dan tur terpandu (Driver.js) pada kunjungan pertama.
+
+### Donatur dan distributor: konsol web
+
+- Ringkasan, peta bahaya, Aid Priority Index, dan pantauan harga, untuk melihat di mana bantuan dibutuhkan dan membuktikan harga yang wajar.
+
+### Admin
+
+- Akses tulis penuh di rules Firestore, termasuk level resmi gunung api dan batas harga.
+- Memberi peran operator dengan `npm run set-role` (menulis custom claim dan `users/{uid}`).
+- Memuat atau memperbarui data dengan `npm run seed` dan menerbitkan prakiraan model dengan `npm run publish-forecast`.
+- Di konsol, admin mendapat tampilan BPBD.
+
+| Tab konsol | BPBD | Posko | Donatur |
 |:-|:-:|:-:|:-:|
-| Overview | ✓ | ✓ | ✓ |
-| Hazard map | ✓ | ✓ | ✓ |
-| Aid priority | ✓ | ✓ | ✓ |
-| Posts and shelters | ✓ | ✓ | |
-| Alerts and broadcasts | ✓ | ✓ | |
-| Signal filter | ✓ | | |
-| Price watch | ✓ | | ✓ |
+| Ringkasan | ✓ | ✓ | ✓ |
+| Peta bahaya | ✓ | ✓ | ✓ |
+| Prioritas bantuan | ✓ | ✓ | ✓ |
+| Posko dan pengungsian | ✓ | ✓ | |
+| Peringatan dan siaran | ✓ | ✓ | |
+| Filter sinyal | ✓ | | |
+| Pantauan harga | ✓ | | ✓ |
 
-## Product tour
+## Tur produk
 
-Open **[marketshield-inception.vercel.app](https://marketshield-inception.vercel.app)**.
+Buka **[marketshield-inception.vercel.app](https://marketshield-inception.vercel.app)**.
 
-1. **Watch the volcano.** The landing page opens on a live 3D map. Press **Simulasi erupsi** to see the ash column, the pyroclastic flow down Besuk Kobokan and the villages in its path, with and without MarketShield.
-2. **Use the resident app.** Open **[/mobile](https://marketshield-inception.vercel.app/mobile)** or install the APK. Pick *Mode demo* to move the level from I to IV and watch the home screen change, or *Data live* to read the real database. Paste a chain message into **Intel**. Tap **3D** on the map.
-3. **Run the console.** Open **[/app/login](https://marketshield-inception.vercel.app/app/login)**, pick **Data contoh** or **Data live**, then enter as BPBD, an aid-post coordinator or a donor. A guided tour starts on the first visit.
-4. **Change something for real.** With an operator account, switch an aid post from *Buka* to *Penuh*: every open console updates. See [Demo mode and live mode](#demo-mode-and-live-mode) for how to get operator access.
-5. **Check it yourself.** Call the [API](docs/API.md), or open **[/status](https://marketshield-inception.vercel.app/status)**.
+1. **Lihat gunungnya.** Halaman utama langsung menampilkan peta 3D live. Tekan **Simulasi erupsi** untuk melihat kolom abu, awan panas guguran yang turun ke Besuk Kobokan, dan desa-desa di jalurnya, dengan dan tanpa MarketShield.
+2. **Pakai aplikasi warga.** Buka **[/mobile](https://marketshield-inception.vercel.app/mobile)** atau pasang APK-nya. Pilih *Mode demo* untuk menggeser level dari I sampai IV dan melihat beranda berubah, atau *Data live* untuk membaca database yang sebenarnya. Tempel pesan berantai di **Intel**. Ketuk **3D** di peta.
+3. **Jalankan konsol.** Buka **[/app/login](https://marketshield-inception.vercel.app/app/login)**, pilih **Data contoh** atau **Data live**, lalu masuk sebagai BPBD, koordinator posko, atau donatur. Tur terpandu dimulai pada kunjungan pertama.
+4. **Ubah data sungguhan.** Dengan akun operator, ubah status posko dari *Buka* ke *Penuh*: semua konsol yang sedang terbuka ikut berubah. Lihat [Mode demo dan mode live](#mode-demo-dan-mode-live) untuk cara mendapatkan akses operator.
+5. **Cek sendiri.** Panggil [API](docs/API.md), atau buka **[/status](https://marketshield-inception.vercel.app/status)**.
 
-| Surface | Route | For |
+| Tampilan | Route | Untuk |
 |:-|:-|:-|
-| Landing | `/` | Public, partners, BPBD, donors |
-| Web console | `/app` | BPBD operators, aid posts, donors, distributors |
-| Resident app | `/mobile`, Android APK | Residents |
-| 3D map | `/embed/peta` | Opened from the app's **3D** button |
-| Product pages | `/fitur` `/harga` `/docs` `/bantuan` `/kemitraan` `/blog` | Features, pricing, docs, help, partnerships, articles |
-| Trust pages | `/tentang` `/pers` `/keamanan` `/status` `/changelog` | About, press kit, security and compliance, live status, release notes |
-| Legal | `/privasi` `/syarat` `/kredit` | Privacy (UU PDP 27/2022), terms, photo and data credits |
-| Download | `/download` | Latest APK, size and SHA-256 from GitHub Releases |
-| API | `/api/v1/*` | [API reference](docs/API.md) |
+| Landing | `/` | Publik, mitra, BPBD, donatur |
+| Konsol web | `/app` | Operator BPBD, posko, donatur, distributor |
+| Aplikasi warga | `/mobile`, APK Android | Warga |
+| Peta 3D | `/embed/peta` | Dibuka dari tombol **3D** di aplikasi |
+| Halaman produk | `/fitur` `/harga` `/docs` `/bantuan` `/kemitraan` `/blog` | Fitur, harga, dokumentasi, bantuan, kemitraan, artikel |
+| Halaman kepercayaan | `/tentang` `/pers` `/keamanan` `/status` `/changelog` | Tentang, press kit, keamanan dan kepatuhan, status live, catatan rilis |
+| Legal | `/privasi` `/syarat` `/kredit` | Privasi (UU PDP 27/2022), syarat, kredit foto dan data |
+| Unduh | `/download` | APK terbaru, ukuran, dan SHA-256 dari GitHub Releases |
+| API | `/api/v1/*` | [Referensi API](docs/API.md) |
 
-## Architecture
+## Arsitektur
 
 <p align="center">
-  <img src="docs/readme/architecture-detailed.png" alt="MarketShield architecture: people, Flutter app, Next.js site, console, API, map and 3D, Firestore, Auth, ML pipelines, external sources and delivery" width="100%" />
+  <img src="docs/readme/architecture-detailed.png" alt="Arsitektur MarketShield: pengguna, aplikasi Flutter, situs Next.js, konsol, API, peta dan 3D, Firestore, Auth, pipeline ML, sumber eksternal, dan delivery" width="100%" />
 </p>
 
-Source of the diagram: [docs/diagrams/architecture-detailed.html](docs/diagrams/architecture-detailed.html).
+Sumber diagram: [docs/diagrams/architecture-detailed.html](docs/diagrams/architecture-detailed.html).
 
-Three surfaces (resident app, console, public API) share one Firestore project in `asia-southeast2` (Jakarta). The website, console and API run on Vercel; the Flutter web build is served from the same domain under `/mobile-app`. The models run offline in Python and their output is published to Firestore with a script, following the contract in [firebase/ML-CONTRACT.md](firebase/ML-CONTRACT.md).
+Tiga tampilan (aplikasi warga, konsol, API publik) memakai satu project Firestore yang sama di `asia-southeast2` (Jakarta). Situs, konsol, dan API berjalan di Vercel; build Flutter web disajikan dari domain yang sama di bawah `/mobile-app`. Model dijalankan offline dengan Python, lalu hasilnya diterbitkan ke Firestore lewat script, mengikuti kontrak di [firebase/ML-CONTRACT.md](firebase/ML-CONTRACT.md).
 
 <details>
-<summary>Text version (Mermaid)</summary>
+<summary>Versi teks (Mermaid)</summary>
 
 ```mermaid
 flowchart LR
@@ -241,106 +243,106 @@ flowchart LR
 
 </details>
 
-**Key decisions** (reasoning in [Technical §3](docs/TECHNICAL_DOCUMENTATION.md#3-architecture-and-decisions)):
+**Keputusan utama** (alasannya ada di [Dokumentasi teknis §3](docs/TECHNICAL_DOCUMENTATION.md#3-architecture-and-decisions)):
 
-- **Satellites instead of sensors.** Nothing to install, steal or maintain on an active volcano; every input is a public catalogue or an official source.
-- **Firestore for a small team.** Realtime listeners give instant aid-post updates without a socket server, and security rules enforce roles in the database, so a UI bug cannot grant write access.
-- **One Flutter codebase for Android and web.** Residents install a 20 MB APK; partners open the same app in a browser.
-- **Fallback everywhere.** The API, the console and the app all ship bundled data and say when they use it. A disaster app that goes blank when the network drops does more harm than good.
-- **Message text is never stored.** Only the label, confidence, trigger words, language and length are logged (UU PDP 27/2022 data minimisation).
+- **Satelit sebagai pengganti sensor.** Tidak ada perangkat yang perlu dipasang, bisa dicuri, atau harus dirawat di gunung api aktif; semua input berasal dari katalog publik atau sumber resmi.
+- **Firestore untuk tim kecil.** Realtime listener memberi pembaruan posko seketika tanpa server socket, dan security rules menegakkan peran di level database, sehingga bug di UI tidak bisa memberi akses tulis.
+- **Satu codebase Flutter untuk Android dan web.** Warga memasang APK berukuran 20 MB; mitra membuka aplikasi yang sama di browser.
+- **Fallback di semua bagian.** API, konsol, dan aplikasi sama-sama membawa data bawaan dan memberi tahu saat data itu dipakai. Aplikasi bencana yang tampil kosong saat jaringan putus justru lebih banyak merugikan.
+- **Teks pesan tidak pernah disimpan.** Yang dicatat hanya label, tingkat keyakinan, kata pemicu, bahasa, dan panjang pesan (minimisasi data sesuai UU PDP 27/2022).
 
-## Technology stack
+## Stack teknologi
 
-| Layer | Technology | Why |
+| Lapisan | Teknologi | Alasan |
 |:-|:-|:-|
-| Resident app | Flutter 3.41, Dart 3.11, flutter_map, http, shared_preferences, url_launcher, webview_flutter, google_fonts | One codebase for Android and web; offline cache; small APK |
-| Website and console | Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS 4, Motion, Zustand, Recharts, Driver.js, lucide-react | Static marketing pages, client console, Indonesian/English, dark mode |
-| Maps and 3D | MapLibre GL 6.16, three.js 0.186 | Globe projection, terrain, custom WebGL layer for the eruption |
-| Backend | Next.js route handlers on Vercel, Firebase Admin SDK | Public API next to the site, no separate server to run |
-| Database and auth | Cloud Firestore (Jakarta), Firebase Auth (email/password, Google), security rules with custom claims | Realtime, role claims, data close to users |
-| Satellite data | Google Earth Engine (10 datasets, Python `earthengine-api`) | Public catalogues, national coverage |
-| Machine learning | XGBoost, SHAP, scikit-learn, pandas; PyTorch, Hugging Face Transformers and Datasets, IndoBERT (`indobenchmark/indobert-base-p1`); Google Colab | Tabular risk model with explanations; Indonesian language model |
-| Delivery | GitHub Actions, Vercel CLI, GitHub Releases | Build check per PR, production on merge, signed APKs per tag |
-| Testing | `flutter test`, `flutter analyze`, ESLint, TypeScript strict, Playwright (browser checks) | See [Testing](#testing) |
+| Aplikasi warga | Flutter 3.41, Dart 3.11, flutter_map, http, shared_preferences, url_launcher, webview_flutter, google_fonts | Satu codebase untuk Android dan web; cache offline; APK kecil |
+| Situs dan konsol | Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS 4, Motion, Zustand, Recharts, Driver.js, lucide-react | Halaman marketing statis, konsol di sisi klien, Bahasa Indonesia/Inggris, mode gelap |
+| Peta dan 3D | MapLibre GL 6.16, three.js 0.186 | Proyeksi globe, terrain, layer WebGL khusus untuk erupsi |
+| Backend | Route handler Next.js di Vercel, Firebase Admin SDK | API publik berada satu tempat dengan situs, tanpa server terpisah yang harus dijalankan |
+| Database dan autentikasi | Cloud Firestore (Jakarta), Firebase Auth (email/password, Google), security rules dengan custom claim | Realtime, claim peran, data dekat dengan pengguna |
+| Data satelit | Google Earth Engine (10 dataset, Python `earthengine-api`) | Katalog publik, cakupan nasional |
+| Machine learning | XGBoost, SHAP, scikit-learn, pandas; PyTorch, Hugging Face Transformers dan Datasets, IndoBERT (`indobenchmark/indobert-base-p1`); Google Colab | Model risiko tabular dengan penjelasan; model bahasa Indonesia |
+| Delivery | GitHub Actions, Vercel CLI, GitHub Releases | Build check per PR, production saat merge, APK bertanda tangan per tag |
+| Pengujian | `flutter test`, `flutter analyze`, ESLint, TypeScript strict, Playwright (pengecekan browser) | Lihat [Pengujian](#pengujian) |
 
-## Models
+## Model
 
-Both models are trained and evaluated in [`ml/`](ml/README.md). Every number below comes from the JSON files in [`ml/results/`](ml/results).
+Kedua model dilatih dan dievaluasi di [`ml/`](ml/README.md). Semua angka di bawah berasal dari file JSON di [`ml/results/`](ml/results).
 
-### Satellite risk engine (XGBoost + SHAP)
+### Mesin risiko satelit (XGBoost + SHAP)
 
-**Target.** Whether NASA FIRMS records at least one thermal hotspot within 5 km of the summit in the next 7 days. PVMBG's alert-level history is not available in machine-readable form, so the model predicts this satellite proxy for eruptive activity. **It is not the PVMBG level**, and the app always shows the official level separately.
+**Target.** Apakah NASA FIRMS mencatat minimal satu titik panas (hotspot) termal dalam radius 5 km dari puncak dalam 7 hari ke depan. Riwayat level status PVMBG tidak tersedia dalam format yang bisa dibaca mesin, jadi model memprediksi proksi satelit ini untuk aktivitas erupsi. **Target ini berbeda dari level PVMBG**, dan aplikasi selalu menampilkan level resmi secara terpisah.
 
-**Data.** Weekly Google Earth Engine features for 25 volcanoes, January 2019 to October 2026: 407 weeks, 10,067 volcano-weeks. Features: FIRMS hotspot fraction (this week and the previous 3 weeks), Sentinel-5P SO₂ and its trend, Sentinel-1 VV backscatter change, GPM IMERG rainfall.
+**Data.** Fitur mingguan Google Earth Engine untuk 25 gunung api, Januari 2019 sampai Oktober 2026: 407 minggu, 10.067 gunung-minggu. Fitur: fraksi hotspot FIRMS (minggu ini dan 3 minggu sebelumnya), SO₂ Sentinel-5P beserta trennya, perubahan backscatter VV Sentinel-1, dan curah hujan GPM IMERG.
 
-**Method.** XGBoost (300 trees, depth 4, class-weighted). Time split: train 2019–2023 (6,416 rows), test 2024–2026 (3,651 rows). Baseline: persistence ("next week looks like this week").
+**Metode.** XGBoost (300 pohon, kedalaman 4, dengan bobot kelas). Pembagian data berdasarkan waktu: latih 2019–2023 (6.416 baris), uji 2024–2026 (3.651 baris). Baseline: persistence ("minggu depan sama seperti minggu ini").
 
-| Metric (test 2024–2026) | XGBoost | Persistence baseline |
+| Metrik (uji 2024–2026) | XGBoost | Baseline persistence |
 |:-|:-:|:-:|
-| ROC-AUC | **0.899** | 0.784 |
-| PR-AUC | **0.674** | 0.455 |
-| Recall | **78 %** | 63 % |
-| Precision | 55 % | 63 % |
-| F1 | **0.649** | 0.633 |
-| Onset weeks (no hotspot this week): ROC-AUC / recall | **0.81 / 45 %** | cannot predict onsets |
+| ROC-AUC | **0,899** | 0,784 |
+| PR-AUC | **0,674** | 0,455 |
+| Recall | **78%** | 63% |
+| Precision | 55% | 63% |
+| F1 | **0,649** | 0,633 |
+| Minggu awal aktivitas (tanpa hotspot minggu ini): ROC-AUC / recall | **0,81 / 45%** | tidak bisa memprediksi awal aktivitas |
 
-SHAP ranking: hotspots in the previous 3 weeks, hotspots this week, SO₂, rainfall, Sentinel-1 backscatter, SO₂ trend. The newest forecast per volcano is written to `volcanoes/{id}.forecast` by `web/scripts/publish-forecast.ts`; the console and `/api/v1/volcanoes/{id}/risk` read it.
+Peringkat SHAP: hotspot pada 3 minggu sebelumnya, hotspot minggu ini, SO₂, curah hujan, backscatter Sentinel-1, tren SO₂. Prakiraan terbaru untuk tiap gunung ditulis ke `volcanoes/{id}.forecast` oleh `web/scripts/publish-forecast.ts`; konsol dan `/api/v1/volcanoes/{id}/risk` membaca data ini.
 
-### IndoBERT hoax filter
+### Filter hoaks IndoBERT
 
-**Data.** [`mzuama/IndonesianHoaxdetection`](https://huggingface.co/datasets/mzuama/IndonesianHoaxdetection): 12,150 texts, 12,136 after removing empty rows and duplicates **before** splitting. Stratified 80/10/10 split (9,708 / 1,214 / 1,214). Fine-tuned `indobenchmark/indobert-base-p1` for 2 epochs with short-crop augmentation and 60 team-written short disaster messages (training only).
+**Data.** [`mzuama/IndonesianHoaxdetection`](https://huggingface.co/datasets/mzuama/IndonesianHoaxdetection): 12.150 teks, tersisa 12.136 setelah baris kosong dan duplikat dihapus **sebelum** pembagian data. Pembagian stratified 80/10/10 (9.708 / 1.214 / 1.214). `indobenchmark/indobert-base-p1` di-fine-tune selama 2 epoch dengan augmentasi potongan pendek dan 60 pesan bencana pendek yang ditulis tim (hanya untuk pelatihan).
 
-| Evaluation set | n | TF-IDF + LogReg | IndoBERT |
+| Set evaluasi | n | TF-IDF + LogReg | IndoBERT |
 |:-|:-:|:-:|:-:|
-| Test (article-length texts) | 1,214 | 96.9 % | **98.4 %** (macro-F1 0.984) |
-| Test, short crops (first 8–30 words) | 1,208 | 94.8 % | **96.6 %** |
-| Test, disaster-related subset | 70 | 98.6 % | **100 %** |
-| Probe: short WhatsApp-style disaster messages | 40 | 87.5 % | **90.0 %** |
+| Uji (teks sepanjang artikel) | 1.214 | 96,9% | **98,4%** (macro-F1 0,984) |
+| Uji, potongan pendek (8–30 kata pertama) | 1.208 | 94,8% | **96,6%** |
+| Uji, subset terkait bencana | 70 | 98,6% | **100%** |
+| Probe: pesan bencana pendek ala WhatsApp | 40 | 87,5% | **90,0%** |
 
-The first run scored 98.3 % on the test split but only 50 % on the 40-message probe set, because it labelled every short message as a hoax. Short-crop augmentation and the team-written messages brought the probe to 90 %. The probe set was written by the team, so treat it as a sanity check, not a benchmark.
+Percobaan pertama mendapat 98,3% di data uji, tetapi hanya 50% di set probe 40 pesan, karena model melabeli semua pesan pendek sebagai hoaks. Augmentasi potongan pendek dan pesan yang ditulis tim menaikkan hasil probe menjadi 90%. Set probe ini ditulis oleh tim sendiri, jadi hasilnya hanya berfungsi sebagai sanity check.
 
-**In the product.** A 500 MB model does not fit a serverless function, so `/api/v1/signals/check` still uses the rule-based classifier in `web/src/lib/classify.ts` (`rules-v1`). Serving IndoBERT behind the same response contract is the next step.
+**Di dalam produk.** Model berukuran 500 MB tidak muat di serverless function, jadi `/api/v1/signals/check` masih memakai classifier berbasis aturan di `web/src/lib/classify.ts` (`rules-v1`). Langkah berikutnya adalah menyajikan IndoBERT dengan kontrak respons yang sama.
 
 <p align="center">
-  <img src="ml/results/risk_results.png" alt="Risk engine: ROC and precision-recall curves on 2024–2026 and SHAP importance" width="100%" />
-  <img src="ml/results/hoax_results.png" alt="IndoBERT: confusion matrix, macro-F1 against the baseline and training curve" width="100%" />
+  <img src="ml/results/risk_results.png" alt="Mesin risiko: kurva ROC dan precision-recall pada 2024–2026 serta tingkat kepentingan SHAP" width="100%" />
+  <img src="ml/results/hoax_results.png" alt="IndoBERT: confusion matrix, macro-F1 dibandingkan baseline, dan kurva pelatihan" width="100%" />
 </p>
 
-Training details, discarded runs and reproduction commands: [ml/README.md](ml/README.md).
+Detail pelatihan, percobaan yang dibuang, dan perintah untuk mereproduksi hasil: [ml/README.md](ml/README.md).
 
-## Data sources and licences
+## Sumber data dan lisensi
 
-| Source | Used for | Licence / terms |
+| Sumber | Dipakai untuk | Lisensi / ketentuan |
 |:-|:-|:-|
-| Google Earth Engine: NASA FIRMS, Sentinel-5P SO₂ and aerosol (`COPERNICUS/S5P`), Sentinel-1 GRD | Risk engine features, hazard layers | Copernicus open licence, NASA open data, Earth Engine terms (project registered for non-commercial use) |
-| Google Earth Engine: GPM IMERG, NOAA GFS | Rainfall (rain-lahar risk), wind (ash drift) | NASA / NOAA open data |
-| Google Earth Engine: Sentinel-2, MODIS, Landsat 9, Copernicus DEM GLO-30 | Vegetation change, land-surface temperature, terrain | Copernicus open licence, NASA / USGS open data |
-| Google Earth Engine: WorldPop, ESA WorldCover | Exposed population, land cover | CC BY 4.0 |
-| PVMBG / MAGMA Indonesia | Official volcano levels | Public government information |
-| Government price caps (HET) | Price watch reference | Public regulations |
-| `mzuama/IndonesianHoaxdetection` (Hugging Face) | IndoBERT training and evaluation | Licence not stated by the author |
-| Sentinel-2 cloudless 2023 by EOX | Map imagery | CC BY-NC-SA 4.0 (**non-commercial**) |
-| AWS Terrain Tiles (Terrarium) | 3D terrain | Open data |
-| Esri basemaps | Map basemap | Esri terms of use |
-| OpenStreetMap | Map data | ODbL |
-| Natural Earth | Land outline for the globe | Public domain |
+| Google Earth Engine: NASA FIRMS, Sentinel-5P SO₂ dan aerosol (`COPERNICUS/S5P`), Sentinel-1 GRD | Fitur mesin risiko, layer bahaya | Lisensi terbuka Copernicus, data terbuka NASA, ketentuan Earth Engine (project terdaftar untuk penggunaan non-komersial) |
+| Google Earth Engine: GPM IMERG, NOAA GFS | Curah hujan (risiko lahar hujan), angin (arah sebaran abu) | Data terbuka NASA / NOAA |
+| Google Earth Engine: Sentinel-2, MODIS, Landsat 9, Copernicus DEM GLO-30 | Perubahan vegetasi, suhu permukaan tanah, terrain | Lisensi terbuka Copernicus, data terbuka NASA / USGS |
+| Google Earth Engine: WorldPop, ESA WorldCover | Populasi terpapar, tutupan lahan | CC BY 4.0 |
+| PVMBG / MAGMA Indonesia | Level resmi gunung api | Informasi publik pemerintah |
+| Harga eceran tertinggi pemerintah (HET) | Acuan pantauan harga | Regulasi publik |
+| `mzuama/IndonesianHoaxdetection` (Hugging Face) | Pelatihan dan evaluasi IndoBERT | Lisensi tidak disebutkan oleh pembuatnya |
+| Sentinel-2 cloudless 2023 oleh EOX | Citra peta | CC BY-NC-SA 4.0 (**non-komersial**) |
+| AWS Terrain Tiles (Terrarium) | Terrain 3D | Data terbuka |
+| Esri basemaps | Basemap peta | Ketentuan penggunaan Esri |
+| OpenStreetMap | Data peta | ODbL |
+| Natural Earth | Garis daratan untuk globe | Domain publik |
 
-The full list, including photos, 3D models, fonts and libraries, is in [docs/AI_USE_AND_THIRD_PARTY.md](docs/AI_USE_AND_THIRD_PARTY.md).
+Daftar lengkapnya, termasuk foto, model 3D, font, dan library, ada di [docs/AI_USE_AND_THIRD_PARTY.md](docs/AI_USE_AND_THIRD_PARTY.md).
 
-## API reference
+## Referensi API
 
-Base URL: `https://marketshield-inception.vercel.app/api/v1`. JSON over HTTPS, no authentication, CORS open (`Access-Control-Allow-Origin: *`). Every response includes `source`: `"firestore"` when served from the live database, `"static"` when the bundled dataset was used.
+Base URL: `https://marketshield-inception.vercel.app/api/v1`. JSON lewat HTTPS, tanpa autentikasi, CORS terbuka (`Access-Control-Allow-Origin: *`). Setiap respons menyertakan `source`: `"firestore"` jika disajikan dari database live, `"static"` jika memakai dataset bawaan.
 
-| Method | Path | Returns |
+| Method | Path | Hasil |
 |:-|:-|:-|
-| GET | `/volcanoes` | 25 mapped volcanoes with the official PVMBG level |
-| GET | `/volcanoes/{id}/risk` | Official level, scenario escalation probability, action window, satellite indicators and the latest model forecast (`model`) |
-| GET | `/villages/priority?level=&volcano=` | Aid Priority Index ranking |
-| GET | `/prices` | Emergency goods: HET, market average, deviation, `flagged` above 0.3 |
-| GET | `/posko?volcano=` | Aid posts and shelters: status, capacity, stock, needs |
-| GET | `/alerts` | Latest alerts from BPBD and satellites (newest 20) |
-| GET | `/intel` | Verified claims: hoax, panic, verified, official |
-| POST | `/signals/check` | Classify a chain message (`{ "text": "...", "lang": "id" }`) and cross-check it; the text is never stored |
+| GET | `/volcanoes` | 25 gunung api yang dipetakan beserta level resmi PVMBG |
+| GET | `/volcanoes/{id}/risk` | Level resmi, probabilitas eskalasi skenario, jendela aksi, indikator satelit, dan prakiraan model terbaru (`model`) |
+| GET | `/villages/priority?level=&volcano=` | Peringkat Aid Priority Index |
+| GET | `/prices` | Barang darurat: HET, rata-rata harga pasar, selisih, `flagged` jika di atas 0,3 |
+| GET | `/posko?volcano=` | Posko dan pengungsian: status, kapasitas, stok, kebutuhan |
+| GET | `/alerts` | Peringatan terbaru dari BPBD dan satelit (20 terbaru) |
+| GET | `/intel` | Klaim yang sudah dicek: hoaks, panik, terverifikasi, resmi |
+| POST | `/signals/check` | Mengklasifikasi pesan berantai (`{ "text": "...", "lang": "id" }`) dan melakukan cek silang; teks tidak pernah disimpan |
 
 ```bash
 curl https://marketshield-inception.vercel.app/api/v1/volcanoes/semeru/risk
@@ -350,273 +352,273 @@ curl -X POST https://marketshield-inception.vercel.app/api/v1/signals/check \
   -d '{"text":"Katanya lahar sudah masuk Pronojiwo, segera tinggalkan rumah! Sebarkan!"}'
 ```
 
-Parameters, sample responses and error codes: [docs/API.md](docs/API.md).
+Parameter, contoh respons, dan kode error: [docs/API.md](docs/API.md).
 
-## Repository structure
+## Struktur repositori
 
 ```
 marketshield/
-├── app/                        Flutter resident app (Android + web)
+├── app/                        aplikasi warga Flutter (Android + web)
 │   ├── lib/
-│   │   ├── main.dart, core.dart    entry point; bundled models and demo data
+│   │   ├── main.dart, core.dart    entry point; model dan data demo bawaan
 │   │   ├── data/                   api.dart, repository.dart (cache → fallback), mappers.dart, credits.dart
 │   │   ├── screens/                shell, map, map3d, intel, posko, sector, sos, profile, onboarding, credits
-│   │   └── geo_map.dart            flutter_map hazard map (KRB rings, ash, lahar, routes, posts)
-│   ├── android/                Gradle; release signing from key.properties (CI only)
+│   │   └── geo_map.dart            peta bahaya flutter_map (cincin KRB, abu, lahar, jalur, posko)
+│   ├── android/                Gradle; penandatanganan rilis dari key.properties (hanya di CI)
 │   └── test/                   data_test.dart, widget_test.dart
-├── web/                        Next.js 16 site, console and public API
-│   ├── src/app/                routes: /, /app, /mobile, /embed/peta, /download, product, trust and legal pages
-│   │   └── api/v1/             route handlers for the public API
-│   ├── src/components/         landing, map (MapLibre + three.js), webapp (console), pages, site, ui
+├── web/                        situs, konsol, dan API publik Next.js 16
+│   ├── src/app/                route: /, /app, /mobile, /embed/peta, /download, halaman produk, kepercayaan, dan legal
+│   │   └── api/v1/             route handler untuk API publik
+│   ├── src/components/         landing, map (MapLibre + three.js), webapp (konsol), pages, site, ui
 │   ├── src/lib/                data.ts, classify.ts, live.ts, auth.ts, store.ts, release.ts, server/ (Admin SDK)
 │   ├── scripts/                seed.ts, set-role.ts, publish-forecast.ts
 │   └── .env.example
-├── ml/                         Models: risk_engine.py, train_hoax.py, hoax_classifier.ipynb, data/, results/
+├── ml/                         model: risk_engine.py, train_hoax.py, hoax_classifier.ipynb, data/, results/
 ├── firebase/                   firestore.rules, firestore.indexes.json, SCHEMA.md, ML-CONTRACT.md
-├── docs/                       technical docs, API, security, evidence, diagrams, README images
+├── docs/                       dokumentasi teknis, API, keamanan, bukti, diagram, gambar README
 ├── .github/workflows/          deploy.yml, release-apk.yml
 ├── firebase.json
 └── CHANGELOG.md
 ```
 
-## Getting started
+## Cara menjalankan
 
-**Requirements**
+**Kebutuhan**
 
-| Part | Needs |
+| Bagian | Kebutuhan |
 |:-|:-|
-| Website, console, API | Node.js 20+ and npm |
-| Resident app | Flutter 3.41 stable (CI uses 3.41.6); Android SDK for device builds; Java 17 for release APKs |
-| Firebase rules | Firebase CLI (`npm install -g firebase-tools`), optional |
-| Models | Python 3 with pip; an Earth Engine–registered Google Cloud project for the risk engine; a GPU helps for IndoBERT |
+| Situs, konsol, API | Node.js 20+ dan npm |
+| Aplikasi warga | Flutter 3.41 stable (CI memakai 3.41.6); Android SDK untuk build ke perangkat; Java 17 untuk APK rilis |
+| Rules Firebase | Firebase CLI (`npm install -g firebase-tools`), opsional |
+| Model | Python 3 dengan pip; project Google Cloud yang terdaftar di Earth Engine untuk mesin risiko; GPU membantu untuk IndoBERT |
 
-Nothing below needs a secret unless you want live data. Without credentials every surface serves the bundled demo dataset.
+Langkah-langkah di bawah tidak butuh secret, kecuali Anda ingin memakai data live. Tanpa kredensial, semua tampilan menyajikan dataset demo bawaan.
 
-### Web (site, console, API)
+### Web (situs, konsol, API)
 
 ```bash
 git clone https://github.com/aarieffawwaz/marketshield.git
 cd marketshield/web
-npm install          # also copies the MapLibre worker into public/vendor
-npm run dev          # http://localhost:3000, serves bundled demo data
+npm install          # sekaligus menyalin worker MapLibre ke public/vendor
+npm run dev          # http://localhost:3000, menyajikan data demo bawaan
 npm run lint         # ESLint
-npm run build        # production build
+npm run build        # build production
 ```
 
-**Environment variables.** The only server variable is listed in [`web/.env.example`](web/.env.example):
+**Environment variable.** Satu-satunya variabel server tercantum di [`web/.env.example`](web/.env.example):
 
-| Variable | Purpose |
+| Variabel | Fungsi |
 |:-|:-|
-| `FIREBASE_SERVICE_ACCOUNT` | Service-account JSON (raw or base64) for the Firebase Admin SDK. Leave empty to serve bundled demo data. |
+| `FIREBASE_SERVICE_ACCOUNT` | JSON service account (mentah atau base64) untuk Firebase Admin SDK. Kosongkan untuk menyajikan data demo bawaan. |
 
 ```bash
-cp .env.example .env.local     # used by `npm run dev`; never commit it (.env* is git-ignored)
+cp .env.example .env.local     # dipakai oleh `npm run dev`; jangan pernah di-commit (.env* sudah di-git-ignore)
 ```
 
-The browser-side Firebase config in `web/src/lib/firebase-config.ts` is public by design and its key is restricted to the project's domains. To run against your own Firebase project, replace that config and use a service account from your project.
+Config Firebase sisi browser di `web/src/lib/firebase-config.ts` memang dibuat publik, dan key-nya dibatasi hanya untuk domain project. Untuk menjalankan dengan project Firebase Anda sendiri, ganti config tersebut dan pakai service account dari project Anda.
 
-**Admin scripts** read `FIREBASE_SERVICE_ACCOUNT` from the shell:
+**Script admin** membaca `FIREBASE_SERVICE_ACCOUNT` dari shell:
 
 ```bash
 export FIREBASE_SERVICE_ACCOUNT="$(cat path/to/your-service-account.json)"
-npm run seed                                   # load the demo dataset into Firestore (idempotent)
+npm run seed                                   # memuat dataset demo ke Firestore (idempoten)
 npm run set-role -- operator@example.org bpbd "Nama Operator" "BPBD Kab. Lumajang"
 npm run publish-forecast -- ../ml/results/risk_latest.json
 ```
 
-`set-role` accepts the roles `admin`, `bpbd`, `posko` and `donor`. Passing `google` as a fifth argument creates a Google-only account.
+`set-role` menerima peran `admin`, `bpbd`, `posko`, dan `donor`. Jika `google` diberikan sebagai argumen kelima, script membuat akun yang hanya bisa login lewat Google.
 
-### Resident app (Flutter)
+### Aplikasi warga (Flutter)
 
 ```bash
 cd app
 flutter pub get
 flutter analyze
 flutter test
-flutter run                     # Android device or emulator
-flutter run -d chrome           # web; add ?mode=demo or ?mode=live
+flutter run                     # perangkat Android atau emulator
+flutter run -d chrome           # web; tambahkan ?mode=demo atau ?mode=live
 ```
 
-To serve the app at `/mobile` locally:
+Untuk menyajikan aplikasi di `/mobile` secara lokal:
 
 ```bash
 flutter build web --release --base-href /mobile-app/ --no-web-resources-cdn
 cp -R build/web/. ../web/public/mobile-app/
 ```
 
-Android builds: `flutter build apk --release --split-per-abi`. Without `android/key.properties` the build falls back to the debug key; release signing happens in CI.
+Build Android: `flutter build apk --release --split-per-abi`. Tanpa `android/key.properties`, build memakai debug key; penandatanganan rilis dilakukan di CI.
 
-### Firebase (rules and indexes)
+### Firebase (rules dan indeks)
 
-`firebase.json` points the Firebase CLI at `firebase/firestore.rules` and `firebase/firestore.indexes.json`.
+`firebase.json` mengarahkan Firebase CLI ke `firebase/firestore.rules` dan `firebase/firestore.indexes.json`.
 
 ```bash
 firebase login
 firebase deploy --only firestore:rules,firestore:indexes --project <your-project-id>
 ```
 
-To try the rules locally, `firebase emulators:start --only firestore --project demo-marketshield` starts the Firestore emulator with the same rules file. The web and app code are not wired to the emulator, so this is only useful for testing rules. Collections and fields are documented in [firebase/SCHEMA.md](firebase/SCHEMA.md).
+Untuk mencoba rules secara lokal, `firebase emulators:start --only firestore --project demo-marketshield` menjalankan emulator Firestore dengan file rules yang sama. Kode web dan aplikasi belum terhubung ke emulator, jadi emulator ini hanya berguna untuk menguji rules. Koleksi dan field didokumentasikan di [firebase/SCHEMA.md](firebase/SCHEMA.md).
 
-### Models (Python)
+### Model (Python)
 
 ```bash
 cd ml
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# IndoBERT hoax filter (about 21 min on an Apple M5 GPU, about 10 min on a Colab T4)
+# Filter hoaks IndoBERT (sekitar 21 menit di GPU Apple M5, sekitar 10 menit di Colab T4)
 python train_hoax.py --epochs 2 --crop-aug --domain-aug --out results
 
-# Satellite risk engine (needs Earth Engine access)
+# Mesin risiko satelit (butuh akses Earth Engine)
 pip install earthengine-api xgboost shap
 gcloud auth application-default login \
   --scopes=https://www.googleapis.com/auth/earthengine,https://www.googleapis.com/auth/cloud-platform
 python risk_engine.py --project <your-gcp-project> --out results
 ```
 
-The hoax notebook [`ml/hoax_classifier.ipynb`](ml/hoax_classifier.ipynb) runs the same pipeline in Colab. Keys for notebooks go in Colab Secrets, never in cells ([firebase/ML-CONTRACT.md](firebase/ML-CONTRACT.md)).
+Notebook hoaks [`ml/hoax_classifier.ipynb`](ml/hoax_classifier.ipynb) menjalankan pipeline yang sama di Colab. Key untuk notebook disimpan di Colab Secrets dan tidak pernah ditulis di cell ([firebase/ML-CONTRACT.md](firebase/ML-CONTRACT.md)).
 
-## Demo mode and live mode
+## Mode demo dan mode live
 
 <p align="center">
-  <img src="docs/readme/data-modes.png" alt="Three modes: demo, live view-only, live operator" width="100%" />
+  <img src="docs/readme/data-modes.png" alt="Tiga mode: demo, live hanya lihat, live operator" width="100%" />
 </p>
 
-| Mode | How to get it | Data | Writes |
+| Mode | Cara mengaktifkan | Data | Penulisan data |
 |:-|:-|:-|:-|
-| **Demo** | Console: *Data contoh* + a quick role. App: *Mode demo* or `?mode=demo` | Bundled scenario | Stay on screen only, never saved |
-| **Live, view only** | Console: *Data live* + a quick role, or a Google account without a role. App: *Data live* or `?mode=live` | Firestore in realtime | Refused with a message |
-| **Live, operator** | Sign in with an operator account (email or Google) that has a role claim | Firestore in realtime | Saved, and checked by Firestore rules |
+| **Demo** | Konsol: *Data contoh* + peran cepat. Aplikasi: *Mode demo* atau `?mode=demo` | Skenario bawaan | Hanya tampil di layar, tidak pernah disimpan |
+| **Live, hanya lihat** | Konsol: *Data live* + peran cepat, atau akun Google tanpa peran. Aplikasi: *Data live* atau `?mode=live` | Firestore secara realtime | Ditolak dengan pesan |
+| **Live, operator** | Login dengan akun operator (email atau Google) yang punya role claim | Firestore secara realtime | Disimpan, dan dicek oleh rules Firestore |
 
-A badge on every screen shows which mode is active. Live never goes blank: the app falls back to the last cached data, then to bundled data, and says so in the header (*Offline · data tersimpan 14.05*).
+Badge di setiap layar menunjukkan mode yang sedang aktif. Mode live tidak pernah tampil kosong: aplikasi beralih ke data cache terakhir, lalu ke data bawaan, dan menyebutkannya di header (*Offline · data tersimpan 14.05*).
 
-**Operator access for a demo.** Demo and live view-only modes need no account and show every screen. To try a real write (for example switching an aid post to *Penuh*), contact the team through the [repository owner's GitHub profile](https://github.com/aarieffawwaz) and we will create an operator account for you. Credentials are never published in this repository. If you run your own copy, create operators with `npm run set-role`.
+**Akses operator untuk demo.** Mode demo dan mode live hanya lihat tidak butuh akun dan menampilkan semua layar. Untuk mencoba penulisan data sungguhan (misalnya mengubah status posko menjadi *Penuh*), hubungi tim lewat [profil GitHub pemilik repositori](https://github.com/aarieffawwaz), dan kami akan membuatkan akun operator untuk Anda. Kredensial tidak pernah dipublikasikan di repositori ini. Jika Anda menjalankan salinan sendiri, buat akun operator dengan `npm run set-role`.
 
 ## CI/CD
 
 <p align="center">
-  <img src="docs/readme/cicd.png" alt="Pull request build check, merge to production, tag to signed APK release" width="100%" />
+  <img src="docs/readme/cicd.png" alt="Build check untuk pull request, merge ke production, tag menjadi rilis APK bertanda tangan" width="100%" />
 </p>
 
-| Trigger | Workflow | What happens |
+| Pemicu | Workflow | Yang terjadi |
 |:-|:-|:-|
-| Pull request | [`deploy.yml`](.github/workflows/deploy.yml) | Flutter web build copied into `web/public/mobile-app`, then `vercel build` as a check. Nothing is uploaded |
-| Merge to `main` | [`deploy.yml`](.github/workflows/deploy.yml) | Same build, then `vercel deploy --prebuilt --prod` to production |
-| Tag `v*` | [`release-apk.yml`](.github/workflows/release-apk.yml) | Signed arm64 and armv7 APKs, `SHA256SUMS.txt`, GitHub Release with generated notes |
+| Pull request | [`deploy.yml`](.github/workflows/deploy.yml) | Build Flutter web disalin ke `web/public/mobile-app`, lalu `vercel build` dijalankan sebagai pengecekan. Tidak ada yang di-upload |
+| Merge ke `main` | [`deploy.yml`](.github/workflows/deploy.yml) | Build yang sama, lalu `vercel deploy --prebuilt --prod` ke production |
+| Tag `v*` | [`release-apk.yml`](.github/workflows/release-apk.yml) | APK arm64 dan armv7 bertanda tangan, `SHA256SUMS.txt`, dan GitHub Release dengan catatan rilis otomatis |
 
-PR previews were switched to build-only after they used up Vercel's free daily upload quota. To release the app, bump `version` in `app/pubspec.yaml`, then `git tag vX.Y.Z && git push --tags`; [/download](https://marketshield-inception.vercel.app/download) reads the latest release from the GitHub API.
+Preview PR diubah menjadi build saja setelah kuota upload harian gratis Vercel habis terpakai. Untuk merilis aplikasi, naikkan `version` di `app/pubspec.yaml`, lalu jalankan `git tag vX.Y.Z && git push --tags`; [/download](https://marketshield-inception.vercel.app/download) membaca rilis terbaru dari GitHub API.
 
-Repository secrets (names only): `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Vercel holds `FIREBASE_SERVICE_ACCOUNT`.
+Secret repositori (hanya nama): `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Vercel menyimpan `FIREBASE_SERVICE_ACCOUNT`.
 
-## Testing
+## Pengujian
 
-| Check | How | Result |
+| Pengecekan | Cara | Hasil |
 |:-|:-|:-|
-| Flutter | `flutter analyze`, `flutter test` | No issues; 7 tests pass (data mapping and widgets) |
-| Web | TypeScript strict, `npm run lint`, `npm run build` (also run on every PR) | Builds in CI |
-| Page audit | Playwright, 23 routes at 1440 px and 390 px | No console errors, no horizontal overflow, no broken images after three fixes |
-| Firestore rules, anonymous client | REST reads per collection | Public collections 200; `signals`, `reports`, `users` 403 |
-| Operator write, end to end | Posko coordinator signs in and changes *Posko Pronojiwo* | Firestore updated, then reverted |
-| Demo and live view-only | Same change in both modes | Demo stays on screen; view-only is refused; Firestore untouched |
-| Live API | All 7 GET endpoints in production | Served from Firestore; risk endpoint includes the model forecast |
-| Models | Held-out test sets, time split for the risk engine | See [Models](#models) |
-| APK integrity | SHA-256 per release | `SHA256SUMS.txt` in each release and on `/download` |
+| Flutter | `flutter analyze`, `flutter test` | Tidak ada issue; 7 test lulus (pemetaan data dan widget) |
+| Web | TypeScript strict, `npm run lint`, `npm run build` (juga dijalankan di setiap PR) | Build berhasil di CI |
+| Audit halaman | Playwright, 23 route di lebar 1440 px dan 390 px | Tidak ada error console, overflow horizontal, atau gambar rusak setelah tiga perbaikan |
+| Rules Firestore, klien anonim | Pembacaan REST per koleksi | Koleksi publik 200; `signals`, `reports`, `users` 403 |
+| Penulisan oleh operator, end to end | Koordinator posko login dan mengubah *Posko Pronojiwo* | Firestore berubah, lalu dikembalikan seperti semula |
+| Demo dan live hanya lihat | Perubahan yang sama di kedua mode | Demo hanya berubah di layar; mode hanya lihat ditolak; Firestore tidak tersentuh |
+| API live | Ketujuh endpoint GET di production | Disajikan dari Firestore; endpoint risiko menyertakan prakiraan model |
+| Model | Set uji terpisah (held-out), pembagian berdasarkan waktu untuk mesin risiko | Lihat [Model](#model) |
+| Integritas APK | SHA-256 per rilis | `SHA256SUMS.txt` di setiap rilis dan di `/download` |
 
-Commands, timestamps, sample responses and a screenshot gallery (Firebase, Earth Engine, Colab, Vercel, GitHub): [docs/EXECUTION_EVIDENCE.md](docs/EXECUTION_EVIDENCE.md).
+Perintah, timestamp, contoh respons, dan galeri screenshot (Firebase, Earth Engine, Colab, Vercel, GitHub): [docs/EXECUTION_EVIDENCE.md](docs/EXECUTION_EVIDENCE.md).
 
 <p align="center">
-  <img src="docs/evidence/firestore-semeru.webp" alt="Firestore: volcanoes/semeru with the published XGBoost forecast" width="49%" />
-  <img src="docs/evidence/firestore-rules.webp" alt="Deployed Firestore security rules" width="49%" />
-  <img src="docs/evidence/github-actions.webp" alt="GitHub Actions build checks and deploys" width="49%" />
-  <img src="docs/evidence/github-releases.webp" alt="Signed APK releases with SHA-256" width="49%" />
-  <img src="docs/evidence/colab-hoax.webp" alt="IndoBERT notebook in Colab" width="49%" />
-  <img src="docs/evidence/earthengine-codeeditor.webp" alt="Google Earth Engine Code Editor" width="49%" />
+  <img src="docs/evidence/firestore-semeru.webp" alt="Firestore: volcanoes/semeru dengan prakiraan XGBoost yang sudah diterbitkan" width="49%" />
+  <img src="docs/evidence/firestore-rules.webp" alt="Security rules Firestore yang sudah di-deploy" width="49%" />
+  <img src="docs/evidence/github-actions.webp" alt="Build check dan deploy di GitHub Actions" width="49%" />
+  <img src="docs/evidence/github-releases.webp" alt="Rilis APK bertanda tangan dengan SHA-256" width="49%" />
+  <img src="docs/evidence/colab-hoax.webp" alt="Notebook IndoBERT di Colab" width="49%" />
+  <img src="docs/evidence/earthengine-codeeditor.webp" alt="Code Editor Google Earth Engine" width="49%" />
 </p>
 
-## Security
+## Keamanan
 
-- **Roles are enforced by the database.** Firestore rules allow public reads only for reference data. Aid-post coordinators can change only status fields; `signals`, `reports` and `users` are private. Checked from an anonymous client: `volcanoes` 200, `signals` 403.
-- **The browser session is never trusted.** The console session in `localStorage` only controls the UI; every write is checked by Firestore against the ID token's custom claim.
-- **Least-privilege keys.** The API's service account has Datastore User and Firebase Auth Admin only; notebooks use a separate Datastore-only account. The browser key is restricted to the project's domains.
-- **Data minimisation (UU PDP 27/2022).** The hoax check stores label, confidence and trigger words, never the message text. The resident app works without an account.
-- **Secrets stay out of git.** Keys live in GitHub and Vercel secrets; `.env*`, keystores, `key.properties` and AI helper files are git-ignored. APKs from v1.0.1 are signed with a release key kept outside the repository.
+- **Peran ditegakkan oleh database.** Rules Firestore hanya mengizinkan pembacaan publik untuk data referensi. Koordinator posko hanya bisa mengubah field status; `signals`, `reports`, dan `users` bersifat privat. Sudah dicek dari klien anonim: `volcanoes` 200, `signals` 403.
+- **Sesi browser tidak pernah dipercaya.** Sesi konsol di `localStorage` hanya mengatur UI; setiap penulisan dicek oleh Firestore berdasarkan custom claim di ID token.
+- **Key dengan hak akses minimum.** Service account API hanya punya peran Datastore User dan Firebase Auth Admin; notebook memakai akun terpisah yang hanya punya akses Datastore. Key browser dibatasi untuk domain project.
+- **Minimisasi data (UU PDP 27/2022).** Cek hoaks hanya menyimpan label, tingkat keyakinan, dan kata pemicu; teks pesan tidak pernah disimpan. Aplikasi warga bisa dipakai tanpa akun.
+- **Secret tidak masuk ke git.** Key disimpan di secret GitHub dan Vercel; `.env*`, keystore, `key.properties`, dan file bantu AI di-git-ignore. APK mulai v1.0.1 ditandatangani dengan release key yang disimpan di luar repositori.
 
-Open items include per-post scoping for the `posko` role and a rate limit on `POST /signals/check`. The full self-assessment, including a notebook key that was exposed and disabled during development, is in [docs/SECURITY_SELF_ASSESSMENT.md](docs/SECURITY_SELF_ASSESSMENT.md). Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/aarieffawwaz/marketshield/security/advisories/new).
+Hal yang masih terbuka antara lain pembatasan peran `posko` per posko dan rate limit pada `POST /signals/check`. Self-assessment lengkap, termasuk key notebook yang sempat terekspos lalu dinonaktifkan selama pengembangan, ada di [docs/SECURITY_SELF_ASSESSMENT.md](docs/SECURITY_SELF_ASSESSMENT.md). Laporkan kerentanan secara privat lewat [GitHub Security Advisories](https://github.com/aarieffawwaz/marketshield/security/advisories/new).
 
-## Known limitations
+## Keterbatasan saat ini
 
-- **Seeded operational data.** Villages, aid posts, prices, alerts and intel are realistic demo records in Firestore. They are not yet fed by BPBD or market surveys.
-- **The risk target is a proxy.** The risk engine predicts NASA FIRMS thermal activity within 5 km of the summit in the next 7 days, because PVMBG level history is not machine-readable. It is not the PVMBG alert level, and without seismic data a sudden eruption can be missed. PVMBG stays the official reference.
-- **Models run offline.** The risk engine and IndoBERT are trained and evaluated in `ml/`, and the forecast is published to Firestore with a script. The 6-hourly schedule is not set up yet, and the message check in the API and app still uses the rule-based classifier.
-- **The hoax dataset is news-style.** Real WhatsApp messages are shorter and messier; the 40-message probe set was written by the team and is a sanity check only.
-- **One volcano in depth.** Semeru has full detail (villages, posts, risk); the other 24 mapped volcanoes have hazard rings only.
-- **No push notifications yet.** Broadcasts appear in the console and the app feed; FCM delivery is planned.
-- **The price report form in the app is UI only.** Reports are not sent to the server yet.
-- **Android only for the native app.** iOS and the Play Store are planned. v1.0.0 was signed with a debug key; later releases use the release key, so v1.0.0 testers reinstall once.
-- **Non-commercial imagery.** EOX Sentinel-2 cloudless (CC BY-NC-SA 4.0) and the Earth Engine registration are non-commercial; a paid service needs commercial imagery and an Earth Engine commercial licence.
-- **Self-assessed security.** No third-party audit; open findings are listed in [the self-assessment](docs/SECURITY_SELF_ASSESSMENT.md#4-findings).
+- **Data operasional masih data seed.** Desa, posko, harga, peringatan, dan intel adalah data demo realistis di Firestore. Data ini belum diisi dari BPBD atau survei pasar.
+- **Target risiko adalah proksi.** Mesin risiko memprediksi aktivitas termal NASA FIRMS dalam radius 5 km dari puncak dalam 7 hari ke depan, karena riwayat level PVMBG tidak bisa dibaca mesin. Target ini berbeda dari level status PVMBG, dan tanpa data seismik, erupsi mendadak bisa terlewat. PVMBG tetap menjadi acuan resmi.
+- **Model dijalankan offline.** Mesin risiko dan IndoBERT dilatih dan dievaluasi di `ml/`, lalu prakiraannya diterbitkan ke Firestore lewat script. Jadwal otomatis tiap 6 jam belum dipasang, dan cek pesan di API dan aplikasi masih memakai classifier berbasis aturan.
+- **Dataset hoaks bergaya berita.** Pesan WhatsApp asli lebih pendek dan lebih berantakan; set probe 40 pesan ditulis oleh tim dan hanya berfungsi sebagai sanity check.
+- **Baru satu gunung yang lengkap.** Semeru punya detail lengkap (desa, posko, risiko); 24 gunung lain yang dipetakan baru punya cincin bahaya.
+- **Belum ada push notification.** Siaran muncul di konsol dan feed aplikasi; pengiriman lewat FCM sudah direncanakan.
+- **Formulir laporan harga di aplikasi baru sebatas UI.** Laporan belum dikirim ke server.
+- **Aplikasi native baru tersedia untuk Android.** iOS dan Play Store sudah direncanakan. v1.0.0 ditandatangani dengan debug key; rilis setelahnya memakai release key, jadi penguji v1.0.0 perlu memasang ulang satu kali.
+- **Citra non-komersial.** EOX Sentinel-2 cloudless (CC BY-NC-SA 4.0) dan pendaftaran Earth Engine bersifat non-komersial; layanan berbayar butuh citra komersial dan lisensi komersial Earth Engine.
+- **Keamanan dinilai sendiri.** Belum ada audit dari pihak ketiga; temuan yang masih terbuka tercantum di [self-assessment](docs/SECURITY_SELF_ASSESSMENT.md#4-findings).
 
 ## Roadmap
 
-1. Schedule the Earth Engine feature pipeline and the risk model every 6 hours (GitHub Actions and a service account).
-2. Serve the fine-tuned IndoBERT model behind `/api/v1/signals/check`, keeping the same response contract.
-3. FCM push notifications, sent in cohorts so broadcasts do not trigger panic buying.
-4. Pilot with one village on Semeru's slopes and BPBD Lumajang (proposed: Kecamatan Candipuro), with real aid-post and price data; measure a baseline before claiming impact.
-5. Retrain the risk engine on official escalations once machine-readable PVMBG level history is available.
-6. Play Store release (PSE registration under PP 71/2019) and an iOS build, then the next volcanoes.
-7. **SAR-Vault (research idea, not built):** an IoT supply box with a smart lock for distribution without hoarding.
+1. Menjadwalkan pipeline fitur Earth Engine dan model risiko setiap 6 jam (GitHub Actions dan service account).
+2. Menyajikan model IndoBERT hasil fine-tuning di balik `/api/v1/signals/check` dengan kontrak respons yang sama.
+3. Push notification lewat FCM, dikirim per kelompok agar siaran tidak memicu panic buying.
+4. Pilot dengan satu desa di lereng Semeru dan BPBD Lumajang (usulan: Kecamatan Candipuro), dengan data posko dan harga sungguhan; mengukur baseline sebelum mengklaim dampak.
+5. Melatih ulang mesin risiko dengan data eskalasi resmi setelah riwayat level PVMBG tersedia dalam format yang bisa dibaca mesin.
+6. Rilis di Play Store (pendaftaran PSE sesuai PP 71/2019) dan build iOS, lalu menambah gunung api berikutnya.
+7. **SAR-Vault (ide riset, belum dibuat):** kotak logistik IoT dengan kunci pintar untuk distribusi tanpa penimbunan.
 
-## Team
+## Tim
 
 **BRAIN – Ayam Jago**, BINUS University
 
-| Member | Role | Worked on |
+| Anggota | Peran | Yang dikerjakan |
 |:-|:-|:-|
-| Hansel Mitchell T. | Data and AI engineer | Google Earth Engine pipeline, risk engine, IndoBERT |
-| Aarief Fawwaz S. | Mobile and cloud engineer | Flutter app, Next.js console and API, Firebase, deployment |
+| Hansel Mitchell T. | Data dan AI engineer | Pipeline Google Earth Engine, mesin risiko, IndoBERT |
+| Aarief Fawwaz S. | Mobile dan cloud engineer | Aplikasi Flutter, konsol dan API Next.js, Firebase, deployment |
 
-## Credits and third-party licences
+## Kredit dan lisensi pihak ketiga
 
-The full declaration, with licences for every dataset, map service, photo, 3D model, font and library, is in **[docs/AI_USE_AND_THIRD_PARTY.md](docs/AI_USE_AND_THIRD_PARTY.md)**. In short:
+Deklarasi lengkap, dengan lisensi untuk setiap dataset, layanan peta, foto, model 3D, font, dan library, ada di **[docs/AI_USE_AND_THIRD_PARTY.md](docs/AI_USE_AND_THIRD_PARTY.md)**. Ringkasnya:
 
-**AI inside the product**
+**AI di dalam produk**
 
-| Component | Model | Status |
+| Komponen | Model | Status |
 |:-|:-|:-|
-| Risk engine | XGBoost + SHAP, trained by the team on Earth Engine features for 25 volcanoes (2019–2026); target is NASA FIRMS thermal activity in the next 7 days | ROC-AUC 0.899 vs 0.784 baseline on 2024–2026; forecast in `volcanoes/{id}.forecast` |
-| Hoax filter | IndoBERT (`indobenchmark/indobert-base-p1`, MIT) fine-tuned by the team on `mzuama/IndonesianHoaxdetection` plus 60 team-written short disaster messages | 98.4 % test accuracy, 90 % on a 40-message probe set; not served yet |
-| Rule-based classifier | Trigger phrases and satellite cross-check (`web/src/lib/classify.ts`) | In production |
+| Mesin risiko | XGBoost + SHAP, dilatih oleh tim dengan fitur Earth Engine untuk 25 gunung api (2019–2026); targetnya aktivitas termal NASA FIRMS dalam 7 hari ke depan | ROC-AUC 0,899 dibanding baseline 0,784 pada 2024–2026; prakiraan disimpan di `volcanoes/{id}.forecast` |
+| Filter hoaks | IndoBERT (`indobenchmark/indobert-base-p1`, MIT) yang di-fine-tune oleh tim dengan `mzuama/IndonesianHoaxdetection` ditambah 60 pesan bencana pendek yang ditulis tim | Akurasi uji 98,4%, 90% pada set probe 40 pesan; belum disajikan di production |
+| Classifier berbasis aturan | Frasa pemicu dan cek silang satelit (`web/src/lib/classify.ts`) | Dipakai di production |
 
-**AI used to build the product**
+**AI yang dipakai untuk membangun produk**
 
-| Tool | Used for |
+| Tool | Dipakai untuk |
 |:-|:-|
-| Claude Code (Anthropic) | Writing and refactoring code for the website, console, API, Flutter app and CI; debugging; automated browser checks; writing documentation and drawing its diagrams. The team reviewed, tested and merged every change through pull requests. |
+| Claude Code (Anthropic) | Menulis dan me-refactor kode untuk situs, konsol, API, aplikasi Flutter, dan CI; debugging; pengecekan browser otomatis; menulis dokumentasi dan menggambar diagramnya. Tim meninjau, menguji, dan me-merge setiap perubahan lewat pull request. |
 
-**Third-party data, services and assets**
+**Data, layanan, dan aset pihak ketiga**
 
-- **Satellite and geospatial data:** Google Earth Engine catalogue (Sentinel-1, Sentinel-2, Sentinel-5P, NASA FIRMS, MODIS, Landsat 9, GPM IMERG, NOAA GFS, Copernicus DEM, WorldPop, ESA WorldCover).
-- **Official information:** PVMBG / MAGMA Indonesia volcano levels; government price caps (HET).
-- **Map tiles:** Sentinel-2 cloudless by EOX (CC BY-NC-SA 4.0, non-commercial), AWS Terrain Tiles, Esri basemaps, © OpenStreetMap contributors (ODbL), Natural Earth.
-- **Photos:** Wikimedia Commons and BNPB, each with author and licence in [`web/src/lib/photo-credits.json`](web/src/lib/photo-credits.json) and on [/kredit](https://marketshield-inception.vercel.app/kredit).
-- **3D models:** NVIDIA SimReady Assets (CC BY 4.0).
-- **Logos:** agency and brand marks identify data sources and target users only; no partnership is implied. Brand icons from Simple Icons (CC0).
-- **Fonts:** Poppins, Geist, Geist Mono and Google Fonts in the app (SIL Open Font License 1.1).
-- **Open-source libraries:** MIT, Apache-2.0, BSD or ISC licensed, plus GSAP under its own free standard licence.
+- **Data satelit dan geospasial:** katalog Google Earth Engine (Sentinel-1, Sentinel-2, Sentinel-5P, NASA FIRMS, MODIS, Landsat 9, GPM IMERG, NOAA GFS, Copernicus DEM, WorldPop, ESA WorldCover).
+- **Informasi resmi:** level gunung api dari PVMBG / MAGMA Indonesia; harga eceran tertinggi pemerintah (HET).
+- **Tile peta:** Sentinel-2 cloudless oleh EOX (CC BY-NC-SA 4.0, non-komersial), AWS Terrain Tiles, Esri basemaps, © kontributor OpenStreetMap (ODbL), Natural Earth.
+- **Foto:** Wikimedia Commons dan BNPB, masing-masing dengan nama pembuat dan lisensinya di [`web/src/lib/photo-credits.json`](web/src/lib/photo-credits.json) dan di [/kredit](https://marketshield-inception.vercel.app/kredit).
+- **Model 3D:** NVIDIA SimReady Assets (CC BY 4.0).
+- **Logo:** logo lembaga dan merek hanya dipakai untuk menunjukkan sumber data dan target pengguna; tidak ada kemitraan yang tersirat. Ikon merek dari Simple Icons (CC0).
+- **Font:** Poppins, Geist, Geist Mono, dan Google Fonts di aplikasi (SIL Open Font License 1.1).
+- **Library open-source:** berlisensi MIT, Apache-2.0, BSD, atau ISC, ditambah GSAP dengan lisensi standar gratisnya sendiri.
 
-## Documentation
+## Dokumentasi
 
-| Document | Contents |
+| Dokumen | Isi |
 |:-|:-|
-| [Technical documentation](docs/TECHNICAL_DOCUMENTATION.md) | Architecture and decisions, app, console, backend, data model, models, deployment, operations |
-| [API reference](docs/API.md) | Every endpoint with parameters and sample responses |
-| [ML report](ml/README.md) | Training data, method, results and reproduction for both models |
-| [Security self-assessment](docs/SECURITY_SELF_ASSESSMENT.md) | Threat model, controls, findings and their status |
-| [Execution evidence](docs/EXECUTION_EVIDENCE.md) | What was run, when, what it returned, and a screenshot gallery |
-| [AI use and third parties](docs/AI_USE_AND_THIRD_PARTY.md) | Full declaration with licences |
-| [Firestore schema](firebase/SCHEMA.md) · [ML data contract](firebase/ML-CONTRACT.md) | Collections, fields and roles; how notebooks write |
-| [Changelog](CHANGELOG.md) | Release history |
+| [Dokumentasi teknis](docs/TECHNICAL_DOCUMENTATION.md) | Arsitektur dan keputusan, aplikasi, konsol, backend, model data, model, deployment, operasional |
+| [Referensi API](docs/API.md) | Semua endpoint beserta parameter dan contoh respons |
+| [Laporan ML](ml/README.md) | Data latih, metode, hasil, dan cara mereproduksi kedua model |
+| [Self-assessment keamanan](docs/SECURITY_SELF_ASSESSMENT.md) | Threat model, kontrol, temuan, dan statusnya |
+| [Bukti eksekusi](docs/EXECUTION_EVIDENCE.md) | Apa yang dijalankan, kapan, hasilnya, dan galeri screenshot |
+| [Penggunaan AI dan pihak ketiga](docs/AI_USE_AND_THIRD_PARTY.md) | Deklarasi lengkap dengan lisensi |
+| [Skema Firestore](firebase/SCHEMA.md) · [Kontrak data ML](firebase/ML-CONTRACT.md) | Koleksi, field, dan peran; cara notebook menulis data |
+| [Changelog](CHANGELOG.md) | Riwayat rilis |
 
-## License
+## Lisensi
 
-Source code: all rights reserved by the team until an open-source licence is chosen. Third-party data, photos, models and libraries keep their own licences (see [Credits and third-party licences](#credits-and-third-party-licences)).
+Kode sumber: seluruh hak dimiliki oleh tim sampai lisensi open-source dipilih. Data, foto, model, dan library pihak ketiga tetap memakai lisensinya masing-masing (lihat [Kredit dan lisensi pihak ketiga](#kredit-dan-lisensi-pihak-ketiga)).
