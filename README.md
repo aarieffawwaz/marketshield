@@ -44,7 +44,7 @@ MarketShield is a disaster-readiness system for communities around Indonesia's a
 | **3D map and eruption simulation** | <https://marketshield-inception.vercel.app/embed/peta?sim=1> |
 | **Public API** | <https://marketshield-inception.vercel.app/api/v1/volcanoes> · [API reference](docs/API.md) |
 | **System status** | <https://marketshield-inception.vercel.app/status>: live checks from your browser every 30 seconds |
-| **Demo video** | ⟨link video demo⟩ |
+| **Demo video** | https://youtu.be/oceCSCnBmjg |
 | **Technical documentation** | [docs/TECHNICAL_DOCUMENTATION.md](docs/TECHNICAL_DOCUMENTATION.md) |
 
 ## Preview
