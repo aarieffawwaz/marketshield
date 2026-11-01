@@ -571,7 +571,7 @@ Open items include per-post scoping for the `posko` role and a rate limit on `PO
 
 | Member | Role | Worked on |
 |:-|:-|:-|
-| Hansel Mitchell T. | Team lead, data and AI engineer | Google Earth Engine pipeline, risk engine, IndoBERT |
+| Hansel Mitchell T. | Data and AI engineer | Google Earth Engine pipeline, risk engine, IndoBERT |
 | Aarief Fawwaz S. | Mobile and cloud engineer | Flutter app, Next.js console and API, Firebase, deployment |
 
 ## Credits and third-party licences
